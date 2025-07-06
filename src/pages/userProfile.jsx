@@ -7,11 +7,11 @@ const UserProfile = () => {
   const [services, setServices] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [servicePage,setServicePage]=useState(1);
-  const[reviewPage,setReviewsPage]=useState(1);
+  const [servicePage, setServicePage] = useState(1);
+  const [reviewPage, setReviewsPage] = useState(1);
 
-  const servicePerPage=3;
-  const reviewPerPage=3;
+  const servicePerPage = 3;
+  const reviewPerPage = 3;
   const BACKEND_URL = "http://localhost:3000/api";
   const userId = 1;
 
@@ -37,6 +37,8 @@ const UserProfile = () => {
           name: `${userData.firstName} ${userData.lastName}`,
           email: userData.email,
           image: userData.image,
+          isVerified: userData.isVerified,
+          createdAt: userData.createdAt,
         });
       }
       setServices(serviceRes.data.userService || []);
@@ -48,13 +50,11 @@ const UserProfile = () => {
     }
   };
 
+  // Define the pagination Logic
+  const totalServicesPages = Math.ceil(services.length / servicePerPage);
+  const totalReviewPages = Math.ceil(reviews.length / reviewPerPage);
 
-    // Define the pagination Logic 
-    const totalServicesPages=Math.ceil(services.length/servicePerPage);
-    const totalReviewPages=Math.ceil(reviews.length/reviewPerPage);
-   
-   
-    const currentServices = services.slice(
+  const currentServices = services.slice(
     (servicePage - 1) * servicePerPage,
     servicePage * servicePerPage
   );
@@ -63,7 +63,7 @@ const UserProfile = () => {
     (reviewPage - 1) * reviewPerPage,
     reviewPage * reviewPerPage
   );
-    if (loading) return <div className="text-center mt-10">Loading...</div>;
+  if (loading) return <div className="text-center mt-10">Loading...</div>;
   if (!user)
     return (
       <div className="text-center mt-10 text-red-500">
@@ -72,20 +72,46 @@ const UserProfile = () => {
     );
 
   return (
+    // Profile Section
     <div className="max-w-3xl mx-auto p-4 space-y-6">
-      <div className="bg-white p-6 rounded-xl shadow-md flex items-center space-x-6">
+      <div className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl shadow-md flex items-center space-x-6 hover:shadow-3xl transition transform hover:scale-[1.01]">
         <img
-          src={user.image || "/avatar.png"}
+          src={user.image || "../assets/avatar.png"}
           alt="Profile"
-          className="w-24 h-24 rounded-full object-cover"
+          className="w-28 h-28 rounded-full object-cover border-4 border-blue-200 shadow"
         />
-        <div>
-          <h2 className="text-2xl font-bold">Name: {user.name}</h2>
-          <p className="text-gray-600">Email: {user.email}</p>
+
+        <div className="flex-1 space-y-2">
+          <h2 className="text-3xl font-extrabold text-blue-800">{user.name}</h2>
+
+          <div className="text-gray-600">
+            <p className="flex items-center">
+              <span className="font-semibold w-24">Email:</span>
+              <span>{user.email}</span>
+            </p>
+
+            <p className="flex items-center">
+              <span className="font-semibold w-24">Verified:</span>
+              <span
+                className={
+                  user.isVerified
+                    ? "text-green-600 font-medium"
+                    : "text-red-500"
+                }
+              >
+                {user.isVerified ? "Yes" : "No"}
+              </span>
+            </p>
+
+            <p className="flex items-center">
+              <span className="font-semibold w-24">Joined:</span>
+              <span>{new Date(user.createdAt).toLocaleDateString()}</span>
+            </p>
+          </div>
         </div>
       </div>
-     
-    {/* Services */}
+
+      {/* Services */}
       <div className="bg-white p-6 rounded-xl shadow-md">
         <h3 className="text-2xl font-semibold mb-4 text-blue-700">Services</h3>
         {services.length === 0 ? (
@@ -98,13 +124,6 @@ const UserProfile = () => {
                   key={service.id}
                   className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50"
                 >
-                  {service.image && (
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      className="h-40 w-full object-cover mb-3 rounded"
-                    />
-                  )}
                   <h4 className="font-bold text-lg mb-1 text-blue-700">
                     {service.title}
                   </h4>
@@ -131,24 +150,45 @@ const UserProfile = () => {
         )}
       </div>
 
-       {/* Reviews Section! */}
-          <div className="bg-white p-6 rounded-xl shadow-xl">
-        <h3 className="text-xl font-semibold mb-4 text-blue-700">Reviews</h3>
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        <h3 className="text-2xl font-semibold mb-4 text-blue-700">Reviews</h3>
+
         {reviews.length === 0 ? (
           <p className="text-gray-500">No reviews yet.</p>
         ) : (
           <>
-            <ul className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {currentReviews.map((review) => (
-                <li key={review.id} className="border p-3 rounded-lg shadow hover:shadow-md transition">
-                  <p className="font-medium">{review.reviewName}</p>
-                  <p className="text-gray-700">{review.comment}</p>
-                  <div className="text-yellow-500">
-                    Rating: {review.rating} / 5
+                <div
+                  key={review.id}
+                  className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50 flex flex-col h-full"
+                >
+                  <div className="mb-2">
+                    <h4 className="font-semibold text-blue-700 text-lg">
+                      {review.service?.title || "Service Not Found"}
+                    </h4>
+
+                    <a
+                      href={`/service/${review.service?.id}`}
+                      className="text-blue-500 underline text-sm hover:text-blue-700"
+                    >
+                      View Service
+                    </a>
                   </div>
-                </li>
+
+                  <p className="mt-3 text-gray-700 flex-grow">{review.body}</p>
+
+                  <div className="mt-4 flex justify-between items-center">
+                    <div className="text-yellow-500 font-medium">
+                      ⭐ {review.rating} / 5
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
 
             <div className="flex justify-center mt-6">
               <Pagination

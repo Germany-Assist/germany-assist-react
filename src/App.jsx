@@ -8,9 +8,7 @@ function App() {
 
   return (
     <>
-    <h1>Hello I am Muna</h1>
-      {/* <Signup />
-      <Login />  */}
+ 
       <UserProfile/>
    
     </>
