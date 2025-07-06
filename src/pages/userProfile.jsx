@@ -8,7 +8,7 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
 
   const BACKEND_URL = "http://localhost:3000/api";
-  const userId = 1; 
+  const userId = 1;
 
   useEffect(() => {
     fetchAllData();
@@ -44,13 +44,18 @@ const UserProfile = () => {
   };
 
   if (loading) return <div className="text-center mt-10">Loading...</div>;
-  if (!user) return <div className="text-center mt-10 text-red-500">Failed to load user info.</div>;
+  if (!user)
+    return (
+      <div className="text-center mt-10 text-red-500">
+        Failed to load user info.
+      </div>
+    );
 
   return (
     <div className="max-w-3xl mx-auto p-4 space-y-6">
       <div className="bg-white p-6 rounded-xl shadow-md flex items-center space-x-6">
         <img
-          src={user.image || "/avatar.png"}  // Use 'public/avatar.png' for fallback
+          src={user.image || "/avatar.png"}
           alt="Profile"
           className="w-24 h-24 rounded-full object-cover"
         />
@@ -59,20 +64,37 @@ const UserProfile = () => {
           <p className="text-gray-600">Email: {user.email}</p>
         </div>
       </div>
-
-      <div className="bg-white p-4 rounded-xl shadow-md">
-        <h3 className="text-xl font-semibold mb-4">Services</h3>
+      {/* Services */}
+      <div className="bg-white p-6 rounded-xl shadow-2xl">
+        <h3 className="text-2xl font-semibold mb-4 text-blue-700">Services</h3>
         {services.length === 0 ? (
-          <p className="text-gray-500">No Services added yet..</p>
+          <p className="text-gray-500">No Services added yet.</p>
         ) : (
-          <ul className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {services.map((service) => (
-              <li key={service.id} className="p-3 bg-gray-50">
-                <h4 className="font-medium">{service.title}</h4>
-                <p className="text-gray-600">{service.description}</p>
-              </li>
+              <div
+                key={service.id}
+               className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50"
+              >
+                {service.image && (
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    className="h-40 w-full object-cover mb-3 rounded"
+                  />
+                )}
+                <h4 className="font-bold text-lg mb-1 text-blue-700">{service.title}</h4>
+                <p className="text-gray-600 mb-2">{service.description}</p>
+                <div className="flex justify-between text-sm text-gray-900">
+                  <span>Type: {service.type}</span>
+                  <span >Price: ${service.price}</span>
+                </div>
+                <div className="mt-2 text-yellow-500">
+                  ⭐ {service.rating} / 5 ({service.total_reviews} reviews)
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 
@@ -86,7 +108,9 @@ const UserProfile = () => {
               <li key={review.id} className="border p-3 rounded-lg">
                 <p className="font-medium">{review.reviewName}</p>
                 <p className="text-gray-700">{review.comment}</p>
-                <div className="text-yellow-500">Rating: {review.rating} / 5</div>
+                <div className="text-yellow-500">
+                  Rating: {review.rating} / 5
+                </div>
               </li>
             ))}
           </ul>
