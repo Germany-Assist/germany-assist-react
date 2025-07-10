@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-function serviceDetails() {
+import ServiceInfo from "./ServiceInfo";
+const serviceDetails=()=> {
   const { serviceId } = useParams();
   const [service, setService] = useState("");
   const [loading, setLoading] = useState(true);
