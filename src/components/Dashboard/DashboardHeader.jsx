@@ -1,4 +1,4 @@
-import React from 'react';
+import { Link } from 'react-router-dom';
 
 const DashboardHeader = () => {
   return (
@@ -9,7 +9,7 @@ const DashboardHeader = () => {
           "url('https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1600&q=80')",
       }}
     >
-      {/* Removed the blur wrapper */}
+ 
       <div className="px-8 py-6">
         <div className="flex justify-between items-center border-b border-gray-200 pb-4">
           <div className="flex items-center">
@@ -27,9 +27,11 @@ const DashboardHeader = () => {
             <a href="/courses" className="text-black hover:text-blue-700 text-base">Courses</a>
             <a href="/pages" className="text-black hover:text-blue-700 text-base">Pages</a>
             <a href="/contact" className="text-black hover:text-blue-700 text-base">Contact</a>
+          <Link to="/signup">
             <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-base">
               Sign Up
             </button>
+            </Link>
           </nav>
         </div>
 
