@@ -2,18 +2,38 @@
 import './App.css'
 import Signup from "./pages/signup";
 import Login from './pages/login';
+import UserProfile from './pages/userProfile';
+import DashboardHeader from './components/Dashboard/DashboardHeader';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import {ServiceList} from './components/Services/serviceList.jsx';
 function App() {
 
 
   return (
     <>
-    <h1>Hello I am Muna</h1>
-      <Signup />
-      <Login /> 
-      <div className="bg-blue-500 text-white p-4 w-300">
-      Tailwind Test Works!
-    </div>
+   
+     <Router>
+      <Routes>
+        <Route path="/"  element={
+          <>
+        <DashboardHeader/>
+          <div id="services">
+        <ServiceList />
+      </div>
+        </>
+        }></Route>
+        <Route path="/signup" element={<Signup/>}></Route>
+        <Route path="/services" element={<ServiceList/>}></Route>
+        <Route path="/userProfile" element={<UserProfile/>}></Route>
+      </Routes>
+     </Router>
+
+
+     
+     
     </>
+    
   )
 }
 
