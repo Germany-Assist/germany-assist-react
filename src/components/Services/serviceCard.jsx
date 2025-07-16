@@ -1,4 +1,4 @@
-import React from "react";
+
 import { StarIcon } from "@heroicons/react/solid";
 export const serviceCard = ({ service }) => {
   return (

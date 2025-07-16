@@ -1,5 +1,5 @@
-import Services from "../models/services.js";
-const data = [
+
+const services  = [
   // CodeMaster Academy (providersProfileId: 1) - 4 services
   {
     title: "Full Stack Web Development Bootcamp",
@@ -250,6 +250,4 @@ const data = [
     image: null,
   },
 ];
-export default async function servicesSeed() {
-  await Services.bulkCreate(data);
-}
+
