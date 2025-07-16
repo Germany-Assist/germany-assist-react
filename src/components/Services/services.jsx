@@ -1,5 +1,5 @@
 
-const services  = [
+export const services  = [
   // CodeMaster Academy (providersProfileId: 1) - 4 services
   {
     title: "Full Stack Web Development Bootcamp",
