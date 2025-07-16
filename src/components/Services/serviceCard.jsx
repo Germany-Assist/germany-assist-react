@@ -1,12 +1,11 @@
-
-import { StarIcon } from "@heroicons/react/solid";
-export const serviceCard = ({ service }) => {
+import { StarIcon } from "@heroicons/react/24/solid";
+export const ServiceCard = ({ service }) => {
   return (
     <div className="max-w-screen rounded overflow-hidden shadow-lg bg-white  hover:shadow-xl transition-shadow duration-300">
       <img
         className="w-full h-8 object-cover"
         src={service.img}
-        alt={service.title}
+        // alt={service.title}
         onError={(e) => {
           e.target.src =
             "https://via.placeholder.com/400x200?text=Service+Image";
