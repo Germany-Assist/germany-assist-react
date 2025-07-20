@@ -2,6 +2,7 @@
 import './App.css'
 import Signup from "./pages/signup";
 import Login from './pages/login';
+import UserProfile from './pages/userProfile';
 import DashboardHeader from './components/Dashboard/DashboardHeader';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
@@ -11,6 +12,7 @@ function App() {
 
   return (
     <>
+    <UserProfile/>
     {/* <DashboardHeader/>
      */}
      <Router>
