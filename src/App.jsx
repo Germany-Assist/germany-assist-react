@@ -5,6 +5,7 @@ import Login from './pages/login';
 import DashboardHeader from './components/Dashboard/DashboardHeader';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
+import {ServiceList} from './components/Services/serviceList.jsx';
 function App() {
 
 
