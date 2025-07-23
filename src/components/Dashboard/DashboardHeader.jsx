@@ -24,9 +24,9 @@ const DashboardHeader = () => {
           <nav className="flex items-center space-x-6">
             <a href="/" className="text-black hover:text-blue-700 text-base">Home</a>
             <a href="/about" className="text-black hover:text-blue-700 text-base">About</a>
-            <a href="/courses" className="text-black hover:text-blue-700 text-base">Courses</a>
+            <a href="#services" className="text-black hover:text-blue-700 text-base">Services</a>
             <a href="/pages" className="text-black hover:text-blue-700 text-base">Pages</a>
-            <a href="/contact" className="text-black hover:text-blue-700 text-base">Contact</a>
+            <a href="/userProfile" className="text-black hover:text-blue-700 text-base">Profile</a>
           <Link to="/signup">
             <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-base">
               Sign Up
