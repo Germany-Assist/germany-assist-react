@@ -23,7 +23,7 @@ const UserProfile = () => {
     try {
       const [userRes, serviceRes, reviewRes] = await Promise.all([
         axios.get(`${BACKEND_URL}/user/${userId}`, {
-          params: { password: "password123" },
+          // params: { password: "password#D3" },
         }),
         axios.get(`${BACKEND_URL}/service/${userId}`),
         axios.get(`${BACKEND_URL}/review/${userId}`),
