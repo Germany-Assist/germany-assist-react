@@ -7,6 +7,7 @@ import DashboardHeader from './components/Dashboard/DashboardHeader';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import {ServiceList} from './components/Services/serviceList.jsx';
+import ServiceDetails from './components/Services/ServiceDetails.jsx';
 function App() {
 
 
@@ -26,6 +27,7 @@ function App() {
         <Route path="/signup" element={<Signup/>}></Route>
         <Route path="/services" element={<ServiceList/>}></Route>
         <Route path="/userProfile" element={<UserProfile/>}></Route>
+        <Route path="/serviceDetails/:slug" element={<ServiceDetails/>}></Route>
       </Routes>
      </Router>
 
