@@ -4,28 +4,28 @@ export const reviews = [
   // Reviews for CodeMaster Academy services (serviceId 1-4)
   {
     body: "This bootcamp completely changed my career trajectory! The instructors were knowledgeable and the projects were relevant to real-world work.",
-    userId: 1,
+    userId: "Ahmad ALi",
     providersProfileId: 1,
     rating: 5,
     serviceId: 3,
   },
   {
     body: "Great content but the pace was too fast for complete beginners. Would benefit from more TA support.",
-    userId: 2,
+    userId: "Omar Rami",
     providersProfileId: 1,
     rating: 4,
     serviceId: 3,
   },
   {
     body: "The Python course was excellent. I went from zero to building my first ML model in 8 weeks!",
-    userId: 3,
+    userId: "Mohammad Omar",
     providersProfileId: 1,
     rating: 5,
     serviceId: 3,
   },
   {
     body: "Good introduction to data science concepts, but the final project could be more challenging.",
-    userId: 4,
+    userId: "Ali Mahmoud",
     providersProfileId: 1,
     rating: 4,
     serviceId: 3,
