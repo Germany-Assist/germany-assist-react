@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-
-import CommentSection from "../comments/CommentSection";
-import ServiceInfo from "./ServiceInfo.jsx";
-import { reviews as fetchReviews } from "../comments/reviews.jsx";
+import { reviews as fetchReviews } from "../Reviews/reviews.jsx";
 import { services } from "./services.jsx";
 import { slugify } from "./utils.jsx";
+import {ReviewSection} from "../Reviews/ReviewSection.jsx"
 function ServiceDetails() {
   const { slug } = useParams();
 
@@ -13,7 +11,6 @@ function ServiceDetails() {
   const [loading, setLoading] = useState(true);
   const [error] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [newReview, setNewReview] = useState("");
 
   useEffect(() => {
     const foundService = services.find((s) => slugify(s.title) === slug);
@@ -30,21 +27,7 @@ function ServiceDetails() {
     }
   }, [slug]);
 
-  const handleAddServiceReview = () => {
-    if (newReview.trim()) {
-      setReviews((prev) => [
-        ...prev,
-        {
-          body: newReview,
-          rating: service.rating,
-          userId: 1,
-          serviceSlug: slug,
-        },
-      ]);
 
-      setNewReview("");
-    }
-  };
   const defaultImage =
     "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60";
 
@@ -57,7 +40,7 @@ function ServiceDetails() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <h1 className=" text-3xl  text-blue-700 p-8 mb-10 ">Service Details</h1>
+      <h1 className=" text-3xl  text-blue-800 p-8 mb-10 font-bold">Service Details</h1>
       <div className="flex flex-col md:flex-row gap-12 items-start">
         {/* Service Image */}
         <div className="md:w-1/2">
@@ -83,15 +66,15 @@ function ServiceDetails() {
 
       <hr className="my-6 " />
 
-      <h3 className="text-xl font-bold mb-4 text-blue-800">Reviews:</h3>
+      <h3 className="text-3xl font-bold mb-4 text-blue-800">Reviews:</h3>
       {reviews.length === 0 ? (
         <p className="text-gray-500">No reviews yet.</p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-3 ">
           {reviews.map((r, i) => (
             <li
               key={i}
-              className="border border-gray-200 rounded-xl bg-white p-4  shadow-sm"
+              className="border border-gray-200 rounded-xl bg-blue-50 p-4  shadow-sm"
             >
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 font-semibold text-blue-700 w-1/4">
@@ -111,22 +94,10 @@ function ServiceDetails() {
           ))}
         </ul>
       )}
-
-      <div className="mt-6">
-        <h4 className="text-lg font-semibold mb-2">Leave a Review</h4>
-        <textarea
-          value={newReview}
-          onChange={(e) => setNewReview(e.target.value)}
-          className="w-full border border-gray-300 rounded p-2 mb-2"
-          placeholder="Write your review here..."
-        />
-        <button
-          onClick={handleAddServiceReview}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Submit Review
-        </button>
-      </div>
+       <div className="mt-12 rounded-xl shadow:xl ">
+        <ReviewSection  serviceId={services.id}/>
+       </div>
+      
     </div>
   );
 }
