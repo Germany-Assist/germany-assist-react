@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import CommentSection from "../comments/CommentSection";
 import ServiceInfo from "./ServiceInfo.jsx";
-
+import { reviews as fetchReviews } from "../comments/reviews.jsx";
 import { services } from "./services.jsx";
 import { slugify } from "./utils.jsx";
 function ServiceDetails() {
@@ -17,8 +17,16 @@ const { slug } = useParams();
   
 useEffect(() => {
   const foundService = services.find((s) => slugify(s.title) === slug);
+  
   setService(foundService || null);
+  console.log("service",foundService);
   setLoading(false);
+  if(foundService){
+    const serviceWithReviews= fetchReviews.filter((review)=>review.serviceId===foundService.id)
+   setReviews(serviceWithReviews);
+   console.log("reviews",serviceWithReviews);
+   
+  }
 }, [slug]);
 
 
@@ -38,7 +46,9 @@ const handleAddServiceReview=()=>{
     setNewReview("");
   }
 }
-
+ const defaultImage =
+    "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60";
+  
 
   if (loading)
     return (
@@ -48,22 +58,30 @@ const handleAddServiceReview=()=>{
   if (!service) return <div className="p-4">Service not found</div>;
 
    return (
-    <div className="p-6 max-w-3xl mx-auto">
-        <div className="md:w-1/2">
-             <Img
-              src={service.image}
-              alt={service.title}
-              className="w-full h-auto rounded-lg shadow-md"
-             />
-        </div>
+     <div className="p-6 max-w-5xl mx-auto">
+   <h1 className=" text-3xl  text-blue-700 p-8 mb-10 ">Service Details</h1>
+  <div className="flex flex-col md:flex-row gap-12 items-start">
+    {/* Service Image */}
+    <div className="md:w-1/2">
+      <img
+        src={defaultImage}
+        alt={service.title}
+        className="w-full h-auto rounded-lg shadow-md"
+      />
+    </div>
 
-
+    {/* Service Details*/}
+    <div className="md:w-1/2 space-y-4 flex flex-col items-start">
       <h2 className="text-2xl font-bold">{service.title}</h2>
-      <p className="text-gray-600 mt-2">{service.description}</p>
-      <p className="mt-2 text-sm text-blue-800 font-semibold">{service.type}</p>
-      <p className="mt-2 text-lg font-bold">${service.price}</p>
-    
-      <hr className="my-4" />
+      <p className="text-xl text-gray-800">description: {service.description}</p>
+      <p className="text-lg text-blue-800 font-semibold">Service_Type: {service.type}</p>
+      <p className="text-lg font-bold">Price: ${service.price}</p>
+    </div>
+  </div>
+
+  <hr className="my-6 " />
+
+
 
       <h3 className="text-xl font-semibold mb-2">Reviews:</h3>
       {reviews.length === 0 ? (
