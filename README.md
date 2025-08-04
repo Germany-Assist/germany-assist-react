@@ -11,8 +11,8 @@ Currently, two official plugins are available:
 # Start Developing locally:
 
 ```shell
-npm insall 
-vite dev
+npm install 
+npm run dev
 ```
 Explore more vite comamnds via:
 
