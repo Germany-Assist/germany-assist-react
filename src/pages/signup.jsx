@@ -2,10 +2,12 @@ import { useState } from "react";
 import InputFields from "../components/InputFields";
 import AuthInputs from "../components/AuthInputs";
 import axios from "axios";
+import { useAuth } from "./AuthProvider"; 
 const Signup = () => {
   /**
    * Define the main inputs of the sign up page
    */
+  const { login } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +20,8 @@ const Signup = () => {
   const [successMsg, setSuccessMsg] = useState("");
 
   const handleSignUP = async () => {
+  
+
     if (password !== confirmedPassword) {
       setError("Password is not confirmed", error);
       return;
@@ -32,17 +36,21 @@ const Signup = () => {
         image,
         DOP,
         isVerified,
+      },{
+        withCredentials:true
       });
 
+       console.log("the value of response",response.data);
+       
       if (response.status == 201 || response.status == 200) {
+        login(response.data.accessToken,response.data.user);
         setSuccessMsg("User Created Successfully");
+        console.log("data  of the user",response.data.user);
+        console.log("data  of token",response.data.accessToken);
+        
       }
     } catch (error) {
-      if (error.response?.data?.message) {
-        setError(error.response?.data?.message);
-      } else {
-        setError("Something is wrong");
-      }
+     setError(error.response?.data?.message|| "something want wrong");
     }
   };
   return (
