@@ -2,7 +2,8 @@ import { useState } from "react";
 import InputFields from "../components/InputFields";
 import AuthInputs from "../components/AuthInputs";
 import axios from "axios";
-import { useAuth } from "./AuthProvider"; 
+import { useAuth } from "./AuthProvider";
+import { ValidateSignUPInputs } from "../components/ValidateSignUPInputs";
 const Signup = () => {
   /**
    * Define the main inputs of the sign up page
@@ -20,37 +21,53 @@ const Signup = () => {
   const [successMsg, setSuccessMsg] = useState("");
 
   const handleSignUP = async () => {
-  
+    const validates = ValidateSignUPInputs({
+      firstName,
+      lastName,
+      image,
+      DOP,
+      password,
+      confirmedPassword,
+      email,
+    });
 
-    if (password !== confirmedPassword) {
-      setError("Password is not confirmed", error);
+    if (validates.length > 0) {
+      setError(validates.join("\n"));
+      console.warn("Validation is error", validates);
       return;
     }
     try {
-      const response = await axios.post("http://localhost:3000/api/user", {
-        firstName,
-        lastName,
-        password,
-        confirmedPassword,
-        email,
-        image,
-        DOP,
-        isVerified,
-      },{
-        withCredentials:true
-      });
+      const response = await axios.post(
+        "http://localhost:3000/api/user",
+        {
+          firstName,
+          lastName,
+          password,
+          confirmedPassword,
+          email,
+          image,
+          DOP,
+          isVerified,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
-       console.log("the value of response",response.data);
-       
+      console.log("the value of response", response.data);
+
       if (response.status == 201 || response.status == 200) {
-        login(response.data.accessToken,response.data.user);
+        login(response.data.accessToken, response.data.user);
         setSuccessMsg("User Created Successfully");
-        console.log("data  of the user",response.data.user);
-        console.log("data  of token",response.data.accessToken);
-        
+        console.log("data  of the user", response.data.user);
+        console.log("data  of token", response.data.accessToken);
       }
-    } catch (error) {
-     setError(error.response?.data?.message|| "something want wrong");
+    } catch (err) {
+      const backendError =
+        err.response?.data?.errors?.[0]?.msg ||
+        err.response?.data?.message ||
+        "Something went wrong";
+      setError(backendError);
     }
   };
   return (
