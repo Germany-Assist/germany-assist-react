@@ -3,7 +3,9 @@ import InputFields from "../components/InputFields";
 import AuthInputs from "../components/AuthInputs";
 import axios from "axios";
 import { useAuth } from "./AuthProvider";
+import { ToastContainer, toast } from "react-toastify";
 import { ValidateSignUPInputs } from "../components/ValidateSignUPInputs";
+import "react-toastify/dist/ReactToastify.css";
 const Signup = () => {
   /**
    * Define the main inputs of the sign up page
@@ -13,12 +15,10 @@ const Signup = () => {
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmedPassword, setConfirmedPassword] = useState("");
-  const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [DOP, setDOP] = useState("");
   const [image, setImage] = useState("");
   const [isVerified, setIsVerified] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
 
   const handleSignUP = async () => {
     const validates = ValidateSignUPInputs({
@@ -32,10 +32,10 @@ const Signup = () => {
     });
 
     if (validates.length > 0) {
-      setError(validates.join("\n"));
-      console.warn("Validation is error", validates);
+      toast.error(validates.join("\n"));
       return;
     }
+
     try {
       const response = await axios.post(
         "http://localhost:3000/api/user",
@@ -54,24 +54,28 @@ const Signup = () => {
         }
       );
 
-      console.log("the value of response", response.data);
-
       if (response.status == 201 || response.status == 200) {
         login(response.data.accessToken, response.data.user);
-        setSuccessMsg("User Created Successfully");
-        console.log("data  of the user", response.data.user);
-        console.log("data  of token", response.data.accessToken);
+        toast.success("User Created Successfully");
       }
     } catch (err) {
       const backendError =
         err.response?.data?.errors?.[0]?.msg ||
         err.response?.data?.message ||
         "Something went wrong";
-      setError(backendError);
+      toast.error(backendError);
     }
   };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 py-8">
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+      />
+
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-4">
         <h2 className="text-2xl font-bold text-center text-blue-600 mb-4">
           Sign Up
@@ -149,9 +153,6 @@ const Signup = () => {
           />
           <span className="text-sm text-gray-900">Verified Account</span>
         </label>
-
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        {successMsg && <p className="text-green-500 text-sm">{successMsg}</p>}
 
         <AuthInputs label="Create Account" onClick={handleSignUP} />
       </div>
