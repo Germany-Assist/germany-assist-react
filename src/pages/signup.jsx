@@ -2,51 +2,80 @@ import { useState } from "react";
 import InputFields from "../components/InputFields";
 import AuthInputs from "../components/AuthInputs";
 import axios from "axios";
+import { useAuth } from "./AuthProvider";
+import { ToastContainer, toast } from "react-toastify";
+import { ValidateSignUPInputs } from "../components/ValidateSignUPInputs";
+import "react-toastify/dist/ReactToastify.css";
 const Signup = () => {
   /**
    * Define the main inputs of the sign up page
    */
+  const { login } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmedPassword, setConfirmedPassword] = useState("");
-  const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [DOP, setDOP] = useState("");
   const [image, setImage] = useState("");
   const [isVerified, setIsVerified] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
 
   const handleSignUP = async () => {
-    if (password !== confirmedPassword) {
-      setError("Password is not confirmed", error);
+    const validates = ValidateSignUPInputs({
+      firstName,
+      lastName,
+      image,
+      DOP,
+      password,
+      confirmedPassword,
+      email,
+    });
+
+    if (validates.length > 0) {
+      toast.error(validates.join("\n"));
       return;
     }
+
     try {
-      const response = await axios.post("http://localhost:3000/api/user", {
-        firstName,
-        lastName,
-        password,
-        confirmedPassword,
-        email,
-        image,
-        DOP,
-        isVerified,
-      });
+      const response = await axios.post(
+        "http://localhost:3000/api/user",
+        {
+          firstName,
+          lastName,
+          password,
+          confirmedPassword,
+          email,
+          image,
+          DOP,
+          isVerified,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       if (response.status == 201 || response.status == 200) {
-        setSuccessMsg("User Created Successfully");
+        login(response.data.accessToken, response.data.user);
+        toast.success("User Created Successfully");
       }
-    } catch (error) {
-      if (error.response?.data?.message) {
-        setError(error.response?.data?.message);
-      } else {
-        setError("Something is wrong");
-      }
+    } catch (err) {
+      const backendError =
+        err.response?.data?.errors?.[0]?.msg ||
+        err.response?.data?.message ||
+        "Something went wrong";
+      toast.error(backendError);
     }
   };
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 py-8">
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+      />
+
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-4">
         <h2 className="text-2xl font-bold text-center text-blue-600 mb-4">
           Sign Up
@@ -124,9 +153,6 @@ const Signup = () => {
           />
           <span className="text-sm text-gray-900">Verified Account</span>
         </label>
-
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        {successMsg && <p className="text-green-500 text-sm">{successMsg}</p>}
 
         <AuthInputs label="Create Account" onClick={handleSignUP} />
       </div>
