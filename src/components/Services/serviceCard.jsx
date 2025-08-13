@@ -1,5 +1,6 @@
 import { StarIcon } from "@heroicons/react/24/solid";
 import { services } from "./services";
+
 import { Link } from "react-router-dom";
 import { slugify } from "./utils.jsx";
 export const ServiceCard = ({ service }) => {
@@ -71,3 +72,4 @@ export const ServicesCarousel = () => {
     </div>
   );
 };
+

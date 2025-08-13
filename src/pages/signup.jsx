@@ -13,7 +13,7 @@ const Signup = () => {
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [DOP, setDOP] = useState("");
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState("");
   const [isVerified, setIsVerified] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
 
@@ -22,7 +22,6 @@ const Signup = () => {
       setError("Password is not confirmed", error);
       return;
     }
-
     try {
       const response = await axios.post("http://localhost:3000/api/user", {
         firstName,
@@ -30,7 +29,7 @@ const Signup = () => {
         password,
         confirmedPassword,
         email,
-        // image,
+        image,
         DOP,
         isVerified,
       });
