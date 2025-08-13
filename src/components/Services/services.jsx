@@ -2,6 +2,8 @@
 export const services  = [
   // CodeMaster Academy (providersProfileId: 1) - 4 services
   {
+
+    id:1,
     title: "Full Stack Web Development Bootcamp",
     description:
       "12-week intensive program covering HTML, CSS, JavaScript, React, Node.js, and databases. Graduate with a portfolio of 5 real-world projects.",
@@ -16,6 +18,7 @@ export const services  = [
     image: "https://example.com/service-images/webdev-bootcamp.jpg",
   },
   {
+    id:2,
     title: "Python for Data Science",
     description:
       "8-week course teaching Python, Pandas, NumPy, and machine learning fundamentals. Perfect for beginners looking to enter the data field.",
@@ -30,6 +33,7 @@ export const services  = [
     image: null,
   },
   {
+    id:3,
     title: "Cybersecurity Fundamentals",
     description:
       "Learn ethical hacking, network security, and cryptography in this 10-week program. Includes certification prep for Security+.",
@@ -44,6 +48,7 @@ export const services  = [
     image: "https://example.com/service-images/cybersecurity-course.jpg",
   },
   {
+    id:4,
     title: "Mobile App Development with Flutter",
     description:
       "Build cross-platform mobile apps using Flutter framework. 6-week course with hands-on projects.",
@@ -60,6 +65,7 @@ export const services  = [
 
   // Design Thinkers (providersProfileId: 2) - 3 services
   {
+    id:5,
     title: "UX/UI Design Fundamentals",
     description:
       "Master Figma, user research, wireframing, and prototyping in this comprehensive 6-week course for aspiring designers.",
@@ -74,6 +80,7 @@ export const services  = [
     image: "https://example.com/service-images/ux-course.jpg",
   },
   {
+    id:6,
     title: "Advanced Photoshop Techniques",
     description:
       "For intermediate designers looking to master photo manipulation, compositing, and digital painting.",
@@ -88,6 +95,7 @@ export const services  = [
     image: "https://example.com/service-images/photoshop-course.jpg",
   },
   {
+    id:7,
     title: "Design Thinking Workshop",
     description:
       "2-day intensive workshop teaching the design thinking process through real-world case studies.",
