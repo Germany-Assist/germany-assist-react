@@ -27,6 +27,8 @@ const DashboardHeader = () => {
             <a href="#services" className="text-black hover:text-blue-700 text-base">Services</a>
             <a href="/pages" className="text-black hover:text-blue-700 text-base">Pages</a>
             <a href="/userProfile" className="text-black hover:text-blue-700 text-base">Profile</a>
+            <a href="/login" className="text-black hover:text-blue-700 text-base">Login</a>
+ 
           <Link to="/signup">
             <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-base">
               Sign Up
