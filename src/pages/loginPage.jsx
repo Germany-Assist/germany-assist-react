@@ -1,3 +1,4 @@
+
 import { React, useState } from "react";
 import InputFields from "../components/InputFields";
 import AuthInputs from "../components/AuthInputs";
@@ -38,32 +39,6 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <ToastContainer />
-      <div className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login Page</h2>
-
-        <InputFields
-          label="Email "
-          type="text"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <InputFields
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <AuthInputs
-          label={loading ? "Logging in..." : "Login"}
-          onClick={handleLogin}
-          disabled={loading}
-        />
-      </div>
-    </div>
-  );
-};
 
 export default LoginPage;
+
