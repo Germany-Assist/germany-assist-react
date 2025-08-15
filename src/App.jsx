@@ -12,7 +12,6 @@ import {ServiceList} from './components/Services/serviceList.jsx';
 import Homepage from './components/Homepage/Homepage.jsx';
 import ServiceDetails from './components/Services/ServiceDetails.jsx';
 import LoginPage from './pages/loginPage.jsx';
-import BusinessProvider from './components/Buisnesses/BusinessProvider.jsx';
 
 function App() {
   return (
@@ -45,8 +44,12 @@ function App() {
             <ServiceList />
           </>
         }></Route>
-        <Route path="/userProfile" element={<UserProfile />}></Route>
-        <Route path="/serviceDetails/:slug" element={<ServiceDetails />}></Route>
+        <Route path="/signup" element={<Signup/>}></Route>
+        <Route path="/login" element={<LoginPage/>}></Route>
+        <Route path="/services" element={<ServiceList/>}></Route>
+        <Route path="/userProfile" element={<UserProfile/>}></Route>
+        <Route path="/serviceDetails/:slug" element={<ServiceDetails/>}></Route>
+
       </Routes>
     </Router>
   );

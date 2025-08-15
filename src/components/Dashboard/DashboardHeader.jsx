@@ -68,10 +68,18 @@ const DashboardHeader = () => {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-2">
-            <Link to="/" className={getLinkStyles('/')}>
-              Home
+          <nav className="flex items-center space-x-6">
+            <a href="/" className="text-black hover:text-blue-700 text-base">Home</a>
+            <a href="/about" className="text-black hover:text-blue-700 text-base">About</a>
+            <a href="#services" className="text-black hover:text-blue-700 text-base">Services</a>
+            <a href="/pages" className="text-black hover:text-blue-700 text-base">Pages</a>
+            <a href="/userProfile" className="text-black hover:text-blue-700 text-base">Profile</a>
+            <a href="/login" className="text-black hover:text-blue-700 text-base">Login</a>
+ 
+          <Link to="/signup">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-base">
+              Sign Up
+            </button>
             </Link>
             <Link to="/about" className={getLinkStyles('/about')}>
               About
