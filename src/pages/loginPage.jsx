@@ -3,7 +3,6 @@ import InputFields from '../components/InputFields';
 import AuthInputs from '../components/AuthInputs';
 import { AuthContext, useAuth } from './AuthProvider';
 import { ToastContainer, toast } from "react-toastify";
-import { useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
 const LoginPage = () => {
   const[email,setEmail]= useState('');
