@@ -1,34 +1,74 @@
 import {React,useState} from 'react'
 import InputFields from '../components/InputFields';
 import AuthInputs from '../components/AuthInputs';
-const Login = () => {
-  const[userName,setUserName]= useState('');
+import { AuthContext, useAuth } from './AuthProvider';
+import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from 'react-router-dom'; 
+import axios from 'axios';
+const LoginPage = () => {
+  const[email,setEmail]= useState('');
   const[password,setPassword] = useState('');
-  const[error,setError] = useState('');
+  const navigate= useNavigate();
 
-  /**
-   * Use this function later withAPI
-   */
+  const {login}= useAuth();
+  const[loading,setLoading]=useState(false);
+const handleLogin = async () => {
+  if (!email || !password) {
+    toast.error("Please fill in both fields");
+    return;
+  }
+ 
 
-   const handleLogin=()=>{
-    console.log("The value of the username",userName);
-   }
-  return (
-    
-    <div>
-     <div className='min-h-screen flex items-center justify-center bg-gray-100'>
-     <div className='bg-white p-8 rounded shadow-md w-96'>
-     <h2 className='text-2xl font-bold mb-6 text-center'>
-     Login Page
-     </h2>
-      <InputFields label="User Name" type="text" value={userName} onChange={(e)=>setUserName(e.target.value)}/>
-      <InputFields label="Password" type="password" value={password} onChange={(e)=>setPassword(e.target.value)}/>
-      <AuthInputs label="Login" onClick={handleLogin}/>
-     </div>
+  setLoading(true);
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/user/login",
+      {
+        email,
+        password
+      },
+      { withCredentials: true }
+    );
 
-     </div>
+
+    if (response.status === 200) {
+      login(response.data.accessToken, response.data.user);
+      toast.success("User login successfully");
+      navigate("/userProfile");
+    }
+
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Login failed. Try again!");
+  } 
+};
+
+ return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <ToastContainer />
+      <div className="bg-white p-8 rounded shadow-md w-96">
+        <h2 className="text-2xl font-bold mb-6 text-center">Login Page</h2>
+
+        <InputFields
+          label="Email "
+          type="text"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <InputFields
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <AuthInputs
+          label={loading ? "Logging in..." : "Login"}
+          onClick={handleLogin}
+          disabled={loading}
+        />
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default LoginPage
