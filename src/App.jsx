@@ -3,6 +3,8 @@ import './App.css'
 import Signup from "./pages/signup";
 import UserProfile from './pages/userProfile';
 import About from './pages/about';
+import Jobs from './pages/jobs';
+import OnboardingPage from './pages/onboarding';
 import DashboardHeader from './components/Dashboard/DashboardHeader';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
@@ -28,6 +30,13 @@ function App() {
             <About />
           </>
         } ></Route>
+        <Route path="/jobs" element={
+          <>
+            <DashboardHeader />
+            <Jobs />
+          </>
+        } ></Route>
+        <Route path="/onboarding" element={<OnboardingPage />}></Route>
         <Route path="/login" element={<Login />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/services" element={
