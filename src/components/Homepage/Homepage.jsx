@@ -154,7 +154,6 @@ const Homepage = () => {
               Test Candidate Onboarding
             </Link>
           </div>
-
           <div className="mt-12 flex items-center justify-center space-x-8 text-blue-200">
             <div className="flex items-center">
               <svg
