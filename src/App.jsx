@@ -2,60 +2,46 @@
 import './App.css'
 import Signup from "./pages/signup";
 import UserProfile from './pages/userProfile';
+import About from './pages/about';
 import DashboardHeader from './components/Dashboard/DashboardHeader';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import {ServiceList} from './components/Services/serviceList.jsx';
-
+import Homepage from './components/Homepage/Homepage.jsx';
 import ServiceDetails from './components/Services/ServiceDetails.jsx';
 import LoginPage from './pages/loginPage.jsx';
 import BusinessProvider from './components/Buisnesses/BusinessProvider.jsx';
 import { PaymentForm } from './components/Payment/PaymentForm.jsx';
 
-
 function App() {
-
-
   return (
-    <>
-   
-     <Router>
+    <Router>
       <Routes>
-
-        <Route path="/"  element={
+        <Route path="/" element={
           <>
-        <DashboardHeader/>
-          <div id="services">
-        <ServiceList />
-      </div>
-        </>
-        }></Route>
-        <Route path="/signup" element={<Signup/>}></Route>
-        <Route path="/login" element={<LoginPage/>}></Route>
-        <Route path="/services" element={<ServiceList/>}></Route>
-        <Route path="/userProfile" element={<UserProfile/>}></Route>
-        <Route path="/businessProfile" element={<BusinessProvider/>}></Route>
-        <Route path="/serviceDetails/:slug" element={<ServiceDetails/>}></Route>
-         <Route path="/payment"  element={
+            <DashboardHeader />
+            <Homepage />
+          </>
+        } ></Route>
+        <Route path="/about" element={
           <>
-        <DashboardHeader/>
-          <div >
-        <PaymentForm />
-      </div>
-        </>
+            <DashboardHeader />
+            <About />
+          </>
+        } ></Route>
+        <Route path="/login" element={<Login />}></Route>
+        <Route path="/signup" element={<Signup />}></Route>
+        <Route path="/services" element={
+          <>
+            <DashboardHeader />
+            <ServiceList />
+          </>
         }></Route>
-
+        <Route path="/userProfile" element={<UserProfile />}></Route>
+        <Route path="/serviceDetails/:slug" element={<ServiceDetails />}></Route>
       </Routes>
-     </Router>
-
-
-     
-
-     
-
-    </>
-    
-  )
+    </Router>
+  );
 }
 
 export default App
