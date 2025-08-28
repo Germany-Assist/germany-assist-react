@@ -115,7 +115,22 @@ export default function BusinessProvider() {
         </button>
       </div>
     </header>
+ {/* Content */}
+  <div className="p-6 space-y-6">
+    <div className="bg-gradient-to-r from-[#205781] to-[#3498db] rounded-xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-center">
+        <div>
+            <h1 className="text-2xl font-bold mb-2 ">Welcome back, Ali!</h1>
+            <p className="opacity-90">Here's what's happening with your business today.</p>
+        </div>
+             <button className="mt-4 md:mt-0 bg-white text-[#205781] font-semibold py-2 px-6 rounded-lg hover:bg-blue-50 transition">
+              Upgrade Plan
+            </button>
+    </div>
+  </div>
   </main>
+ 
+  {/* Charts */}
+
 </div>
 
   );
