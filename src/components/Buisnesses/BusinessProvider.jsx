@@ -127,10 +127,19 @@ export default function BusinessProvider() {
             </button>
     </div>
   </div>
+  {/*State Cards   */}
+ 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <StatCard title="Total Clients" value="1,248" change="12% from last month" icon="fas fa-users" color="blue" />
+            <StatCard title="Active Services" value="12" change="2 new this month" icon="fas fa-concierge-bell" color="green" />
+            <StatCard title="Monthly Revenue" value="$12.8K" change="8% from last month" icon="fas fa-wallet" color="purple" />
+            <StatCard title="Satisfaction Rate" value="92%" change="3% from last month" icon="fas fa-star" color="yellow" />
+          </div>
+
   
   {/* Charts */}
 
-   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
             <div className="bg-white p-6 rounded-xl shadow">
               <div className="flex justify-between mb-6">
                 <h3 className="font-semibold text-gray-800">User Engagement</h3>
@@ -161,6 +170,30 @@ export default function BusinessProvider() {
  
 
 </div>
+  );
+}
+const StatCard=({title,value,change,icon,color})=>{
+  const colors = {
+    blue: "bg-blue-100 text-blue-600",
+    green: "bg-green-100 text-green-600",
+    purple: "bg-purple-100 text-purple-600",
+    yellow: "bg-yellow-100 text-yellow-600",
+  };
 
+  return (
+    <div className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition-transform">
+      <div className="flex justify-between items-center">
+        <div>
+          <p className="text-gray-500">{title}</p>
+          <h3 className="text-2xl font-bold mt-1">{value}</h3>
+          <p className="text-green-500 text-sm mt-1">
+            <i className="fas fa-arrow-up"></i> {change}
+          </p>
+        </div>
+        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colors[color]}`}>
+          <i className={`${icon} text-xl`}></i>
+        </div>
+      </div>
+    </div>
   );
 }
