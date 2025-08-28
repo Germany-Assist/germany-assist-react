@@ -15,7 +15,7 @@ export const SideBarBusiness = () => {
         <div className='p-4 border-b border-blue-700 flex items-center'>
             <div className='w-12 h-12 rounded-full bg-blue-600 flex items-center  justify-center text-white font-bold text-lg'>AA</div>
         <div className='ml-3'>
-            <h3 className='font-semibold '>ALi Amer</h3>
+            <h3 className='font-semibold '>ALi Jamal</h3>
             <p className='text-blue-200 text-sm'>Premium Provider </p>
         </div>
         </div>
@@ -36,7 +36,8 @@ export const SideBarBusiness = () => {
             <i className="fas fa-comments mr-3"></i> Messages
             <span className="ml-auto bg-red-500 text-xs px-2 py-1 rounded-full">3</span>
           </a>
-           <p className="text-blue-200 text-sm mt-8 mb-2 ml-2">SETTINGS</p>
+
+         
           <a href="#" className="flex items-center p-2 rounded-lg hover:bg-blue-700">
             <i className="fas fa-cog mr-3"></i> Settings
           </a>
