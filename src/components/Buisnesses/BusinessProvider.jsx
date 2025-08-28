@@ -29,7 +29,7 @@ export default function BusinessProvider() {
 
   const chartData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    dataset: [
+    datasets: [
       {
         label: "New Users",
         data: [120, 150, 180, 210, 280, 350, 400],
@@ -127,9 +127,38 @@ export default function BusinessProvider() {
             </button>
     </div>
   </div>
+  
+  {/* Charts */}
+
+   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-xl shadow">
+              <div className="flex justify-between mb-6">
+                <h3 className="font-semibold text-gray-800">User Engagement</h3>
+                <select className="border border-gray-300 rounded-lg px-3 py-1 text-sm">
+                  <option>Last 7 Days</option>
+                  <option>Last 30 Days</option>
+                  <option>Last 90 Days</option>
+                </select>
+              </div>
+              <div className="h-64">
+                <Line data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow">
+                <div className="flex justify-between mb-6">
+                    <h3 className="font-semibold text-gray-800">Service Distribution</h3>
+                    <select className="border border-gray-300 rounded-lg px-3 py-1 text-sm">
+                        <option>By Usage</option>
+                        <option>By Revenue</option>
+                    </select>
+                </div>
+                <div className="h-64">
+           <Doughnut data={serviceData} options={{ responsive: true, maintainAspectRatio: false }} />
+                </div>
+            </div>
+  </div>
   </main>
  
-  {/* Charts */}
 
 </div>
 
