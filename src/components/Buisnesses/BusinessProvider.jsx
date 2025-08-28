@@ -66,16 +66,19 @@ export default function BusinessProvider() {
   };
 
   return (
-<div className="flex bg-gray-50 h-screen">
-  {IsBarActive && (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-      onClick={() => SetIsBarActive(false)}
-    ></div>
-  )}
+  <div className="flex h-screen">
+   
+      {IsBarActive && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => SetIsBarActive(false)}
+        ></div>
+      )}
 
-  <SideBarBusiness />
+      {/* Sidebar */}
+      <SideBarBusiness isActive={IsBarActive} toggle={() => SetIsBarActive(false)} />
 
+      
   {/* Business-Header */}
   <main className="flex-1 overflow-y-auto">
     <header className="bg-white shadow-md px-6 py-4 flex justify-between items-center border-b">
