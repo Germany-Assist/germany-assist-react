@@ -17,26 +17,13 @@ const handleLogin = async () => {
     return;
   }
 
-<<<<<<< HEAD
-  
-  let emailToSend = email;
-  if (!email.includes("@")) {
-    emailToSend = `${email}@dummy.com`; 
-  }
-=======
-
->>>>>>> d118b98 (handle login of the user with required inputs)
 
   setLoading(true);
   try {
     const response = await axios.post(
       "http://localhost:3000/api/user/login",
       {
-<<<<<<< HEAD
-        email: emailToSend,
-=======
         email, 
->>>>>>> d118b98 (handle login of the user with required inputs)
         password
       },
       { withCredentials: true }
@@ -59,6 +46,10 @@ const handleLogin = async () => {
 
 
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> d118b98 (handle login of the user with required inputs)
    
  return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
