@@ -23,7 +23,7 @@ const DashboardHeader = () => {
 
           <nav className="flex items-center space-x-6">
             <a href="/" className="text-black hover:text-blue-700 text-base">Home</a>
-            <a href="/about" className="text-black hover:text-blue-700 text-base">About</a>
+            <a href="/businessProfile" className="text-black hover:text-blue-700 text-base">Business</a>
             <a href="#services" className="text-black hover:text-blue-700 text-base">Services</a>
             <a href="/pages" className="text-black hover:text-blue-700 text-base">Pages</a>
             <a href="/userProfile" className="text-black hover:text-blue-700 text-base">Profile</a>
