@@ -5,7 +5,7 @@ const Homepage = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
 
- 
+      
   const categories = [
     { id: "all", name: "All Services", icon: "🌟" },
     { id: "translation", name: "Translation", icon: "📝" },
@@ -56,7 +56,7 @@ const Homepage = () => {
         </div>
         {service.views && (
           <div className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-full shadow-md">
-            <span className="text-xs font-bold">✨ Views</span>
+            <span className="text-xs font-bold">✨{service.views} Views</span>
           </div>
         )}
       </div>
