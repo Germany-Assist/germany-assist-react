@@ -207,6 +207,7 @@ const Homepage = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
       {/* Hero Section */}
+     
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">

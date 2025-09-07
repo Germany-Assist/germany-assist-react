@@ -14,10 +14,13 @@ import ServiceDetails from './components/Services/ServiceDetails.jsx';
 import LoginPage from './pages/loginPage.jsx';
 import BusinessProvider from './components/Buisnesses/BusinessProvider.jsx';
 import Login from './pages/login.jsx';
+import CouponsPage from './components/Coupons/couponsPage.jsx';
 
 function App() {
   return (
+    
     <Router>
+     <couponsPage/>
       <Routes>
         <Route path="/" element={
           <>
@@ -52,9 +55,11 @@ function App() {
         <Route path="/userProfile" element={<UserProfile/>}></Route>
         <Route path="/businessProfile" element={<BusinessProvider/>}></Route>
         <Route path="/serviceDetails/:slug" element={<ServiceDetails/>}></Route>
-
+   
       </Routes>
+      <CouponsPage></CouponsPage>
     </Router>
+    
   );
 }
 
