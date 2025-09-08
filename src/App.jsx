@@ -15,6 +15,7 @@ import LoginPage from './pages/loginPage.jsx';
 import BusinessProvider from './components/Buisneses/BusinessProvider.jsx';
 import Login from './pages/login.jsx';
 import CouponsPage from './components/Coupons/couponsPage.jsx';
+import { CreateCoupon } from './components/Coupons/CreateCoupon.jsx';
 
 function App() {
   return (
@@ -38,6 +39,12 @@ function App() {
           <>
             <DashboardHeader />
             <Jobs />
+          </>
+        } ></Route>
+        <Route path="/create-coupon" element={
+          <>
+            <DashboardHeader />
+            <CreateCoupon />
           </>
         } ></Route>
         <Route path="/onboarding" element={<OnboardingPage />}></Route>
