@@ -42,6 +42,9 @@ export const SideBarBusiness = ({ isActive, toggle }) => {
         <a href="#" className="flex items-center p-2 rounded-lg hover:bg-blue-700">
           <i className="fas fa-concierge-bell mr-3"></i>Services
         </a>
+        <Link to= "/create-coupon" className="flex items-center p-2 rounded-lg hover:bg-blue-700">
+          <i className="fas fa-dollar-sign mr-3"></i>Create Coupon
+        </Link>
         <a href="#" className="flex items-center p-2 rounded-lg hover:bg-blue-700">
           <i className="fas fa-wallet mr-3"></i>Finance
         </a>

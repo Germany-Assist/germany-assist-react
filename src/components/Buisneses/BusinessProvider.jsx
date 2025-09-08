@@ -12,6 +12,7 @@ import {
   ArcElement,
 } from "chart.js";
 import { SideBarBusiness } from "./SideBarBusiness";
+import CouponsPage from "../Coupons/couponsPage";
 
 ChartJS.register(
   CategoryScale,
@@ -129,6 +130,8 @@ export default function BusinessProvider() {
             </button>
           </div>
         </div>
+     
+
         {/*State Cards  with the state of each card as exp */}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
@@ -161,6 +164,10 @@ export default function BusinessProvider() {
             color="yellow"
           />
         </div>
+            
+       <div>
+  <CouponsPage />
+</div>
 
         {/* Charts */}
 

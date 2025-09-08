@@ -12,7 +12,7 @@ import {ServiceList} from './components/Services/serviceList.jsx';
 import Homepage from './components/Homepage/Homepage.jsx';
 import ServiceDetails from './components/Services/ServiceDetails.jsx';
 import LoginPage from './pages/loginPage.jsx';
-import BusinessProvider from './components/Buisnesses/BusinessProvider.jsx';
+import BusinessProvider from './components/Buisneses/BusinessProvider.jsx';
 import Login from './pages/login.jsx';
 import CouponsPage from './components/Coupons/couponsPage.jsx';
 
@@ -20,7 +20,7 @@ function App() {
   return (
     
     <Router>
-     <couponsPage/>
+  
       <Routes>
         <Route path="/" element={
           <>
@@ -48,16 +48,21 @@ function App() {
             <DashboardHeader />
             <ServiceList />
           </>
-        }></Route>
-        <Route path="/signup" element={<Signup/>}></Route>
-        <Route path="/login" element={<LoginPage/>}></Route>
-        <Route path="/services" element={<ServiceList/>}></Route>
-        <Route path="/userProfile" element={<UserProfile/>}></Route>
-        <Route path="/businessProfile" element={<BusinessProvider/>}></Route>
-        <Route path="/serviceDetails/:slug" element={<ServiceDetails/>}></Route>
+        }>
+
+        </Route>
+        <Route path="/businessProfile" element={
+          <>
+            <DashboardHeader />
+           <BusinessProvider />
+          </>
+        }>
+
+        </Route>
+      
    
       </Routes>
-      <CouponsPage></CouponsPage>
+    
     </Router>
     
   );

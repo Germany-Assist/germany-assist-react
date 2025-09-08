@@ -26,15 +26,16 @@ import React, { useEffect, useState } from 'react'
        fetchCoupons();
     },[])
   return (
-    <div className='grid grid-col-1 sm:grid-col-2 md:grid-col-3 gap-6 p-6 '>
-        {coupons.map((coupon)=>(
+   <div className="flex flex-nowrap gap-6 p-6 overflow-x-auto">
+ 
+        {coupons.slice(0,4).map((coupon)=>(
             <div key={coupon.id}
-            className='bg-white rounded-2xl shadow-md p-4  border border-blue-400 border-size-5 hover:shadow-lg transition'>
-                <h2 className='text-lg font-bold text-gray-800'>{coupon.coupon_code
+            className='bg-white rounded-2xl shadow-md p-4 border-2 border-blue-500 hover:shadow-lg transition'>
+                <h2 className='text-lg font-bold text-gray-800'>Service Code: {coupon.coupon_code
                 }</h2>
-                <p className='text-gray-600mt-2'> Discount: <span className='font-semibold'>{coupon.discount_rate * 100}%</span></p>
+                <p className='text-red-600 mt-2'> Discount: <span className='font-semibold'>{coupon.discount_rate * 100}%</span></p>
                  <p className='text-yellow-600'>Expiry: {new Date (coupon.expDate).toLocaleDateString()}</p>
-                <p className='text-sm font-medium'>Provider Name: {coupon.ProviderId}</p>
+                <p className='text-sm text-gray-600'>Provider Name: {coupon.ProviderId}</p>
                 {/* {Action button if the userRole is provider} */}
                 {userRole === "provider" &&(
                     <div className='mt-4 flex justify-between'>
@@ -54,6 +55,7 @@ import React, { useEffect, useState } from 'react'
             </a>
         )}
     </div>
+    
   );
 }
 export default CouponsPage;
