@@ -76,6 +76,9 @@ const DashboardHeader = () => {
             <Link to="/about" className={getLinkStyles('/about')}>
               About
             </Link>
+            <Link to="/businessProfile" className={getLinkStyles('/businessProfile')}>
+              Business Profile
+            </Link>
             <Link to="/services" className={getLinkStyles('/services')}>
               Services
             </Link>

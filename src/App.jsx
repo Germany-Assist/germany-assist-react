@@ -39,6 +39,7 @@ function App() {
         } ></Route>
         <Route path="/onboarding" element={<OnboardingPage />}></Route>
         <Route path="/login" element={<Login />}></Route>
+        <Route path="/businessProfile" element={<BusinessProvider />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/services" element={
           <>

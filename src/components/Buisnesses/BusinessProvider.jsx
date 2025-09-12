@@ -12,6 +12,7 @@ import {
   ArcElement,
 } from "chart.js";
 import { SideBarBusiness } from "./SideBarBusiness";
+import { ServiceList } from "../Services/serviceList";
 
 ChartJS.register(
   CategoryScale,
@@ -161,6 +162,7 @@ export default function BusinessProvider() {
             color="yellow"
           />
         </div>
+       
 
         {/* Charts */}
 
