@@ -14,6 +14,8 @@ import ServiceDetails from './components/Services/ServiceDetails.jsx';
 import LoginPage from './pages/loginPage.jsx';
 import BusinessProvider from './components/Buisnesses/BusinessProvider.jsx';
 import Login from './pages/login.jsx';
+import { CreateService } from './components/Services/CreateService.jsx';
+import { EditService } from './components/Services/EditService.jsx';
 
 function App() {
   return (
@@ -47,8 +49,16 @@ function App() {
             <ServiceList />
           </>
         }></Route>
+        <Route path="/provider/services" element={
+          <>
+            <DashboardHeader />
+            <ServiceList />
+          </>
+        }></Route>
         <Route path="/userProfile" element={<UserProfile />}></Route>
         <Route path="/serviceDetails/:slug" element={<ServiceDetails />}></Route>
+         <Route path="/provider/services/create" element={<CreateService />} />
+          <Route path="/provider/services/:id/edit" element={<EditService />} />
       </Routes>
     </Router>
   );

@@ -40,8 +40,8 @@ export const SideBarBusiness = ({ isActive, toggle }) => {
         <a href="#" className="flex items-center p-2 rounded-lg hover:bg-blue-700">
           <i className="fas fa-users mr-3"></i>Clients
         </a>
-        <Link  to="/services" className="flex items-center p-2 rounded-lg hover:bg-blue-700">
-          <i className="fas fa-concierge-bell mr-3"></i>Services
+        <Link  to="/provider/services" className="flex items-center p-2 rounded-lg hover:bg-blue-700">
+          <i className="fas fa-concierge-bell mr-3"></i>My Services
         </Link>
         <a href="#" className="flex items-center p-2 rounded-lg hover:bg-blue-700">
           <i className="fas fa-wallet mr-3"></i>Finance
