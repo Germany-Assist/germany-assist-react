@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, {  useState } from "react";
 
 export const CreateService = () => {
   const [formData, setFormData] = useState({
@@ -42,7 +42,8 @@ export const CreateService = () => {
     }));
   };
 
-  const handleSubmit = async () => {
+const handleSubmit = async (e) => {
+  e.preventDefault();
     try {
       const response = await axios.post(`http://localhost:3000/api/service`);
       setFormData(response.data);
@@ -50,6 +51,7 @@ export const CreateService = () => {
       console.error("Failed create the service", error);
     }
   };
+
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow-lg">
@@ -63,7 +65,7 @@ export const CreateService = () => {
             name="title"
             placeholder="Service Title"
             value={formData.title}
-            onChange={handleChange}
+            onChange={()=>handleChange}
             className="w-full mt-1 p-2 border rounded-lg"
           ></input>
         </div>
@@ -74,7 +76,7 @@ export const CreateService = () => {
             name="description"
             placeholder="Write a detailed description..."
             value={formData.description}
-            onChange={handleChange}
+            onChange={()=>handleChange}
             className="w-full mt-1 p-2 border rounded-lg"
             rows={4}
           />
@@ -87,7 +89,7 @@ export const CreateService = () => {
             name="price"
             placeholder="4999.99"
             value={formData.price}
-            onChange={handleChange}
+            onChange={()=>handleChange}
             className="w-full mt-1 p-2 border rounded-lg"
           />
         </div>
@@ -99,7 +101,7 @@ export const CreateService = () => {
             name="image"
             placeholder="https://example.com/service.jpg"
             value={formData.image}
-            onChange={handleChange}
+            onChange={()=>handleChange}
             className="w-full mt-1 p-2 border rounded-lg"
           />
         </div>
@@ -112,7 +114,7 @@ export const CreateService = () => {
                 <input
                   type="checkbox"
                   checked={selectedCategories.includes(category)}
-                  onChange={handleCategoryToggle(category)}
+                  onChange={()=>handleCategoryToggle(category)}
                 />
                 ;
               </label>
@@ -125,7 +127,7 @@ export const CreateService = () => {
               type="checkbox"
               name="publish"
               checked={formData.publish}
-              onChange={handleChange}
+              onChange={()=>handleChange}
             />
             <label>Publish instantly (Service Provider only)</label>
           </div>
