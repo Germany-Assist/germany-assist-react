@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, {  useState } from "react";
+import React, { useState } from "react";
 
 export const CreateService = () => {
   const [formData, setFormData] = useState({
@@ -29,21 +29,22 @@ export const CreateService = () => {
   };
 
   const handleCategoryToggle = (category) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
+    setSelectedCategories((prev) => {
+      const updated = prev.includes(category)
         ? prev.filter((c) => c !== category)
-        : [...prev, category]
-    );
-    setFormData((prev) => ({
-      ...prev,
-      categories: selectedCategories.includes(category)
-        ? selectedCategories.filter((c) => c !== category)
-        : [...selectedCategories, category],
-    }));
+        : [...prev, category];
+
+      setFormData((f) => ({
+        ...f,
+        categories: updated,
+      }));
+
+      return updated;
+    });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       const response = await axios.post(`http://localhost:3000/api/service`);
       setFormData(response.data);
@@ -51,7 +52,6 @@ const handleSubmit = async (e) => {
       console.error("Failed create the service", error);
     }
   };
-
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow-lg">
@@ -65,7 +65,7 @@ const handleSubmit = async (e) => {
             name="title"
             placeholder="Service Title"
             value={formData.title}
-            onChange={()=>handleChange}
+            onChange={() => handleChange}
             className="w-full mt-1 p-2 border rounded-lg"
           ></input>
         </div>
@@ -76,7 +76,7 @@ const handleSubmit = async (e) => {
             name="description"
             placeholder="Write a detailed description..."
             value={formData.description}
-            onChange={()=>handleChange}
+            onChange={() => handleChange}
             className="w-full mt-1 p-2 border rounded-lg"
             rows={4}
           />
@@ -89,7 +89,7 @@ const handleSubmit = async (e) => {
             name="price"
             placeholder="4999.99"
             value={formData.price}
-            onChange={()=>handleChange}
+            onChange={() => handleChange}
             className="w-full mt-1 p-2 border rounded-lg"
           />
         </div>
@@ -101,33 +101,35 @@ const handleSubmit = async (e) => {
             name="image"
             placeholder="https://example.com/service.jpg"
             value={formData.image}
-            onChange={()=>handleChange}
+            onChange={() => handleChange}
             className="w-full mt-1 p-2 border rounded-lg"
           />
         </div>
         {/* Categories */}
         <div>
-          <label className="block font-medium">Categories</label>
-          <div className="flex flex-wrap gap-3 mt-2">
-            {categoriesList.map((category) => (
-              <label key={category} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={selectedCategories.includes(category)}
-                  onChange={()=>handleCategoryToggle(category)}
-                />
-                ;
-              </label>
-            ))}
-            ,
+          <div>
+            <label className="block font-medium">Categories</label>
+            <div className="flex flex-wrap gap-3 mt-2">
+              {categoriesList.map((category) => (
+                <label key={category} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedCategories.includes(category)}
+                    onChange={() => handleCategoryToggle(category)}
+                  />
+                  <span>{category}</span>
+                </label>
+              ))}
+            </div>
           </div>
+
           {/* Publish */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center  justify-center gap-2 mt-6">
             <input
               type="checkbox"
               name="publish"
               checked={formData.publish}
-              onChange={()=>handleChange}
+              onChange={() => handleChange}
             />
             <label>Publish instantly (Service Provider only)</label>
           </div>
