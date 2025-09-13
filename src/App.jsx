@@ -14,8 +14,8 @@ import ServiceDetails from './components/Services/ServiceDetails.jsx';
 import LoginPage from './pages/loginPage.jsx';
 import BusinessProvider from './components/Buisnesses/BusinessProvider.jsx';
 import Login from './pages/login.jsx';
-import { CreateService } from './components/Services/CreateService.jsx';
-import { EditService } from './components/Services/EditService.jsx';
+import { ServiceForm } from './components/Services/ServiceForm.jsx';
+
 
 function App() {
   return (
@@ -57,8 +57,8 @@ function App() {
         }></Route>
         <Route path="/userProfile" element={<UserProfile />}></Route>
         <Route path="/serviceDetails/:slug" element={<ServiceDetails />}></Route>
-         <Route path="/provider/services/create" element={<CreateService />} />
-          <Route path="/provider/services/:id/edit" element={<EditService />} />
+         <Route path="/provider/services/create" element={<ServiceForm isEdit={false}/>} />
+          <Route path="/provider/services/:id/edit" element={< ServiceForm isEdit={true}/>} />
       </Routes>
     </Router>
   );

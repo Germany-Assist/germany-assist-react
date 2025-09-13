@@ -1,12 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
 
-const ServiceCard = ({ service, onEdit, onDelete, isProvider = false }) => (
-  <div
-    className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group ${
-      service.rating ? "ring-2 ring-blue-500 ring-opacity-50" : ""
-    }`}
-  >
+const ServiceCard = ({ service, onDelete, isProvider = false }) => {
+  const navigate = useNavigate();
+
+  return (
+    <div
+      className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group ${
+        service.rating ? "ring-2 ring-blue-500 ring-opacity-50" : ""
+      }`}
+    >
   
     <div className="relative">
       <img
@@ -25,7 +28,7 @@ const ServiceCard = ({ service, onEdit, onDelete, isProvider = false }) => (
            {isProvider && (
             <div className="flex gap-3">
               <button
-                onClick={() => onEdit(service)}
+                onClick={() => navigate("/provider/services/:id/edit")}
                 className="p-2 rounded-lg hover:bg-red-500"
               >
                 <Pencil size={18} className="text-gray-600" />
@@ -97,6 +100,6 @@ const ServiceCard = ({ service, onEdit, onDelete, isProvider = false }) => (
         
     </div>
   </div>
-);
+)};
 
 export default ServiceCard;
