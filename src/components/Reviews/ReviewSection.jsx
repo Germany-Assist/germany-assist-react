@@ -7,7 +7,7 @@ export const ReviewSection = ({ serviceId }) => {
   const [newReview, setNewReview] = useState("");
   const [reviews, setReviews] = useState([]);
 
- 
+  const[error,setError]=useState(" ");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
