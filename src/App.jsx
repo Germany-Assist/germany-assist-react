@@ -1,7 +1,7 @@
 
 import './App.css'
 import Signup from "./pages/signup";
-import UserProfile from './pages/userProfile';
+import UserProfile from './components/Candidate/userProfile.jsx';
 import About from './pages/about';
 import Jobs from './pages/jobs';
 import OnboardingPage from './pages/onboarding';
@@ -13,6 +13,7 @@ import Homepage from './components/Homepage/Homepage.jsx';
 import ServiceDetails from './components/Services/ServiceDetails.jsx';
 import LoginPage from './pages/loginPage.jsx';
 import BusinessProvider from './components/Buisnesses/BusinessProvider.jsx';
+import Login from './pages/login.jsx';
 
 function App() {
   return (
@@ -42,6 +43,12 @@ function App() {
             <ServiceDetails />
           </>
         } ></Route>
+        <Route path="/userProfile" element={
+          <>
+            <DashboardHeader />
+            <UserProfile />
+          </>
+        } ></Route>
         <Route path="/onboarding" element={<OnboardingPage />}></Route>
         <Route path="/login" element={<Login />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
@@ -51,13 +58,8 @@ function App() {
             <ServiceList />
           </>
         }></Route>
-        <Route path="/signup" element={<Signup/>}></Route>
-        <Route path="/login" element={<LoginPage/>}></Route>
-        <Route path="/services" element={<ServiceList/>}></Route>
-        <Route path="/userProfile" element={<UserProfile/>}></Route>
-        <Route path="/businessProfile" element={<BusinessProvider/>}></Route>
-        <Route path="/serviceDetails/:slug" element={<ServiceDetails/>}></Route>
-
+        <Route path="/userProfile" element={<UserProfile />}></Route>
+        <Route path="/serviceDetails/:slug" element={<ServiceDetails />}></Route>
       </Routes>
     </Router>
   );
