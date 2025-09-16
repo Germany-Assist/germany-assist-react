@@ -1,7 +1,7 @@
 
 import './App.css'
 import Signup from "./pages/signup";
-import UserProfile from './pages/userProfile';
+import UserProfile from './components/Candidate/userProfile.jsx';
 import About from './pages/about';
 import Jobs from './pages/jobs';
 import OnboardingPage from './pages/onboarding';
@@ -13,6 +13,7 @@ import Homepage from './components/Homepage/Homepage.jsx';
 import ServiceDetails from './components/Services/ServiceDetails.jsx';
 import LoginPage from './pages/loginPage.jsx';
 import BusinessProvider from './components/Buisnesses/BusinessProvider.jsx';
+import Login from './pages/login.jsx';
 
 function App() {
   return (

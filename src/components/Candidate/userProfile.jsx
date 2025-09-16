@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Pagination } from "../components/pagination";
+import { Pagination } from "../pagination";
+import { CandidateSideBar } from "./CandidateSideBar";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -64,34 +65,36 @@ const UserProfile = () => {
     reviewPage * reviewPerPage
   );
   if (loading) return <div className="text-center mt-10">Loading...</div>;
-  if (!user)
-    return (
-      <div className="text-center mt-10 text-red-500">
-        Failed to load user info.
-      </div>
-    );
+  // if (!user)
+  //   return (
+  //     <div className="text-center mt-10 text-red-500">
+  //       Failed to load user info.
+  //     </div>
+  //   );
 
   return (
     // Profile Section
+   
     <div className="max-w-3xl mx-auto p-4 space-y-6">
+       <CandidateSideBar/>
       <div className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl shadow-md flex items-center space-x-6 hover:shadow-3xl transition transform hover:scale-[1.01]">
         <img
-          src={user.image || "../assets/avatar.png"}
+          src={user?.image || "../assets/avatar.png"}
           alt="Profile"
           className="w-28 h-28 rounded-full object-cover border-4 border-blue-200 shadow"
         />
 
         <div className="flex-1 space-y-2">
-          <h2 className="text-3xl font-extrabold text-blue-800">{user.name}</h2>
+          <h2 className="text-3xl font-extrabold text-blue-800">{user?.name || ""}</h2>
 
           <div className="text-gray-600">
             <p className="flex items-center">
               <span className="font-semibold w-24">Email:</span>
-              <span>{user.email}</span>
+              <span>{user?.email || ""}</span>
             </p>
 
             <p className="flex items-center">
-              <span className="font-semibold w-24">Verified:</span>
+              {/* <span className="font-semibold w-24">Verified:</span>
               <span
                 className={
                   user.isVerified
@@ -100,12 +103,12 @@ const UserProfile = () => {
                 }
               >
                 {user.isVerified ? "Yes" : "No"}
-              </span>
+              </span> */}
             </p>
 
             <p className="flex items-center">
               <span className="font-semibold w-24">Joined:</span>
-              <span>{new Date(user.createdAt).toLocaleDateString()}</span>
+              <span>{new Date(user?.createdAt).toLocaleDateString() || ""}</span>
             </p>
           </div>
         </div>
