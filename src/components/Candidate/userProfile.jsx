@@ -75,8 +75,15 @@ const UserProfile = () => {
   return (
     // Profile Section
    
-    <div className="max-w-3xl mx-auto p-4 space-y-6">
+    <div className="flex min-h-screen bg-gray-100">
+
        <CandidateSideBar/>
+          
+          {/* MainContent */}
+      <div className="flex-1 p-6 space-y-6 ">
+        {/* Profile Card */}
+       
+     
       <div className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl shadow-md flex items-center space-x-6 hover:shadow-3xl transition transform hover:scale-[1.01]">
         <img
           src={user?.image || "../assets/avatar.png"}
@@ -152,7 +159,7 @@ const UserProfile = () => {
           </>
         )}
       </div>
-
+ {/* Reviews Sections */}
       <div className="bg-white p-6 rounded-xl shadow-md">
         <h3 className="text-2xl font-semibold mb-4 text-blue-700">Reviews</h3>
 
@@ -202,7 +209,8 @@ const UserProfile = () => {
             </div>
           </>
         )}
-      </div>
+   </div>
+    </div>
     </div>
   );
 };

@@ -96,8 +96,7 @@ export const CandidateSideBar = () => {
           {isOpen && <span>My Profile</span>}
         </Link>
 
-        {/* Settings */}
-        <div className="p-4 border-t border-blue-700">
+      
           <Link
             to="/settings"
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-600"
@@ -105,7 +104,7 @@ export const CandidateSideBar = () => {
             <Settings size={20} />
             {isOpen && <span>Settings</span>}
           </Link>
-        </div>
+        
       </nav>
     </aside>
   );
