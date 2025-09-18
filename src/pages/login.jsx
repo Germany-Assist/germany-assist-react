@@ -29,7 +29,7 @@ const Login = () => {
       if (email && password) {
         // TODO: Set authentication state in your auth context/state management
         console.log('Login successful:', { email });
-        navigate('/'); // Redirect to homepage
+        navigate('/userProfile'); // Redirect to homepage
       } else {
         setError('Please fill in all fields');
       }
