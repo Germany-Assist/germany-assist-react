@@ -1,5 +1,9 @@
 import axios from "axios";
+<<<<<<< HEAD
 import React, { createContext, useContext, useState } from "react";
+=======
+import React, { createContext, useContext, useState, useEffect } from "react";
+>>>>>>> 13-sigup-followup
 
 export const AuthContext = createContext();
 
