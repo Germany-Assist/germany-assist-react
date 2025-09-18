@@ -23,7 +23,7 @@ const UserProfile = () => {
   const fetchAllData = async () => {
     try {
       const [userRes, serviceRes, reviewRes] = await Promise.all([
-        axios.get(`${BACKEND_URL}/user/${userId}`, {
+        axios.get(`${BACKEND_URL}/user/profile`, {
           // params: { password: "password#D3" },
         }),
         axios.get(`${BACKEND_URL}/service/${userId}`),
