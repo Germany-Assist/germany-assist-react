@@ -2,32 +2,37 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Pagination } from "../pagination";
 import { CandidateSideBar } from "./CandidateSideBar";
+import { useAuth } from "../../pages/AuthProvider";
 
 const UserProfile = () => {
+  const {userId}=useAuth();
   const [user, setUser] = useState(null);
   const [services, setServices] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [servicePage, setServicePage] = useState(1);
-  const [reviewPage, setReviewsPage] = useState(1);
+  const [servicePage, setServicePage] = useState("");
+  const [reviewPage, setReviewsPage] = useState("");
 
   const servicePerPage = 3;
   const reviewPerPage = 3;
   const BACKEND_URL = "http://localhost:3000/api";
-  const userId = 1;
 
-  useEffect(() => {
-    fetchAllData();
-  }, []);
+ useEffect(() => {
+    console.log("Current userId:", userId);
+    if (userId) {
+      fetchAllData();
+    }
+  }, [userId]);
 
   const fetchAllData = async () => {
     try {
       const [userRes, serviceRes, reviewRes] = await Promise.all([
         axios.get(`${BACKEND_URL}/user/profile`, {
-          // params: { password: "password#D3" },
+          params: { userId },
+          withCredentials: true, 
         }),
-        axios.get(`${BACKEND_URL}/service/${userId}`),
-        axios.get(`${BACKEND_URL}/review/${userId}`),
+        axios.get(`${BACKEND_URL}/service/${userId}`, { withCredentials: true }),
+        axios.get(`${BACKEND_URL}/review/${userId}`, { withCredentials: true }),
       ]);
 
       console.log("User API response:", userRes.data);
@@ -42,6 +47,7 @@ const UserProfile = () => {
           createdAt: userData.createdAt,
         });
       }
+
       setServices(serviceRes.data.userService || []);
       setReviews(reviewRes.data.userReviews || []);
     } catch (err) {
@@ -50,6 +56,8 @@ const UserProfile = () => {
       setLoading(false);
     }
   };
+
+  // if (loading) return <p>Loading profile...</p>;
 
   // Define the pagination Logic
   const totalServicesPages = Math.ceil(services.length / servicePerPage);
@@ -64,7 +72,7 @@ const UserProfile = () => {
     (reviewPage - 1) * reviewPerPage,
     reviewPage * reviewPerPage
   );
-  if (loading) return <div className="text-center mt-10">Loading...</div>;
+ 
   // if (!user)
   //   return (
   //     <div className="text-center mt-10 text-red-500">
