@@ -9,11 +9,11 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
- 
+
   const handleLogin = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
-  setError("");
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
   try {
     const response = await fetch("http://localhost:3000/api/user/login", {
