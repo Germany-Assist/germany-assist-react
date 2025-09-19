@@ -6,7 +6,7 @@ import { useAuth } from "../../pages/AuthProvider";
 
 const UserProfile = () => {
   const { userId, accessToken } = useAuth();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({});
   const [services, setServices] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,41 +18,41 @@ const UserProfile = () => {
   const BACKEND_URL = "http://localhost:3000/api";
 
   useEffect(() => {
-  if (userId && accessToken) {
-    fetchAllData();
+    if (userId && accessToken) {
+      fetchAllData();
+    }
+  }, [userId, accessToken]);
+  useEffect(() => {
+  if (user) {
+    console.log("User state updated:", user);
   }
-}, [userId, accessToken]);
+}, [user]);
 
 
   const fetchAllData = async () => {
     try {
-      const [userRes, serviceRes, reviewRes] = await Promise.all([
+      const [userRes] = await Promise.all([
         axios.get(`${BACKEND_URL}/user/profile`, {
           headers: { Authorization: `Bearer ${accessToken}` },
           withCredentials: true,
         }),
-        // axios.get(`${BACKEND_URL}/service/${userId}`, {   headers:{Authorization:`Bearer ${accessToken}`},withCredentials: true }),
-        // axios.get(`${BACKEND_URL}/review/${userId}`, {   headers:{Authorization:`Bearer ${accessToken}`},withCredentials: true }),
       ]);
 
+      const userData = userRes.data;
       console.log("User API response:", userRes.data);
+            setUser({
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              email: userData.email,
+              image: userData.image,
+              isVerified: userData.isVerified,
+              createdAt: userData.createdAt,
+            });
 
-      const userData = userRes.data.user;
-      console.log("User API response:", userRes.data);
-      console.log("User state before set:", user);
-
-      setUser({
-        name: `${userData.firstName} ${userData.lastName}`,
-        email: userData.email,
-        image: userData.image,
-        isVerified: userData.isVerified,
-        createdAt: userData.createdAt,
-      });
+      
+      console.log("User  Rs API response:", userRes.data);
 
       console.log("User state after set:", user);
-
-      setServices(serviceRes.data.userService || []);
-      setReviews(reviewRes.data.userReviews || []);
     } catch (err) {
       console.error("Error fetching data:", err);
     } finally {
@@ -60,7 +60,7 @@ const UserProfile = () => {
     }
   };
 
-  // if (loading) return <p>Loading profile...</p>;
+  if (loading) return <p>Loading profile...</p>;
 
   // Define the pagination Logic
   const totalServicesPages = Math.ceil(services.length / servicePerPage);
@@ -101,14 +101,15 @@ const UserProfile = () => {
           />
 
           <div className="flex-1 space-y-2">
-            <h2 className="text-3xl font-extrabold text-blue-800">
-              {user?.name || ""}
+             <h2>{user?.firstName} {user?.lastName}</h2>
+            <h2 className="text-xl font-extrabold text-blue-800">
+
             </h2>
 
             <div className="text-gray-600">
               <p className="flex items-center">
                 <span className="font-semibold w-24">Email:</span>
-                <span>{user?.firstName || ""}</span>
+                <span>{user?.email || ""}</span>
               </p>
 
               <p className="flex items-center">
