@@ -14,9 +14,26 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import DashboardHeader from "../Dashboard/DashboardHeader";
+import { useEffect } from "react";
 
 export const CandidateSideBar = () => {
   const [isOpen, setIsOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsMobile(true);
+        setIsOpen(false);
+      } else {
+        setIsMobile(false);
+        setIsOpen(true);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <aside
@@ -29,13 +46,15 @@ export const CandidateSideBar = () => {
         <h1 className={`text-xl font-bold ${!isOpen && "hidden"}`}>
           Germany-Assist
         </h1>
-        <button
-          onClick={() => {
-            setIsOpen(!isOpen);
-          }}
-        >
-          <Menu size={20} />
-        </button>
+        {!isMobile && (
+          <button
+            onClick={() => {
+              setIsOpen(!isOpen);
+            }}
+          >
+            <Menu size={20} />
+          </button>
+        )}
       </div>
       {/*  Menu Items*/}
       <nav className="flex-1 p-4 space-y-2">
@@ -96,15 +115,13 @@ export const CandidateSideBar = () => {
           {isOpen && <span>My Profile</span>}
         </Link>
 
-      
-          <Link
-            to="/settings"
-            className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-600"
-          >
-            <Settings size={20} />
-            {isOpen && <span>Settings</span>}
-          </Link>
-        
+        <Link
+          to="/settings"
+          className="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-600"
+        >
+          <Settings size={20} />
+          {isOpen && <span>Settings</span>}
+        </Link>
       </nav>
     </aside>
   );
