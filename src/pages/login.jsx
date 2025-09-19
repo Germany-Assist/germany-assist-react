@@ -9,42 +9,24 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
- 
+
   const handleLogin = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
-  setError("");
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-  try {
-    const response = await fetch("http://localhost:3000/api/user/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-      // ❌ API error
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Login failed");
+    try {
+      await login({ email, password } );
+      toast.success("User login successfully");
+      navigate("/userProfile");
+    } catch (error) {
+      console.error(error);
+      setError(error.message);
+      toast.error(error.message || "Login failed. Try again!");
+    } finally {
+      setIsLoading(false);
     }
-
-    // ✅ Parse the response JSON
-    const data = await response.json();
-
-    // Example: token + user
-    login(data.accessToken, data.user);
-
-    toast.success("User login successfully");
-    navigate("/"); // Redirect to homepage
-  } catch (error) {
-    console.error(error);
-    setError(error.message);
-    toast.error(error.message || "Login failed. Try again!");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+  };
   // TODO: Implement actual Google OAuth
   const handleGoogleLogin = () => {
     console.log("Google login initiated");
