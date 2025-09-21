@@ -45,7 +45,7 @@ function App() {
           </>
         }></Route>
         <Route path="/userProfile" element={<UserProfile />}></Route>
-        <Route path="/serviceDetails/:slug" element={<ServiceDetails />}></Route>
+        <Route path="/serviceDetails/:id" element={<ServiceDetails />}></Route>
       </Routes>
     </Router>
   );
