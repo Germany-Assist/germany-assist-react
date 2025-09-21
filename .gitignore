@@ -1,1 +1,3 @@
 node_modules
+# Ignore config file
+src/config/api.js
