@@ -81,7 +81,14 @@ function ServiceDetails() {
               </span>
             ))}
           </div>
+           <button
+    onClick={() => handleTheCart(service)}
+    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-md transition"
+  >
+    Add to Cart <i class="fa-solid fa-cart-shopping"></i>
+  </button>
         </div>
+        
       </div>
 
       {/* Reviews */}
