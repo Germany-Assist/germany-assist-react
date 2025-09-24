@@ -11,9 +11,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import {ServiceList} from './components/Services/serviceList.jsx';
 import Homepage from './components/Homepage/Homepage.jsx';
 import ServiceDetails from './components/Services/ServiceDetails.jsx';
+import { CartProvider } from './components/cart/CartReducer.jsx';
 
 function App() {
   return (
+      <CartProvider>
     <Router>
       <Routes>
         <Route path="/" element={
@@ -45,8 +47,12 @@ function App() {
         }></Route>
         <Route path="/userProfile" element={<UserProfile />}></Route>
         <Route path="/serviceDetails/:slug" element={<ServiceDetails />}></Route>
+    
       </Routes>
+        
     </Router>
+        </CartProvider>
+    
   );
 }
 
