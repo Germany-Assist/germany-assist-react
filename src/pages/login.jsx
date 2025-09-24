@@ -1,80 +1,59 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-const Signup = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // TODO: Replace with actual registration API call
-  const handleSignup = async (e) => {
+  // TODO: Replace with actual authentication API call
+  const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
-    // Basic validation
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
-      setIsLoading(false);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setIsLoading(false);
-      return;
-    }
-
-    if (!agreeToTerms) {
-      setError('Please agree to the Terms of Service and Privacy Policy');
-      setIsLoading(false);
-      return;
-    }
 
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // TODO: Replace with actual registration logic
-      // const response = await fetch('/api/auth/register', {
+      // TODO: Replace with actual login logic
+      // const response = await fetch('/api/auth/login', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ firstName, lastName, email, password })
+      //   body: JSON.stringify({ email, password })
       // });
       
       // For demo: just check if email and password are provided
       if (email && password) {
         // TODO: Set authentication state in your auth context/state management
-        console.log('Registration successful:', { firstName, lastName, email });
-        navigate('/onboarding'); // Redirect to onboarding
+        console.log('Login successful:', { email });
+        navigate('/'); // Redirect to homepage
       } else {
-        setError('Registration failed. Please try again.');
+        setError('Please fill in all fields');
       }
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError('Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   // TODO: Implement actual Google OAuth
-  const handleGoogleSignup = () => {
-    console.log('Google signup initiated');
+  const handleGoogleLogin = () => {
+    console.log('Google login initiated');
     // TODO: Integrate with Google OAuth
     // Example: window.location.href = '/auth/google';
+    // Or use Google OAuth library
   };
 
   // TODO: Implement actual Facebook OAuth
-  const handleFacebookSignup = () => {
-    console.log('Facebook signup initiated');
+  const handleFacebookLogin = () => {
+    console.log('Facebook login initiated');
     // TODO: Integrate with Facebook OAuth
     // Example: window.location.href = '/auth/facebook';
+    // Or use Facebook SDK
   };
 
   return (
@@ -93,13 +72,13 @@ const Signup = () => {
               Germany-Assist
             </div>
           </Link>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Create your account</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome back</h2>
           <p className="text-gray-600">
-            Start your journey to working in Germany
+            Sign in to continue your German journey
           </p>
         </div>
 
-        {/* Signup Form */}
+        {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -107,41 +86,7 @@ const Signup = () => {
             </div>
           )}
 
-          <form onSubmit={handleSignup} className="space-y-6">
-            {/* Name Fields */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                  First Name
-                </label>
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  required
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your first name"
-                />
-              </div>
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Last Name
-                </label>
-                <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  required
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your last name"
-                />
-              </div>
-            </div>
-
+          <form onSubmit={handleLogin} className="space-y-6">
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -160,7 +105,7 @@ const Signup = () => {
               />
             </div>
 
-            {/* Password Fields */}
+            {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -169,55 +114,34 @@ const Signup = () => {
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="new-password"
+                autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                placeholder="Create a password"
+                placeholder="Enter your password"
               />
             </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                placeholder="Confirm your password"
-              />
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                  Remember me
+                </label>
+              </div>
+              <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">
+                Forgot password?
+              </Link>
             </div>
 
-            {/* Terms Agreement */}
-            <div className="flex items-start">
-              <input
-                id="agreeToTerms"
-                name="agreeToTerms"
-                type="checkbox"
-                checked={agreeToTerms}
-                onChange={(e) => setAgreeToTerms(e.target.checked)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
-              />
-              <label htmlFor="agreeToTerms" className="ml-3 block text-sm text-gray-700">
-                I agree to the{' '}
-                <Link to="/terms" className="text-blue-600 hover:text-blue-500">
-                  Terms of Service
-                </Link>
-                {' '}and{' '}
-                <Link to="/privacy" className="text-blue-600 hover:text-blue-500">
-                  Privacy Policy
-                </Link>
-              </label>
-            </div>
-
-            {/* Signup Button */}
+            {/* Login Button */}
             <button
               type="submit"
               disabled={isLoading}
@@ -226,10 +150,10 @@ const Signup = () => {
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Creating account...
+                  Signing in...
                 </div>
               ) : (
-                'Create Account'
+                'Sign in'
               )}
             </button>
           </form>
@@ -241,16 +165,16 @@ const Signup = () => {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">Or sign up with</span>
+                <span className="px-4 bg-white text-gray-500">Or continue with</span>
               </div>
             </div>
           </div>
 
-          {/* Social Signup Buttons */}
+          {/* Social Login Buttons */}
           <div className="mt-6 grid grid-cols-2 gap-3">
-            {/* Google Signup */}
+            {/* Google Login */}
             <button
-              onClick={handleGoogleSignup}
+              onClick={handleGoogleLogin}
               className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -262,9 +186,9 @@ const Signup = () => {
               <span className="ml-2">Google</span>
             </button>
 
-            {/* Facebook Signup */}
+            {/* Facebook Login */}
             <button
-              onClick={handleFacebookSignup}
+              onClick={handleFacebookLogin}
               className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200"
             >
               <svg className="h-5 w-5" fill="#1877F2" viewBox="0 0 24 24">
@@ -274,12 +198,12 @@ const Signup = () => {
             </button>
           </div>
 
-          {/* Login Link */}
+          {/* Sign Up Link */}
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-600">
-              Already have an account?{' '}
-              <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-                Sign in here
+              Don't have an account?{' '}
+              <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">
+                Sign up for free
               </Link>
             </p>
           </div>
@@ -288,7 +212,10 @@ const Signup = () => {
         {/* Footer */}
         <div className="text-center">
           <p className="text-xs text-gray-500">
-            By creating an account, you're joining thousands of professionals who have successfully started their careers in Germany
+            By signing in, you agree to our{' '}
+            <Link to="/terms" className="text-blue-600 hover:text-blue-500">Terms of Service</Link>
+            {' '}and{' '}
+            <Link to="/privacy" className="text-blue-600 hover:text-blue-500">Privacy Policy</Link>
           </p>
         </div>
       </div>
@@ -296,4 +223,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;
