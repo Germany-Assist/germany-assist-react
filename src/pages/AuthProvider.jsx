@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 
 import axios from "axios";
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+=======
+import axios from "axios";
+import React, { createContext, useContext, useState, useEffect } from "react";
+
+>>>>>>> ccdf717 (Integrating API with Sign up and Login Page (#24))
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
