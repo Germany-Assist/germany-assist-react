@@ -1,10 +1,9 @@
-import { callback } from "chart.js/helpers";
 import { useState, useCallback } from "react";
 
 export const useAlert = () => {
   const [alert, setAlert] = useState(null);
 
-  const showAlert = callback((message, type = "info") => {
+  const showAlert = useCallback((message, type = "info") => {
     setAlert({ message, type });
   }, []);
 
@@ -15,6 +14,7 @@ export const useAlert = () => {
     },
     []
   );
+
   return {
     alert,
     showAlert,
