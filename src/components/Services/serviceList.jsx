@@ -38,185 +38,28 @@ export const ServiceList = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // TODO: Replace with actual API call
-      // const response = await fetch(`${API_BASE_URL}/api/services`);
-      // if (!response.ok) throw new Error('Failed to fetch services');
-      // const data = await response.json();
+      const response = await fetch(`http://localhost:3000/api/services`);
+
+      if (!response.ok) {
+        // Try to get error message from body
+        let errorMsg = "Failed to fetch services";
+        try {
+          const errData = await response.json();
+          if (errData?.message) errorMsg = errData.message;
+        } catch (error) {
+          console.log(error, "error");
+        }
+        throw new Error(errorMsg);
+      }
+
+      const data = await response.json();
 
       // Demo data matching Germany Assist context
-      const demoServices = [
-        {
-          id: 1,
-          title: "German Document Translation",
-          category: "translation",
-          provider: "LinguaGermany",
-          rating: 4.8,
-          reviewCount: 156,
-          price: "€25/page",
-          priceNumeric: 25,
-          location: "Berlin",
-          image:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face",
-          description:
-            "Professional translation of official documents for visa and work permit applications.",
-          badges: ["Certified", "Fast Delivery"],
-          experience: "5+ years",
-          featured: true,
-          views: 1250,
-          type: "translation",
-        },
-        {
-          id: 2,
-          title: "Visa Application Assistance",
-          category: "paperwork",
-          provider: "GermanyVisa Pro",
-          rating: 4.9,
-          reviewCount: 203,
-          price: "€150/application",
-          priceNumeric: 150,
-          location: "Munich",
-          image:
-            "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=300&fit=crop&crop=face",
-          description:
-            "Complete assistance with German visa applications, from document preparation to submission.",
-          badges: ["Government Approved", "Success Rate 98%"],
-          experience: "10+ years",
-          featured: true,
-          views: 2100,
-          type: "paperwork",
-        },
-        {
-          id: 3,
-          title: "Career Coaching for Tech Professionals",
-          category: "career-coaching",
-          provider: "TechCareer Germany",
-          rating: 4.7,
-          reviewCount: 89,
-          price: "€80/hour",
-          priceNumeric: 80,
-          location: "Hamburg",
-          image:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=300&fit=crop&crop=face",
-          description:
-            "Specialized career coaching for software developers and IT professionals seeking jobs in Germany.",
-          badges: ["Tech Specialist", "Interview Prep"],
-          experience: "8+ years",
-          featured: false,
-          views: 890,
-          type: "career-coaching",
-        },
-        {
-          id: 4,
-          title: "German Language Tutoring",
-          category: "language",
-          provider: "SpeakGerman Now",
-          rating: 4.6,
-          reviewCount: 124,
-          price: "€30/hour",
-          priceNumeric: 30,
-          location: "Online",
-          image:
-            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=300&fit=crop&crop=face",
-          description:
-            "One-on-one German language tutoring focused on professional communication and job interviews.",
-          badges: ["Native Speaker", "Business German"],
-          experience: "7+ years",
-          featured: true,
-          views: 1560,
-          type: "language",
-        },
-        {
-          id: 5,
-          title: "Housing Search Assistant",
-          category: "relocation",
-          provider: "HomeSeeker Germany",
-          rating: 4.5,
-          reviewCount: 67,
-          price: "€200/search",
-          priceNumeric: 200,
-          location: "Frankfurt",
-          image:
-            "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop",
-          description:
-            "Help finding suitable accommodation in major German cities with local expertise.",
-          badges: ["Local Expert", "Quick Results"],
-          experience: "6+ years",
-          featured: false,
-          views: 780,
-          type: "relocation",
-        },
-        {
-          id: 6,
-          title: "Tax Registration & Setup",
-          category: "paperwork",
-          provider: "TaxPro Germany",
-          rating: 4.8,
-          reviewCount: 91,
-          price: "€120/setup",
-          priceNumeric: 120,
-          location: "Düsseldorf",
-          image:
-            "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=300&fit=crop&crop=face",
-          description:
-            "Complete tax registration and setup for new residents and workers in Germany.",
-          badges: ["Tax Certified", "Multilingual"],
-          experience: "12+ years",
-          featured: false,
-          views: 920,
-          type: "paperwork",
-        },
-        {
-          id: 7,
-          title: "Legal Consultation for Expats",
-          category: "legal",
-          provider: "LegalEase Germany",
-          rating: 4.9,
-          reviewCount: 145,
-          price: "€100/hour",
-          priceNumeric: 100,
-          location: "Berlin",
-          image:
-            "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=300&fit=crop&crop=face",
-          description:
-            "Legal advice for residence permits, employment contracts, and German law compliance.",
-          badges: ["Bar Certified", "Expat Specialist"],
-          experience: "15+ years",
-          featured: false,
-          views: 1120,
-          type: "legal",
-        },
-        {
-          id: 8,
-          title: "Financial Planning for Newcomers",
-          category: "financial",
-          provider: "FinanceWise DE",
-          rating: 4.6,
-          reviewCount: 73,
-          price: "€90/session",
-          priceNumeric: 90,
-          location: "Munich",
-          image:
-            "https://images.unsplash.com/photo-1559526324-593bc073d938?w=400&h=300&fit=crop",
-          description:
-            "Financial planning services including banking setup, insurance, and investment advice for expats.",
-          badges: ["Certified Advisor", "Multilingual"],
-          experience: "9+ years",
-          featured: false,
-          views: 650,
-          type: "financial",
-        },
-      ];
 
-      throw new Error("API not working");
-
-      // setServices(demoServices);
-      // setFilteredServices(demoServices);
+      setServices(data);
+      setFilteredServices(data);
     } catch (err) {
-      showAutoAlert(
-        "Failed to load services. Please try again later.",
-        "error",
-        3000
-      );
-      console.error("Error fetching services:", err);
+      showAutoAlert(err.message || "Something went wrong.", "error", 5000);
     } finally {
       setIsLoading(false);
     }
@@ -348,9 +191,9 @@ export const ServiceList = () => {
     <div className="bg-gray-50 min-h-screen">
       {alert && (
         <AlertNotify
-          message="Something went wrong!"
-          type="error"
-          onClose={() => console.log("Alert closed")}
+          message={alert.message}
+          type={alert.type}
+          onClose={clearAlert}
           duration={4000}
         />
       )}
