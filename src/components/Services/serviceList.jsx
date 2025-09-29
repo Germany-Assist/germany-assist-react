@@ -11,7 +11,7 @@ export const ServiceList = () => {
   const [sortBy, setSortBy] = useState("rating");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const { alert, showAlert } = useAlert();
+  const { alert, showAlert, clearAlert, showAutoAlert } = useAlert();
 
   // TODO: Replace with actual API endpoint
   // const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
@@ -211,7 +211,11 @@ export const ServiceList = () => {
       // setServices(demoServices);
       // setFilteredServices(demoServices);
     } catch (err) {
-      showAlert("Failed to load services. Please try again later.", "error");
+      showAutoAlert(
+        "Failed to load services. Please try again later.",
+        "error",
+        3000
+      );
       console.error("Error fetching services:", err);
     } finally {
       setIsLoading(false);
@@ -342,10 +346,15 @@ export const ServiceList = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Always render alert if it exists */}
-      {alert && <AlertNotify message={alert.message} type={alert.type} />}
+      {alert && (
+        <AlertNotify
+          message="Something went wrong!"
+          type="error"
+          onClose={() => console.log("Alert closed")}
+          duration={4000}
+        />
+      )}
 
-      {/* Loading state */}
       {isLoading && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -358,7 +367,6 @@ export const ServiceList = () => {
         </div>
       )}
 
-      {/* Error state */}
       {error && !isLoading && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <div className="text-6xl mb-4">⚠️</div>
@@ -375,7 +383,6 @@ export const ServiceList = () => {
         </div>
       )}
 
-      {/* Main content */}
       {!isLoading && !error && (
         <div>
           <div className="bg-gray-50 min-h-screen">
