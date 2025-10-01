@@ -37,6 +37,12 @@ function App() {
             <Jobs />
           </>
         } ></Route>
+        <Route path="/serviceDetails/:id" element={
+          <>
+            <DashboardHeader />
+            <ServiceDetails />
+          </>
+        } ></Route>
         <Route path="/onboarding" element={<OnboardingPage />}></Route>
         <Route path="/login" element={<Login />}></Route>
         <Route path="/signup" element={<Signup />}></Route>
@@ -47,7 +53,6 @@ function App() {
           </>
         }></Route>
         <Route path="/userProfile" element={<UserProfile />}></Route>
-        <Route path="/serviceDetails/:slug" element={<ServiceDetails />}></Route>
       </Routes>
     </Router>
   );
