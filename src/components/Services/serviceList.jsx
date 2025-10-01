@@ -33,162 +33,14 @@ export const ServiceList = () => {
     try {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
+   
+      const response = await fetch(`http://localhost:3000/api/service`);
+      if (!response.ok) throw new Error('Failed to fetch services');
+      const data = await response.json();
+       setServices(data);
+      setFilteredServices(data);
+      console.log("data is service list",data);
       
-      // TODO: Replace with actual API call
-      // const response = await fetch(`${API_BASE_URL}/api/services`);
-      // if (!response.ok) throw new Error('Failed to fetch services');
-      // const data = await response.json();
-      
-      // Demo data matching Germany Assist context
-      const demoServices = [
-        {
-          id: 1,
-          title: "German Document Translation",
-          category: "translation",
-          provider: "LinguaGermany",
-          rating: 4.8,
-          reviewCount: 156,
-          price: "€25/page",
-          priceNumeric: 25,
-          location: "Berlin",
-          image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face",
-          description: "Professional translation of official documents for visa and work permit applications.",
-          badges: ["Certified", "Fast Delivery"],
-          experience: "5+ years",
-          featured: true,
-          views: 1250,
-          type: "translation"
-        },
-        {
-          id: 2,
-          title: "Visa Application Assistance",
-          category: "paperwork",
-          provider: "GermanyVisa Pro",
-          rating: 4.9,
-          reviewCount: 203,
-          price: "€150/application",
-          priceNumeric: 150,
-          location: "Munich",
-          image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=300&fit=crop&crop=face",
-          description: "Complete assistance with German visa applications, from document preparation to submission.",
-          badges: ["Government Approved", "Success Rate 98%"],
-          experience: "10+ years",
-          featured: true,
-          views: 2100,
-          type: "paperwork"
-        },
-        {
-          id: 3,
-          title: "Career Coaching for Tech Professionals",
-          category: "career-coaching",
-          provider: "TechCareer Germany",
-          rating: 4.7,
-          reviewCount: 89,
-          price: "€80/hour",
-          priceNumeric: 80,
-          location: "Hamburg",
-          image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=300&fit=crop&crop=face",
-          description: "Specialized career coaching for software developers and IT professionals seeking jobs in Germany.",
-          badges: ["Tech Specialist", "Interview Prep"],
-          experience: "8+ years",
-          featured: false,
-          views: 890,
-          type: "career-coaching"
-        },
-        {
-          id: 4,
-          title: "German Language Tutoring",
-          category: "language",
-          provider: "SpeakGerman Now",
-          rating: 4.6,
-          reviewCount: 124,
-          price: "€30/hour",
-          priceNumeric: 30,
-          location: "Online",
-          image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=300&fit=crop&crop=face",
-          description: "One-on-one German language tutoring focused on professional communication and job interviews.",
-          badges: ["Native Speaker", "Business German"],
-          experience: "7+ years",
-          featured: true,
-          views: 1560,
-          type: "language"
-        },
-        {
-          id: 5,
-          title: "Housing Search Assistant",
-          category: "relocation",
-          provider: "HomeSeeker Germany",
-          rating: 4.5,
-          reviewCount: 67,
-          price: "€200/search",
-          priceNumeric: 200,
-          location: "Frankfurt",
-          image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop",
-          description: "Help finding suitable accommodation in major German cities with local expertise.",
-          badges: ["Local Expert", "Quick Results"],
-          experience: "6+ years",
-          featured: false,
-          views: 780,
-          type: "relocation"
-        },
-        {
-          id: 6,
-          title: "Tax Registration & Setup",
-          category: "paperwork",
-          provider: "TaxPro Germany",
-          rating: 4.8,
-          reviewCount: 91,
-          price: "€120/setup",
-          priceNumeric: 120,
-          location: "Düsseldorf",
-          image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=300&fit=crop&crop=face",
-          description: "Complete tax registration and setup for new residents and workers in Germany.",
-          badges: ["Tax Certified", "Multilingual"],
-          experience: "12+ years",
-          featured: false,
-          views: 920,
-          type: "paperwork"
-        },
-        {
-          id: 7,
-          title: "Legal Consultation for Expats",
-          category: "legal",
-          provider: "LegalEase Germany",
-          rating: 4.9,
-          reviewCount: 145,
-          price: "€100/hour",
-          priceNumeric: 100,
-          location: "Berlin",
-          image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=300&fit=crop&crop=face",
-          description: "Legal advice for residence permits, employment contracts, and German law compliance.",
-          badges: ["Bar Certified", "Expat Specialist"],
-          experience: "15+ years",
-          featured: false,
-          views: 1120,
-          type: "legal"
-        },
-        {
-          id: 8,
-          title: "Financial Planning for Newcomers",
-          category: "financial",
-          provider: "FinanceWise DE",
-          rating: 4.6,
-          reviewCount: 73,
-          price: "€90/session",
-          priceNumeric: 90,
-          location: "Munich",
-          image: "https://images.unsplash.com/photo-1559526324-593bc073d938?w=400&h=300&fit=crop",
-          description: "Financial planning services including banking setup, insurance, and investment advice for expats.",
-          badges: ["Certified Advisor", "Multilingual"],
-          experience: "9+ years",
-          featured: false,
-          views: 650,
-          type: "financial"
-        }
-      ];
-      
-      setServices(demoServices);
-      setFilteredServices(demoServices);
     } catch (err) {
       setError('Failed to load services. Please try again later.');
       console.error('Error fetching services:', err);
@@ -224,15 +76,14 @@ export const ServiceList = () => {
         case 'rating':
           return b.rating - a.rating;
         case 'price-low-high':
-          return a.priceNumeric - b.priceNumeric;
+          return a.price - b.price;
         case 'price-high-low':
-          return b.priceNumeric - a.priceNumeric;
+          return b.price - a.price;
         case 'reviews':
-          return b.reviewCount - a.reviewCount;
-        case 'featured':
-          if (a.featured && !b.featured) return -1;
-          if (!a.featured && b.featured) return 1;
-          return b.rating - a.rating;
+          return b.total_reviews - a.total_reviews;
+        case 'views':
+        
+          return b.views - a.views;
         default:
           return b.rating - a.rating;
       }
@@ -243,7 +94,7 @@ export const ServiceList = () => {
 
   const ServiceCard = ({ service }) => (
     <div className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group ${
-      service.featured ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
+      service.views ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
     }`}>
       <div className="relative">
         <img
@@ -254,9 +105,9 @@ export const ServiceList = () => {
         <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-md">
           <span className="text-sm font-semibold text-gray-800">⭐ {service.rating}</span>
         </div>
-        {service.featured && (
+        {service.views && (
           <div className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-full shadow-md">
-            <span className="text-xs font-bold">✨ FEATURED</span>
+            <span className="text-xs font-bold">✨{service.views } Views</span>
           </div>
         )}
       </div>
@@ -271,13 +122,13 @@ export const ServiceList = () => {
         
         <div className="flex items-center mb-4">
           <span className="text-sm text-gray-500">by</span>
-          <span className="text-sm font-semibold text-gray-900 ml-1">{service.provider}</span>
+          <span className="text-sm font-semibold text-gray-900 ml-1">{service.ProviderId}</span>
           <span className="text-gray-300 mx-2">•</span>
           <span className="text-sm text-gray-500">{service.location}</span>
         </div>
         
         <div className="flex flex-wrap gap-2 mb-4">
-          {service.badges.map((badge, index) => (
+          {Array.isArray(service.badges) &&service.badges.map((badge, index) => (
             <span
               key={index}
               className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
@@ -290,7 +141,7 @@ export const ServiceList = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <span className="text-sm text-gray-500">
-              ⭐ {service.rating} ({service.reviewCount} reviews)
+              ⭐ {service.rating} ({service.total_reviews} reviews)
             </span>
           </div>
           <Link
@@ -500,7 +351,7 @@ export const ServiceList = () => {
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="rating">Best Rating</option>
-                <option value="featured">Featured First</option>
+                <option value="views">Highest Views</option>
                 <option value="price-low-high">Price: Low to High</option>
                 <option value="price-high-low">Price: High to Low</option>
                 <option value="reviews">Most Reviews</option>
