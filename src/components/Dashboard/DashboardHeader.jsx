@@ -51,37 +51,39 @@ const DashboardHeader = () => {
   };
 
   return (
-    <header
-      className="w-full font-sans text-gray-800 shadow-sm bg-cover bg-center min-h-[400px]"
-      style={{
-        backgroundImage:
-          "url('https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=1600&q=80')",
-      }}
-    >
- 
-      <div className="px-8 py-6">
-        <div className="flex justify-between items-center border-b border-gray-200 pb-4">
-          <div className="flex items-center">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-              alt="Dashboard"
-              className="h-10 w-10 mr-3 rounded-full object-cover"
-            />
-            <div className="text-2xl font-bold text-black">Germany-Assist</div>
-          </div>
+    <header className="w-full font-sans bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Main Header */}
+        <div className="flex justify-between items-center py-4">
+          {/* Logo Section */}
+          <Link to="/" className="flex items-center group">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-xl mr-3 group-hover:shadow-lg transition-all duration-200">
+              <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Germany-Assist
+            </div>
+          </Link>
 
-          <nav className="flex items-center space-x-6">
-            <a href="/" className="text-black hover:text-blue-700 text-base">Home</a>
-            <a href="/businessProfile" className="text-black hover:text-blue-700 text-base">Business</a>
-            <a href="#services" className="text-black hover:text-blue-700 text-base">Services</a>
-            <a href="/pages" className="text-black hover:text-blue-700 text-base">Pages</a>
-            <a href="/userProfile" className="text-black hover:text-blue-700 text-base">Profile</a>
-            <a href="/login" className="text-black hover:text-blue-700 text-base">Login</a>
- 
-          <Link to="/signup">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-base">
-              Sign Up
-            </button>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-2">
+            <Link to="/" className={getLinkStyles('/')}>
+              Home
+            </Link>
+            <Link to="/about" className={getLinkStyles('/about')}>
+              About
+            </Link>
+            <Link to="/services" className={getLinkStyles('/services')}>
+              Services
+            </Link>
+            <Link to="/jobs" className={getLinkStyles('/jobs')}>
+              Jobs
+              <span className="ml-1 bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full">
+                Soon
+              </span>
             </Link>
             {/* Only show Profile link when user is logged in */}
             {isLoggedIn && (
