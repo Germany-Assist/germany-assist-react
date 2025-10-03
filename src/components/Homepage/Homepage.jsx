@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { FavoriteService } from "../Services/FavoriteService";
 
 const Homepage = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
 
-      
   const categories = [
     { id: "all", name: "All Services", icon: "🌟" },
     { id: "translation", name: "Translation", icon: "📝" },
@@ -15,7 +15,7 @@ const Homepage = () => {
     { id: "relocation", name: "Relocation", icon: "🏠" },
   ];
 
- const fetchServices = async () => {
+  const fetchServices = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/service");
       const data = await response.json();
@@ -97,6 +97,11 @@ const Homepage = () => {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center">
+            <FavoriteService
+              serviceId={service.id}
+              initiallyFavorite={service.isFavorite}
+            />
+
             <span className="text-sm text-gray-500">
               ⭐ {service.rating} ({service.reviewCount} reviews)
             </span>
@@ -295,17 +300,15 @@ const Homepage = () => {
 
         {/* Show only featured services (limit to 6) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-           {
-    filteredServices
-      .filter((service) => service.views)
-      .slice(0, 6)
-      .map((service) => (
-        <ServiceCard key={service.id} service={service} />
-      ))}
+          {filteredServices
+            .filter((service) => service.views)
+            .slice(0, 6)
+            .map((service) => (
+              <ServiceCard key={service.id} service={service} />
+            ))}
         </div>
 
-        {filteredServices.filter((service) => service.views).length ===
-          0 && (
+        {filteredServices.filter((service) => service.views).length === 0 && (
           <div className="text-center py-8">
             <div className="text-4xl mb-4">🌟</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">

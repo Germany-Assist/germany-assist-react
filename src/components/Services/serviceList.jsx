@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { FavoriteService } from './FavoriteService';
 
 export const ServiceList = () => {
   const [services, setServices] = useState([]);
@@ -103,6 +104,7 @@ export const ServiceList = () => {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-md">
+          <FavoriteService   serviceId={service.id} initiallyFavorite={service.isFavorite}/>
           <span className="text-sm font-semibold text-gray-800">⭐ {service.rating}</span>
         </div>
         {service.views && (
