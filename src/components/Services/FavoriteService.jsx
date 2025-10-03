@@ -7,15 +7,17 @@ export const FavoriteService = ({ serviceId, initiallyFavorite = false }) => {
 
   const toggleFavorite = async () => {
     try {
-      const url = isFavorite ? `${BACKEND_URL}/favorites/remove` : `${BACKEND_URL}/favorites/add`;
-
+        const url = `${BACKEND_URL}/service/client/favorite`;
+    
+    if (isFavorite) {
+      const res = await axios.delete(url, { data: { id: serviceId } });
+      if (res.status !== 200) throw new Error("Failed removing favorite");
+    } else {
       const res = await axios.post(url, { id: serviceId });
+      if (res.status !== 201) throw new Error("Failed adding favorite");
+    }
 
-      if (res.status !== 200 && res.status !== 201) {
-        throw new Error("Failed processing");
-      }
-
-      setIsFavorite(!isFavorite);
+    setIsFavorite(!isFavorite);
     } catch (error) {
       console.error("Error using favorite icon", error);
     }
