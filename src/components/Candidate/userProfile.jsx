@@ -3,7 +3,7 @@ import axios from "axios";
 import { Pagination } from "../pagination";
 import { CandidateSideBar } from "./CandidateSideBar";
 import { useAuth } from "../../pages/AuthProvider";
-
+import { BACKEND_URL } from "../../config/api";
 const UserProfile = () => {
   const { userId, accessToken } = useAuth();
   const [user, setUser] = useState({});
@@ -12,10 +12,10 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [servicePage, setServicePage] = useState("");
   const [reviewPage, setReviewsPage] = useState("");
+  const [favoriteServices, setFavoriteServices] = useState([]);
 
   const servicePerPage = 3;
   const reviewPerPage = 3;
-  const BACKEND_URL = "http://localhost:3000/api";
 
   useEffect(() => {
     if (userId && accessToken) {
@@ -23,11 +23,10 @@ const UserProfile = () => {
     }
   }, [userId, accessToken]);
   useEffect(() => {
-  if (user) {
-    console.log("User state updated:", user);
-  }
-}, [user]);
-
+    if (user) {
+      console.log("User state updated:", user);
+    }
+  }, [user]);
 
   const fetchAllData = async () => {
     try {
@@ -40,16 +39,16 @@ const UserProfile = () => {
 
       const userData = userRes.data;
       console.log("User API response:", userRes.data);
-            setUser({
-              firstName: userData.firstName,
-              lastName: userData.lastName,
-              email: userData.email,
-              image: userData.image,
-              isVerified: userData.isVerified,
-              createdAt: userData.createdAt,
-            });
+      setUser({
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        image: userData.image,
+        isVerified: userData.isVerified,
+        createdAt: userData.createdAt,
+      });
+      setFavoriteServices(userData);
 
-      
       console.log("User  Rs API response:", userRes.data);
 
       console.log("User state after set:", user);
@@ -101,10 +100,10 @@ const UserProfile = () => {
           />
 
           <div className="flex-1 space-y-2">
-             <h2>{user?.firstName} {user?.lastName}</h2>
-            <h2 className="text-xl font-extrabold text-blue-800">
-
+            <h2>
+              {user?.firstName} {user?.lastName}
             </h2>
+            <h2 className="text-xl font-extrabold text-blue-800"></h2>
 
             <div className="text-gray-600">
               <p className="flex items-center">
@@ -140,7 +139,7 @@ const UserProfile = () => {
           <h3 className="text-2xl font-semibold mb-4 text-blue-700">
             Services
           </h3>
-          {services.length === 0 ? (
+          {favoriteServices.length === 0 ? (
             <p className="text-gray-500">No Services added yet.</p>
           ) : (
             <>
@@ -171,6 +170,36 @@ const UserProfile = () => {
                   currentPage={servicePage}
                   onPageChange={setServicePage}
                 />
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Favorite Services */}
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h3 className="text-2xl font-semibold mb-4 text-blue-700">
+            Favorite Services
+          </h3>
+          {favoriteServices?.favorite?.length === 0 ? (
+            <p className="text-gray-500">No Services added yet.</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-align-left">
+                {favoriteServices?.favorite?.map((service) => (
+                  <div
+                    key={service.favoriteId}
+                    className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50"
+                  >
+                    <div className="flex flex-col text-sm text-gray-900">
+                      <span>Favorite Service: {service.favoriteId}</span>
+                      <span>Item Title: {service.itemId}</span>
+                    </div>
+
+                    <div className="text-xs text-gray-500">
+                      Thumbnail: {service.thumbnail}
+                    </div>
+                  </div>
+                ))}
               </div>
             </>
           )}

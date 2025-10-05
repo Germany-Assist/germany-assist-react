@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext, useAuth } from "./AuthProvider";
+import { BACKEND_URL } from "../config/api";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -10,29 +11,13 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
 
   try {
-    const response = await fetch("http://localhost:3000/api/user/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-   
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Login failed");
-    }
-
-   
-    const data = await response.json();
-
- 
-    login(data.accessToken, data.user);
+    await login({ email, password }); 
 
     toast.success("User login successfully");
     navigate("/"); 
@@ -44,7 +29,6 @@ const Login = () => {
     setIsLoading(false);
   }
 };
-
   // TODO: Implement actual Google OAuth
   const handleGoogleLogin = () => {
     console.log("Google login initiated");

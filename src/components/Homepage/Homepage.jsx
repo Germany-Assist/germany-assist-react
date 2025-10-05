@@ -50,6 +50,11 @@ const Homepage = () => {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-md">
+             <FavoriteService
+              serviceId={service.id}
+              initiallyFavorite={service.isFavorite}
+            />
+
           <span className="text-sm font-semibold text-gray-800">
             ⭐ {service.rating}
           </span>
@@ -97,11 +102,7 @@ const Homepage = () => {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <FavoriteService
-              serviceId={service.id}
-              initiallyFavorite={service.isFavorite}
-            />
-
+        
             <span className="text-sm text-gray-500">
               ⭐ {service.rating} ({service.reviewCount} reviews)
             </span>

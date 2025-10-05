@@ -49,7 +49,11 @@ function App() {
             <ServiceList />
           </>
         }></Route>
-        <Route path="/userProfile" element={<UserProfile />}></Route>
+        <Route path="/userProfile" element={
+          <>
+           <DashboardHeader />
+          <UserProfile />
+          </>}></Route>
       </Routes>
     </Router>
   );
