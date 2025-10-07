@@ -4,6 +4,7 @@ import { Pagination } from "../pagination";
 import { CandidateSideBar } from "./CandidateSideBar";
 import { useAuth } from "../../pages/AuthProvider";
 import { BACKEND_URL } from "../../config/api";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 const UserProfile = () => {
   const { userId, accessToken } = useAuth();
   const [user, setUser] = useState({});
@@ -99,7 +100,7 @@ const UserProfile = () => {
             className="w-28 h-28 rounded-full object-cover border-4 border-blue-200 shadow"
           />
 
-          <div className="flex-1 space-y-2">
+          <div className="flex-1 space-y-2 text-2xl text-blue-800 font-medium">
             <h2>
               {user?.firstName} {user?.lastName}
             </h2>
@@ -178,26 +179,25 @@ const UserProfile = () => {
         {/* Favorite Services */}
         <div className="bg-white p-6 rounded-xl shadow-md">
           <h3 className="text-2xl font-semibold mb-4 text-blue-700">
-            Favorite Services
+            Favorite Services  <i class="fa-solid fa-heart text-red-500" ></i>
           </h3>
           {favoriteServices?.favorite?.length === 0 ? (
             <p className="text-gray-500">No Services added yet.</p>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-align-left">
+              <div className="grid grid-cols-1 sm:grid-cols-2  gap-4 text-align-left">
                 {favoriteServices?.favorite?.map((service) => (
                   <div
                     key={service.favoriteId}
                     className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50"
                   >
-                    <div className="flex flex-col text-sm text-gray-900">
+                    <div className="flex flex-col space-y-2 text-sm text-gray-900">
                       <span>Favorite Service: {service.favoriteId}</span>
+                      <span> Thumbnail: {service.thumbnail}</span>
                       <span>Item Title: {service.itemId}</span>
                     </div>
 
-                    <div className="text-xs text-gray-500">
-                      Thumbnail: {service.thumbnail}
-                    </div>
+                   
                   </div>
                 ))}
               </div>
