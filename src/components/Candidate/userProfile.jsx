@@ -3,7 +3,8 @@ import axios from "axios";
 import { CandidateSideBar } from "./CandidateSideBar";
 import { useAuth } from "../../pages/AuthProvider";
 import { BACKEND_URL } from "../../config/api";
-import {usePagination} from "../hooks/usePagination"
+import {usePagination} from "../hooks/usePagination";
+import {Pagination} from "../../pages/Pagination.jsx";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 const UserProfile = () => {
   const { userId, accessToken } = useAuth();
@@ -16,7 +17,7 @@ const UserProfile = () => {
   //Pagination uses
   const servicePagination = usePagination(services, 4);
   const reviewPagination = usePagination(reviews, 4);
-  const favoritePagination = usePagination(favoriteServices.favorite||[], 1);
+  const favoritePagination = usePagination(favoriteServices.favorite, 3);
 
   useEffect(() => {
     if (userId && accessToken) {
@@ -126,12 +127,12 @@ const UserProfile = () => {
           <h3 className="text-2xl font-semibold mb-4 text-blue-700">
             Services
           </h3>
-          {servicePagination?.length === 0 ? (
+          {servicePagination?.currentData?.length === 0 ? (
             <p className="text-gray-500">No Services added yet.</p>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {services?.map((service) => (
+                {servicePagination?.currentData?.map((service) => (
                   <div
                     key={service.id}
                     className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50"
@@ -152,7 +153,7 @@ const UserProfile = () => {
               </div>
 
               <div className="flex justify-center mt-6">
-                <usePagination
+                <Pagination
                   totalPages={servicePagination.totalPages}
                   currentPage={servicePagination.currentPage}
                   onPageChange={servicePagination.setCurrentPage}
@@ -167,12 +168,12 @@ const UserProfile = () => {
           <h3 className="text-2xl font-semibold mb-4 text-blue-700">
             Favorite Services <i className="fa-solid fa-heart text-red-500"></i>
           </h3>
-          {favoriteServices?.favorite?.length === 0 ? (
+          {favoritePagination?.currentData?.length === 0 ? (
             <p className="text-gray-500">No Services added yet.</p>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2  gap-4 text-align-left">
-                {favoriteServices?.favorite?.map((service) => (
+                {favoritePagination?.currentData?.map((service) => (
                   <div
                     key={service.favoriteId}
                     className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50"
@@ -186,7 +187,7 @@ const UserProfile = () => {
                 ))}
               </div>
               <div className="flex justify-center mt-6">
-                <usePagination
+                <Pagination
                   totalPages={favoritePagination.totalPages}
                   currentPage={favoritePagination.currentPage}
                   onPageChange={favoritePagination.setCurrentPage}
@@ -199,12 +200,12 @@ const UserProfile = () => {
         <div className="bg-white p-6 rounded-xl shadow-md">
           <h3 className="text-2xl font-semibold mb-4 text-blue-700">Reviews</h3>
 
-          {reviews.length === 0 ? (
+          {reviewPagination?.currentData?.length === 0 ? (
             <p className="text-gray-500">No reviews yet.</p>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {reviews?.map((review) => (
+                {reviewPagination?.currentData?.map((review) => (
                   <div
                     key={review.id}
                     className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50 flex flex-col h-full"
@@ -239,7 +240,7 @@ const UserProfile = () => {
               </div>
 
               <div className="flex justify-center mt-6">
-                <usePagination
+                <Pagination
                   totalPages={reviewPagination.totalPages}
                   currentPage={reviewPagination.currentPage}
                   onPageChange={reviewPagination.setCurrentPage}
