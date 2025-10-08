@@ -3,20 +3,20 @@ import axios from "axios";
 import { CandidateSideBar } from "./CandidateSideBar";
 import { useAuth } from "../../pages/AuthProvider";
 import { BACKEND_URL } from "../../config/api";
-import {usePagination} from "../pagination"
+import {usePagination} from "../hooks/usePagination"
 import "@fortawesome/fontawesome-free/css/all.min.css";
 const UserProfile = () => {
   const { userId, accessToken } = useAuth();
   const [user, setUser] = useState({});
-  const [services, setServices] = useState([]);
-  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [favoriteServices, setFavoriteServices] = useState([]);
+  const [services, setServices] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   //Pagination uses
   const servicePagination = usePagination(services, 4);
   const reviewPagination = usePagination(reviews, 4);
-  const favoritePagination = usePagination(favoriteServices, 4);
+  const favoritePagination = usePagination(favoriteServices.favorite||[], 1);
 
   useEffect(() => {
     if (userId && accessToken) {
@@ -126,12 +126,12 @@ const UserProfile = () => {
           <h3 className="text-2xl font-semibold mb-4 text-blue-700">
             Services
           </h3>
-          {favoriteServices.length === 0 ? (
+          {servicePagination?.length === 0 ? (
             <p className="text-gray-500">No Services added yet.</p>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {servicePagination.map((service) => (
+                {services?.map((service) => (
                   <div
                     key={service.id}
                     className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50"
@@ -165,7 +165,7 @@ const UserProfile = () => {
         {/* Favorite Services */}
         <div className="bg-white p-6 rounded-xl shadow-md">
           <h3 className="text-2xl font-semibold mb-4 text-blue-700">
-            Favorite Services <i class="fa-solid fa-heart text-red-500"></i>
+            Favorite Services <i className="fa-solid fa-heart text-red-500"></i>
           </h3>
           {favoriteServices?.favorite?.length === 0 ? (
             <p className="text-gray-500">No Services added yet.</p>
@@ -204,7 +204,7 @@ const UserProfile = () => {
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {reviewPagination.map((review) => (
+                {reviews?.map((review) => (
                   <div
                     key={review.id}
                     className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50 flex flex-col h-full"

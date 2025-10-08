@@ -1,19 +1,38 @@
-import { useState, useMemo } from "react";
+import React from "react";
 
-export const usePagination = (data = [], itemsPerPage = 5) => {
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-
-  const currentData = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return data.slice(start, start + itemsPerPage);
-  }, [data, currentPage, itemsPerPage]);
-
-  return {
-    currentPage,
-    setCurrentPage,
-    totalPages,
-    currentData,
-  };
+export const pagination = ({ totalPages, currentPage, onPageChange }) => {
+  if (totalPages < 1) return null;
+  return (
+    <div className="flex items-center space-x-2">
+      p
+      <button
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage == 1}
+        className="px-3 py-1 border rounded disabled:opacity-50"
+      ></button>
+      Prev
+      {[
+        ...Array(totalPages).map((_, index) => (
+          <button
+            key={index}
+            onClick={() => onPageChange(index + 1)}
+            className={`px-3 py-1 border rounded ${
+              currentPage === index + 1
+                ? "bg-blue-500 text-white "
+                : "bgg-white hover:bg-gray-100"
+            }`}
+          >
+            {index + 1}
+          </button>
+        )),
+      ]}
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className="px-3 py-1 border rounded disabled:opacity-50"
+      >
+        Next
+      </button>
+    </div>
+  );
 };
