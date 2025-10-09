@@ -2,34 +2,44 @@ import React, { useState } from "react";
 import axios from "axios";
 import AuthInputs from "../AuthInputs";
 import InputFields from "../InputFields";
-
+import { BACKEND_URL } from "../../config/api";
+import { useAuth } from "../../pages/AuthProvider";
 export const ReviewSection = ({ serviceId }) => {
   const [newReview, setNewReview] = useState("");
   const [reviews, setReviews] = useState([]);
-
- 
+  const[rating,setRating]=useState(0);
+   const[userName, setUserName]=useState("");
+   const[error,setError]=useState("");
+   const[loading,setLoading]=useState(false);
+   const { userId, user,accessToken } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newReview.trim()) return;
+    if (!newReview.trim() ) return;
+    if (!serviceId) {
+      setError("Service ID is missing!");
+      return;
+    }
 
     try {
+      setLoading(true);
+      setError("");
       const response = await axios.post(
-        `/api/services/${serviceId}/Reviews`,
+        `${BACKEND_URL}/review`,
         {
-          text: newReview,
-          author: "currentUser",
-          date: new Date().toISOString(),
-          rating: 5,
+          body: newReview,
+          id: serviceId,
+          author: user.userName || userId,
+          rating,
         },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+          headers: { Authorization: `Bearer ${accessToken}` },
+          withCredentials: true,
+        },
       );
-
+      setReviews((prev)=>[...prev,response.data])
       setNewReview("");
+      setRating(0);
     } catch (error) {
       setError(
         error.response?.data?.message ||
@@ -44,32 +54,48 @@ export const ReviewSection = ({ serviceId }) => {
       <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
         Customer Reviews
       </h2>
-      <form onSubmit={handleSubmit} className="mb-8">
-        <label
-          id="userName"
-          className='className=" text-left block text-xl font-medium text-blue-700 mb-1 "'
-        >
-          User Name
-        </label>
-        <InputFields type="text" id="userName" placeholder="User Name" />
-        <label
-          id="userName"
-          className='className=" text-left block text-xl font-medium text-blue-700 mb-1 p-3 "'
-        >
-          User Review
-        </label>
-        <textarea
-          value={newReview}
-          onChange={(e) => setReviews(e.value.target)}
-          rows="4"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-        />
+     <form onSubmit={handleSubmit} className="mb-8 space-y-4">
+        <div>
+          <label
+            htmlFor="userName"
+            className="block text-xl font-medium text-blue-700 mb-1"
+          >
+            User Name
+          </label>
+          <InputFields
+            type="text"
+            id="userName"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            placeholder="Enter your name"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="review"
+            className="block text-xl font-medium text-blue-700 mb-1"
+          >
+            Your Review
+          </label>
+          <textarea
+            id="review"
+            value={newReview}
+            onChange={(e) => setNewReview(e.target.value)}
+            rows="4"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+            placeholder="Write your review..."
+          />
+        </div>
+
+        {error && <p className="text-red-500">{error}</p>}
+
         <AuthInputs
-          label="Submit"
+          label={loading ? "Posting..." : "Submit Review"}
+          type="submit"
+          disabled={loading}
           className="mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 w-fit"
-        >
-          Post Review
-        </AuthInputs>
+        />
       </form>
     </div>
   );

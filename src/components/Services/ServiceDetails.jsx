@@ -54,25 +54,25 @@ function ServiceDetails() {
 
         {/* Service Info */}
         <div className="md:w-1/2 space-y-4 flex flex-col items-start">
-          <h2 className="text-2xl font-bold text-gray-800">{service.title}</h2>
-          <p className="text-lg text-gray-700">{service.description}</p>
+          <h2 className="text-2xl font-bold text-gray-800">{service?.title}</h2>
+          <p className="text-lg text-gray-700">{service?.description}</p>
 
           <div className="text-blue-900 font-semibold">
             Type:{" "}
-            <span className="text-gray-700 font-normal">{service.type}</span>
+            <span className="text-gray-700 font-normal">{service?.type}</span>
           </div>
 
           <div className="text-lg font-bold text-green-700">
-            Price: ${service.price}
+            Price: ${service?.price}
           </div>
 
           <div className="flex items-center space-x-2 text-yellow-600">
             <i className="fas fa-star" />
-            {service.rating} ({service.total_reviews} reviews)
+            {service?.rating} ({service?.total_reviews} reviews)
           </div>
 
           <div className="flex gap-2 flex-wrap">
-            {service.categories?.map((cat, i) => (
+            {service?.categories?.map((cat, i) => (
               <span
                 key={i}
                 className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm"
@@ -85,7 +85,7 @@ function ServiceDetails() {
     onClick={() => handleTheCart(service)}
     className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-md transition"
   >
-    Add to Cart <i class="fa-solid fa-cart-shopping"></i>
+    Add to Cart <i className="fa-solid fa-cart-shopping"></i>
   </button>
         </div>
         
@@ -94,11 +94,11 @@ function ServiceDetails() {
       {/* Reviews */}
       <hr className="my-8 border-gray-300" />
       <h3 className="text-3xl font-bold mb-6 text-blue-800">Reviews</h3>
-      {service.Reviews?.length == 0 ? (
+      {service?.Reviews?.length == 0 ? (
         <p className="text-gray-500 text-xl">No Reviews yet</p>
       ) : (
         <ul className="space-y-6">
-          {service.Reviews.map((r, i) => (
+          {service?.Reviews?.map((r, i) => (
             <li
               key={i}
               className="flex flex-col md:flex-row items-start md:items-center border border-gray-200 rounded-2xl bg-white p-6 shadow-md hover:shadow-lg transition-shadow duration-200"
