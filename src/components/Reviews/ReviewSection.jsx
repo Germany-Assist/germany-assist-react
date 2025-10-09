@@ -7,15 +7,15 @@ import { useAuth } from "../../pages/AuthProvider";
 export const ReviewSection = ({ serviceId }) => {
   const [newReview, setNewReview] = useState("");
   const [reviews, setReviews] = useState([]);
-  const[rating,setRating]=useState(0);
-   const[userName, setUserName]=useState("");
-   const[error,setError]=useState("");
-   const[loading,setLoading]=useState(false);
-   const { userId, user,accessToken } = useAuth();
+  const [rating, setRating] = useState(0);
+  const [userName, setUserName] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { userId, user, accessToken } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newReview.trim() ) return;
+    if (!newReview.trim()) return;
     if (!serviceId) {
       setError("Service ID is missing!");
       return;
@@ -35,9 +35,9 @@ export const ReviewSection = ({ serviceId }) => {
         {
           headers: { Authorization: `Bearer ${accessToken}` },
           withCredentials: true,
-        },
+        }
       );
-      setReviews((prev)=>[...prev,response.data])
+      setReviews((prev) => [...prev, response.data]);
       setNewReview("");
       setRating(0);
     } catch (error) {
@@ -54,21 +54,27 @@ export const ReviewSection = ({ serviceId }) => {
       <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">
         Customer Reviews
       </h2>
-     <form onSubmit={handleSubmit} className="mb-8 space-y-4">
+      <form onSubmit={handleSubmit} className="mb-8 space-y-4">
         <div>
           <label
-            htmlFor="userName"
+            htmlFor="rating"
             className="block text-xl font-medium text-blue-700 mb-1"
           >
-            User Name
+            Rating
           </label>
-          <InputFields
-            type="text"
-            id="userName"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            placeholder="Enter your name"
-          />
+          <select
+            id="rating"
+            value={rating}
+            onChange={(e) => setRating(Number(e.target.value))}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+          >
+            <option value={0}>Select rating</option>
+            {[1, 2, 3, 4, 5].map((num) => (
+              <option key={num} value={num}>
+                {num} Star{num > 1 && "s"}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>

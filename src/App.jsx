@@ -10,7 +10,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ServiceList } from "./components/Services/serviceList.jsx";
 import Homepage from "./components/Homepage/Homepage.jsx";
 import ServiceDetails from "./components/Services/ServiceDetails.jsx";
-import LoginPage from "./pages/loginPage.jsx";
 import BusinessProvider from "./components/Buisnesses/BusinessProvider.jsx";
 import Login from "./pages/login.jsx";
 
