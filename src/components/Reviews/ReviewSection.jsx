@@ -40,6 +40,9 @@ export const ReviewSection = ({ serviceId }) => {
       setReviews((prev) => [...prev, response.data]);
       setNewReview("");
       setRating(0);
+      if (response.status === 201) {
+        window.alert("successful added new review ");
+      }
     } catch (error) {
       setError(
         error.response?.data?.message ||
@@ -96,12 +99,19 @@ export const ReviewSection = ({ serviceId }) => {
 
         {error && <p className="text-red-500">{error}</p>}
 
-        <AuthInputs
+        <button
           label={loading ? "Posting..." : "Submit Review"}
           type="submit"
           disabled={loading}
-          className="mt-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200 w-fit"
-        />
+          className={`mt-3 text-white font-semibold py-2 px-6 rounded-xl transition-all duration-300 w-fit 
+    ${
+      loading
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 shadow-md hover:shadow-lg active:scale-95"
+    }`}
+        >
+          {loading ? "Posting..." : "Submit Review"}
+        </button>
       </form>
     </div>
   );
