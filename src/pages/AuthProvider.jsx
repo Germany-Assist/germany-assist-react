@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import jwtDecode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const navigate=useNavigate();
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
@@ -19,27 +21,29 @@ export const AuthProvider = ({ children }) => {
         const expTime=decoded.exp * 1000;
         setTokenExpired(expTime);
         localStorage.setItem("tokenExpiry",expTime);
-
-
-        //Logout when token expires
+      
         const now=Date.now();
         if(expTime<=now){
-          logOut();
+          handleSessionExpired();
         }else{
           const timeout=expTime-now();
           const timer=setTimeout(()=>{
-            alert("Your session has expired please login again");
-            logOut();
+            handleSessionExpired();
           },timeout);
           return ()=>clearTimeout(timer);
         }
       } catch (err) {
         console.error("Error decoding JWT",err)
-      logOut();
+      handleSessionExpired();
       }
     }
    },[accessToken])
 
+   const handleSessionExpired=()=>{
+    alert("Your session has expired,Please log in again");
+    logOut();
+    navigate('/login');
+   }
 
   const login = async (credentials) => {
   const res = await axios.post(`http://localhost:3000/user/login`, credentials, {
