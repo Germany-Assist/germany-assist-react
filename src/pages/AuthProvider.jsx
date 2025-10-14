@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const navigate=useNavigate();
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
@@ -13,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(localStorage.getItem("accessToken") || null);
   const [userId, setUserId] = useState(localStorage.getItem("userId") || null);
   const [tokenExpired,setTokenExpired]=useState(localStorage.getItem("tokenExpiry")||null);
- 
+ const [isSessionExpired, setIsSessionExpired] = useState(false);
    useEffect(()=>{
     if(accessToken){
       try {
@@ -42,7 +41,7 @@ export const AuthProvider = ({ children }) => {
    const handleSessionExpired=()=>{
     alert("Your session has expired,Please log in again");
     logOut();
-    navigate('/login');
+    setIsSessionExpired(true); 
    }
 
   const login = async (credentials) => {
@@ -70,20 +69,27 @@ export const AuthProvider = ({ children }) => {
 };
 
 
-  const logOut = async () => {
-    await axios.post(`http://localhost:3000/logout`, {}, { withCredentials: true });
-    setUser(null);
-    setAccessToken(null);
-    setUserId(null);
-    setTokenExpired(null);
+const logOut = async () => {
+  try {
+    await axios.get(`http://localhost:3000/user/logout`, { withCredentials: true });
+  } catch (err) {
+    console.warn("Logout endpoint not found — ignoring (frontend logout only)",err);
+  }
 
+  setUser(null);
+  setAccessToken(null);
+  setUserId(null);
+  setTokenExpired(null);
 
-    localStorage.removeItem("user");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("tokenExpiry");
-  };
+  localStorage.removeItem("user");
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("tokenExpiry");
+};
 
+    if(isSessionExpired){
+      return <Navigate to="/login" replace/>
+    }
   return (
     <AuthContext.Provider value={{ accessToken, user, userId, login, logOut }}>
       {children}
