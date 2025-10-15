@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthProvider';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -8,33 +9,21 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // TODO: Replace with actual authentication API call
+ const { login } = useAuth();
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // TODO: Replace with actual login logic
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, password })
-      // });
-      
-      // For demo: just check if email and password are provided
-      if (email && password) {
-        // TODO: Set authentication state in your auth context/state management
-        console.log('Login successful:', { email });
-        navigate('/'); // Redirect to homepage
-      } else {
-        setError('Please fill in all fields');
-      }
-    } catch (err) {
-      setError('Login failed. Please try again.');
+      await login({ email, password } );
+      console.log("User login successfully");
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      setError(error.message);
+      console.error(error.message || "Login failed. Try again!");
     } finally {
       setIsLoading(false);
     }
