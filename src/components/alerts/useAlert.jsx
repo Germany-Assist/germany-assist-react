@@ -7,18 +7,13 @@ export const useAlert = () => {
     setAlert({ message, type });
   }, []);
 
-  const showAutoAlert = useCallback(
-    (message, type = "info", duration = 3000) => {
-      setAlert({ message, type });
-      setTimeout(() => setAlert(null), duration);
-    },
-    []
-  );
+  const clearAlert = useCallback(() => {
+    setAlert(null);
+  }, []);
 
   return {
     alert,
     showAlert,
-    showAutoAlert,
-    clearAlert: () => setAlert(null),
+    clearAlert,
   };
 };

@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 const DashboardHeader = () => {
   const location = useLocation();
+  
   // TODO: Replace with actual authentication context/state management
   // For now, using local state - in production, this would come from:
   // - AuthContext, Redux, Zustand, or similar state management

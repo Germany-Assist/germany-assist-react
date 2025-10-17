@@ -11,7 +11,7 @@ export const ServiceList = () => {
   const [sortBy, setSortBy] = useState("rating");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const { alert, showAlert, clearAlert, showAutoAlert } = useAlert();
+  const { alert, showAlert, clearAlert,  } = useAlert();
 
   // TODO: Replace with actual API endpoint
   // const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
@@ -59,7 +59,8 @@ export const ServiceList = () => {
       setServices(data);
       setFilteredServices(data);
     } catch (err) {
-      showAutoAlert(err.message || "Something went wrong.", "error", 5000);
+          console.error(err);
+      showAlert(err.message || "Something went wrong.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -188,13 +189,12 @@ export const ServiceList = () => {
   );
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen p-6">
       {alert && (
         <AlertNotify
           message={alert.message}
           type={alert.type}
           onClose={clearAlert}
-          duration={4000}
         />
       )}
 
