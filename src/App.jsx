@@ -14,6 +14,7 @@ import LoginPage from "./pages/loginPage.jsx";
 import BusinessProvider from "./components/Buisnesses/BusinessProvider.jsx";
 import { PaymentForm } from "./components/Payment/PaymentForm.jsx";
 import Login from "./pages/login.jsx";
+import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 
 function App() {
   return (
