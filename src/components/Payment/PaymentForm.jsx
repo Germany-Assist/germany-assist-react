@@ -16,7 +16,7 @@ export const PaymentForm = () => {
         payment_method: { card: elements.getElement(CardElement) },
       }
     );
-    if (!error && paymentInetnet.status === "succeeded") {
+    if (!error && paymentIntent.status === "succeeded") {
       window.location.href = "/confirmation";
     }
   };

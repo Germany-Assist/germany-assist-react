@@ -10,6 +10,7 @@ import {ServiceList} from './components/Services/serviceList.jsx';
 import ServiceDetails from './components/Services/ServiceDetails.jsx';
 import LoginPage from './pages/loginPage.jsx';
 import BusinessProvider from './components/Buisnesses/BusinessProvider.jsx';
+import { PaymentForm } from './components/Payment/PaymentForm.jsx';
 
 
 function App() {
@@ -35,6 +36,14 @@ function App() {
         <Route path="/userProfile" element={<UserProfile/>}></Route>
         <Route path="/businessProfile" element={<BusinessProvider/>}></Route>
         <Route path="/serviceDetails/:slug" element={<ServiceDetails/>}></Route>
+         <Route path="/payment"  element={
+          <>
+        <DashboardHeader/>
+          <div >
+        <PaymentForm />
+      </div>
+        </>
+        }></Route>
 
       </Routes>
      </Router>
