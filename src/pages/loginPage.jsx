@@ -1,54 +1,60 @@
-import { React, useState } from "react";
-import InputFields from "../components/InputFields";
-import AuthInputs from "../components/AuthInputs";
-import { AuthContext, useAuth } from "./AuthProvider";
+import {React,useState} from 'react'
+import InputFields from '../components/InputFields';
+import AuthInputs from '../components/AuthInputs';
+import { AuthContext, useAuth } from './AuthProvider';
 import { ToastContainer, toast } from "react-toastify";
-import axios from "axios";
+import axios from 'axios';
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const[email,setEmail]= useState('');
+  const[password,setPassword] = useState('');
 
-  const { login } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const handleLogin = async () => {
-    if (!email || !password) {
-      toast.error("Please fill in both fields");
-      return;
+
+  const {login}= useAuth();
+  const[loading,setLoading]=useState(false);
+const handleLogin = async () => {
+  if (!email || !password) {
+    toast.error("Please fill in both fields");
+    return;
+  }
+
+  
+  let emailToSend = email;
+  if (!email.includes("@")) {
+    emailToSend = `${email}@dummy.com`; 
+  }
+
+  setLoading(true);
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/user/login",
+      {
+        email: emailToSend,
+        password
+      },
+      { withCredentials: true }
+    );
+
+    console.log("Login response:", response.data);
+    console.log("Access token:", response.data.accessToken);
+    console.log("User object:", response.data.user);
+
+    if (response.status === 200) {
+      login(response.data.accessToken, response.data.user);
+      toast.success("User login successfully");
     }
+  } catch (error) {
+    console.error(error);
+    toast.error(error.response?.data?.message || "Login failed. Try again!");
+  } finally {
+    setLoading(false);
+  }
+};
 
-    let emailToSend = email;
-    if (!email.includes("@")) {
-      emailToSend = `${email}@dummy.com`;
-    }
 
-    setLoading(true);
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/user/login",
-        {
-          email: emailToSend,
-          password,
-        },
-        { withCredentials: true }
-      );
 
-      console.log("Login response:", response.data);
-      console.log("Access token:", response.data.accessToken);
-      console.log("User object:", response.data.user);
 
-      if (response.status === 200) {
-        login(response.data.accessToken, response.data.user);
-        toast.success("User login successfully");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || "Login failed. Try again!");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
+   
+ return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <ToastContainer />
       <div className="bg-white p-8 rounded shadow-md w-96">
@@ -77,4 +83,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default LoginPage
