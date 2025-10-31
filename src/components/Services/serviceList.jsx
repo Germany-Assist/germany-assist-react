@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { FavoriteService } from './FavoriteService';
 
 export const ServiceList = () => {
   const [services, setServices] = useState([]);
@@ -224,15 +225,14 @@ export const ServiceList = () => {
         case 'rating':
           return b.rating - a.rating;
         case 'price-low-high':
-          return a.priceNumeric - b.priceNumeric;
+          return a.price - b.price;
         case 'price-high-low':
-          return b.priceNumeric - a.priceNumeric;
+          return b.price - a.price;
         case 'reviews':
-          return b.reviewCount - a.reviewCount;
-        case 'featured':
-          if (a.featured && !b.featured) return -1;
-          if (!a.featured && b.featured) return 1;
-          return b.rating - a.rating;
+          return b.total_reviews - a.total_reviews;
+        case 'views':
+        
+          return b.views - a.views;
         default:
           return b.rating - a.rating;
       }
@@ -243,7 +243,7 @@ export const ServiceList = () => {
 
   const ServiceCard = ({ service }) => (
     <div className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group ${
-      service.featured ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
+      service.views ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
     }`}>
       <div className="relative">
         <img
@@ -252,11 +252,12 @@ export const ServiceList = () => {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-md">
+          <FavoriteService   serviceId={service.id} initiallyFavorite={service.isFavorite}/>
           <span className="text-sm font-semibold text-gray-800">⭐ {service.rating}</span>
         </div>
-        {service.featured && (
+        {service.views && (
           <div className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-full shadow-md">
-            <span className="text-xs font-bold">✨ FEATURED</span>
+            <span className="text-xs font-bold">✨{service.views } Views</span>
           </div>
         )}
       </div>
@@ -271,13 +272,13 @@ export const ServiceList = () => {
         
         <div className="flex items-center mb-4">
           <span className="text-sm text-gray-500">by</span>
-          <span className="text-sm font-semibold text-gray-900 ml-1">{service.provider}</span>
+          <span className="text-sm font-semibold text-gray-900 ml-1">{service.ProviderId}</span>
           <span className="text-gray-300 mx-2">•</span>
           <span className="text-sm text-gray-500">{service.location}</span>
         </div>
         
         <div className="flex flex-wrap gap-2 mb-4">
-          {service.badges.map((badge, index) => (
+          {Array.isArray(service.badges) &&service.badges.map((badge, index) => (
             <span
               key={index}
               className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
@@ -290,7 +291,7 @@ export const ServiceList = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <span className="text-sm text-gray-500">
-              ⭐ {service.rating} ({service.reviewCount} reviews)
+              ⭐ {service.rating} ({service.total_reviews} reviews)
             </span>
           </div>
           <Link
@@ -500,7 +501,7 @@ export const ServiceList = () => {
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="rating">Best Rating</option>
-                <option value="featured">Featured First</option>
+                <option value="views">Highest Views</option>
                 <option value="price-low-high">Price: Low to High</option>
                 <option value="price-high-low">Price: High to Low</option>
                 <option value="reviews">Most Reviews</option>

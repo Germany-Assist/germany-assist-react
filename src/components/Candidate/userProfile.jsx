@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Pagination } from "../pagination";
 import { CandidateSideBar } from "./CandidateSideBar";
 import { useAuth } from "../../pages/AuthProvider";
-
+import { BACKEND_URL } from "../../config/api";
+import {usePagination} from "../hooks/usePagination";
+import {Pagination} from "../../pages/Pagination.jsx";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 const UserProfile = () => {
   const { userId, accessToken } = useAuth();
   const [user, setUser] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [favoriteServices, setFavoriteServices] = useState([]);
   const [services, setServices] = useState([]);
   const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [servicePage, setServicePage] = useState("");
-  const [reviewPage, setReviewsPage] = useState("");
 
-  const servicePerPage = 3;
-  const reviewPerPage = 3;
-  const BACKEND_URL = "http://localhost:3000/api";
+  //Pagination uses
+  const servicePagination = usePagination(services, 4);
+  const reviewPagination = usePagination(reviews, 4);
+  const favoritePagination = usePagination(favoriteServices.favorite, 3);
 
   useEffect(() => {
     if (userId && accessToken) {
@@ -23,11 +25,10 @@ const UserProfile = () => {
     }
   }, [userId, accessToken]);
   useEffect(() => {
-  if (user) {
-    console.log("User state updated:", user);
-  }
-}, [user]);
-
+    if (user) {
+      console.log("User state updated:", user);
+    }
+  }, [user]);
 
   const fetchAllData = async () => {
     try {
@@ -40,16 +41,16 @@ const UserProfile = () => {
 
       const userData = userRes.data;
       console.log("User API response:", userRes.data);
-            setUser({
-              firstName: userData.firstName,
-              lastName: userData.lastName,
-              email: userData.email,
-              image: userData.image,
-              isVerified: userData.isVerified,
-              createdAt: userData.createdAt,
-            });
+      setUser({
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        image: userData.image,
+        isVerified: userData.isVerified,
+        createdAt: userData.createdAt,
+      });
+      setFavoriteServices(userData);
 
-      
       console.log("User  Rs API response:", userRes.data);
 
       console.log("User state after set:", user);
@@ -61,20 +62,6 @@ const UserProfile = () => {
   };
 
   if (loading) return <p>Loading profile...</p>;
-
-  // Define the pagination Logic
-  const totalServicesPages = Math.ceil(services.length / servicePerPage);
-  const totalReviewPages = Math.ceil(reviews.length / reviewPerPage);
-
-  const currentServices = services.slice(
-    (servicePage - 1) * servicePerPage,
-    servicePage * servicePerPage
-  );
-
-  const currentReviews = reviews.slice(
-    (reviewPage - 1) * reviewPerPage,
-    reviewPage * reviewPerPage
-  );
 
   // if (!user)
   //   return (
@@ -100,11 +87,11 @@ const UserProfile = () => {
             className="w-28 h-28 rounded-full object-cover border-4 border-blue-200 shadow"
           />
 
-          <div className="flex-1 space-y-2">
-             <h2>{user?.firstName} {user?.lastName}</h2>
-            <h2 className="text-xl font-extrabold text-blue-800">
-
+          <div className="flex-1 space-y-2 text-2xl text-blue-800 font-medium">
+            <h2>
+              {user?.firstName} {user?.lastName}
             </h2>
+            <h2 className="text-xl font-extrabold text-blue-800"></h2>
 
             <div className="text-gray-600">
               <p className="flex items-center">
@@ -140,12 +127,12 @@ const UserProfile = () => {
           <h3 className="text-2xl font-semibold mb-4 text-blue-700">
             Services
           </h3>
-          {services.length === 0 ? (
+          {servicePagination?.currentData?.length === 0 ? (
             <p className="text-gray-500">No Services added yet.</p>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {currentServices.map((service) => (
+                {servicePagination?.currentData?.map((service) => (
                   <div
                     key={service.id}
                     className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50"
@@ -167,9 +154,43 @@ const UserProfile = () => {
 
               <div className="flex justify-center mt-6">
                 <Pagination
-                  totalPages={totalServicesPages}
-                  currentPage={servicePage}
-                  onPageChange={setServicePage}
+                  totalPages={servicePagination.totalPages}
+                  currentPage={servicePagination.currentPage}
+                  onPageChange={servicePagination.setCurrentPage}
+                />
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Favorite Services */}
+        <div className="bg-white p-6 rounded-xl shadow-md">
+          <h3 className="text-2xl font-semibold mb-4 text-blue-700">
+            Favorite Services <i className="fa-solid fa-heart text-red-500"></i>
+          </h3>
+          {favoritePagination?.currentData?.length === 0 ? (
+            <p className="text-gray-500">No Services added yet.</p>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2  gap-4 text-align-left">
+                {favoritePagination?.currentData?.map((service) => (
+                  <div
+                    key={service.favoriteId}
+                    className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50"
+                  >
+                    <div className="flex flex-col space-y-2 text-sm text-gray-900">
+                      <span>Favorite Service: {service.favoriteId}</span>
+                      <span> Thumbnail: {service.thumbnail}</span>
+                      <span>Item Title: {service.itemId}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-center mt-6">
+                <Pagination
+                  totalPages={favoritePagination.totalPages}
+                  currentPage={favoritePagination.currentPage}
+                  onPageChange={favoritePagination.setCurrentPage}
                 />
               </div>
             </>
@@ -179,12 +200,12 @@ const UserProfile = () => {
         <div className="bg-white p-6 rounded-xl shadow-md">
           <h3 className="text-2xl font-semibold mb-4 text-blue-700">Reviews</h3>
 
-          {reviews.length === 0 ? (
+          {reviewPagination?.currentData?.length === 0 ? (
             <p className="text-gray-500">No reviews yet.</p>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {currentReviews.map((review) => (
+                {reviewPagination?.currentData?.map((review) => (
                   <div
                     key={review.id}
                     className="border p-4 rounded-xl shadow-lg hover:shadow-2xl transition transform hover:scale-[1.02] bg-gradient-to-br from-white to-gray-50 flex flex-col h-full"
@@ -220,9 +241,9 @@ const UserProfile = () => {
 
               <div className="flex justify-center mt-6">
                 <Pagination
-                  totalPages={totalReviewPages}
-                  currentPage={reviewPage}
-                  onPageChange={setReviewsPage}
+                  totalPages={reviewPagination.totalPages}
+                  currentPage={reviewPagination.currentPage}
+                  onPageChange={reviewPagination.setCurrentPage}
                 />
               </div>
             </>

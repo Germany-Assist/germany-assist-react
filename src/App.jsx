@@ -1,19 +1,16 @@
 
 import './App.css'
 import Signup from "./pages/signup";
-import UserProfile from './components/Candidate/userProfile.jsx';
+import Login from './pages/login';
 import About from './pages/about';
 import Jobs from './pages/jobs';
 import OnboardingPage from './pages/onboarding';
 import DashboardHeader from './components/Dashboard/DashboardHeader';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
+import UserProfile from "./components/Candidate/userProfile.jsx";
 import {ServiceList} from './components/Services/serviceList.jsx';
 import Homepage from './components/Homepage/Homepage.jsx';
 import ServiceDetails from './components/Services/ServiceDetails.jsx';
-import LoginPage from './pages/loginPage.jsx';
-import BusinessProvider from './components/Buisnesses/BusinessProvider.jsx';
-import Login from './pages/login.jsx';
 
 function App() {
   return (
@@ -37,10 +34,10 @@ function App() {
             <Jobs />
           </>
         } ></Route>
-        <Route path="/userProfile" element={
+        <Route path="/serviceDetails/:id" element={
           <>
             <DashboardHeader />
-            <UserProfile />
+            <ServiceDetails />
           </>
         } ></Route>
         <Route path="/onboarding" element={<OnboardingPage />}></Route>
@@ -52,8 +49,11 @@ function App() {
             <ServiceList />
           </>
         }></Route>
-        <Route path="/userProfile" element={<UserProfile />}></Route>
-        <Route path="/serviceDetails/:slug" element={<ServiceDetails />}></Route>
+        <Route path="/userProfile" element={
+          <>
+           <DashboardHeader />
+          <UserProfile />
+          </>}></Route>
       </Routes>
     </Router>
   );
