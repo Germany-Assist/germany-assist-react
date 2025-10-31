@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { useAlert } from "../alerts/useAlert";
-import { AlertNotify } from "../alerts/AlertNotify";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { FavoriteService } from './FavoriteService';
 
 export const ServiceList = () => {
   const [services, setServices] = useState([]);
@@ -95,16 +94,15 @@ export const ServiceList = () => {
       switch (sortBy) {
         case "rating":
           return b.rating - a.rating;
-        case "price-low-high":
-          return a.priceNumeric - b.priceNumeric;
-        case "price-high-low":
-          return b.priceNumeric - a.priceNumeric;
-        case "reviews":
-          return b.reviewCount - a.reviewCount;
-        case "featured":
-          if (a.featured && !b.featured) return -1;
-          if (!a.featured && b.featured) return 1;
-          return b.rating - a.rating;
+        case 'price-low-high':
+          return a.price - b.price;
+        case 'price-high-low':
+          return b.price - a.price;
+        case 'reviews':
+          return b.total_reviews - a.total_reviews;
+        case 'views':
+        
+          return b.views - a.views;
         default:
           return b.rating - a.rating;
       }
@@ -114,11 +112,9 @@ export const ServiceList = () => {
   }, [selectedCategory, searchTerm, services, sortBy]);
 
   const ServiceCard = ({ service }) => (
-    <div
-      className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group ${
-        service.featured ? "ring-2 ring-blue-500 ring-opacity-50" : ""
-      }`}
-    >
+    <div className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group ${
+      service.views ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
+    }`}>
       <div className="relative">
         <img
           src={service.image}
@@ -126,9 +122,8 @@ export const ServiceList = () => {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-md">
-          <span className="text-sm font-semibold text-gray-800">
-            ⭐ {service.rating}
-          </span>
+          <FavoriteService   serviceId={service.id} initiallyFavorite={service.isFavorite}/>
+          <span className="text-sm font-semibold text-gray-800">⭐ {service.rating}</span>
         </div>
         {service.views && (
           <div className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-full shadow-md">
@@ -153,9 +148,7 @@ export const ServiceList = () => {
 
         <div className="flex items-center mb-4">
           <span className="text-sm text-gray-500">by</span>
-          <span className="text-sm font-semibold text-gray-900 ml-1">
-            {service.provider}
-          </span>
+          <span className="text-sm font-semibold text-gray-900 ml-1">{service.ProviderId}</span>
           <span className="text-gray-300 mx-2">•</span>
           <span className="text-sm text-gray-500">{service.location}</span>
         </div>
@@ -464,25 +457,20 @@ export const ServiceList = () => {
               </div>
             </div>
 
-            {/* Services Grid */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-              {filteredServices.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="text-6xl mb-4">🔍</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    No services found
-                  </h3>
-                  <p className="text-gray-500">
-                    Try adjusting your search or filter criteria
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {filteredServices.map((service) => (
-                    <ServiceCard key={service.id} service={service} />
-                  ))}
-                </div>
-              )}
+            {/* Sort Dropdown */}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-500">Sort:</span>
+              <select 
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="rating">Best Rating</option>
+                <option value="views">Highest Views</option>
+                <option value="price-low-high">Price: Low to High</option>
+                <option value="price-high-low">Price: High to Low</option>
+                <option value="reviews">Most Reviews</option>
+              </select>
             </div>
           </div>
         </div>
