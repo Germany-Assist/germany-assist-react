@@ -1,5 +1,9 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { ValidateSignUPInputs } from '../components/ValidateSignUPInputs';
+import { useAuth } from './AuthProvider';
 
 const Signup = () => {
   const [firstName, setFirstName] = useState('');
@@ -11,57 +15,59 @@ const Signup = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  // TODO: Replace with actual registration API call
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+const handleSignup = async (e) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
 
-    // Basic validation
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
-      setIsLoading(false);
-      return;
+  // ✅ Basic validation
+  if (!firstName || !lastName || !email || !password || !confirmPassword) {
+    setError("Please fill in all fields");
+    setIsLoading(false);
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    setError("Passwords do not match");
+    setIsLoading(false);
+    return;
+  }
+
+  if (!agreeToTerms) {
+    setError("Please agree to the Terms of Service and Privacy Policy");
+    setIsLoading(false);
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:3000/api/user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ firstName, lastName, email, password }),
+    });
+
+    // ✅ Convert response to JSON
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Registration failed");
     }
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      setIsLoading(false);
-      return;
-    }
+    // ✅ Save user & token in your auth context
+    login(data.accessToken, data.user);
 
-    if (!agreeToTerms) {
-      setError('Please agree to the Terms of Service and Privacy Policy');
-      setIsLoading(false);
-      return;
-    }
+    console.log("Registration successful:", data.user);
 
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // TODO: Replace with actual registration logic
-      // const response = await fetch('/api/auth/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ firstName, lastName, email, password })
-      // });
-      
-      // For demo: just check if email and password are provided
-      if (email && password) {
-        // TODO: Set authentication state in your auth context/state management
-        console.log('Registration successful:', { firstName, lastName, email });
-        navigate('/onboarding'); // Redirect to onboarding
-      } else {
-        setError('Registration failed. Please try again.');
-      }
-    } catch (err) {
-      setError('Registration failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    navigate("/onboarding"); // Redirect to onboarding
+  } catch (err) {
+    console.error("Signup error:", err);
+    setError(err.message || "Registration failed. Please try again.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   // TODO: Implement actual Google OAuth
   const handleGoogleSignup = () => {

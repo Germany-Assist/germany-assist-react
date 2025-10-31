@@ -130,9 +130,9 @@ export const ServiceList = () => {
             ⭐ {service.rating}
           </span>
         </div>
-        {service.featured && (
+        {service.views && (
           <div className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-full shadow-md">
-            <span className="text-xs font-bold">✨ FEATURED</span>
+            <span className="text-xs font-bold">✨{service.views } Views</span>
           </div>
         )}
       </div>
@@ -161,7 +161,7 @@ export const ServiceList = () => {
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">
-          {service.badges.map((badge, index) => (
+          {Array.isArray(service.badges) &&service.badges.map((badge, index) => (
             <span
               key={index}
               className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
@@ -174,7 +174,7 @@ export const ServiceList = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <span className="text-sm text-gray-500">
-              ⭐ {service.rating} ({service.reviewCount} reviews)
+              ⭐ {service.rating} ({service.total_reviews} reviews)
             </span>
           </div>
           <Link
