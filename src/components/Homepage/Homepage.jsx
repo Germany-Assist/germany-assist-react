@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { FavoriteService } from "../Services/FavoriteService";
 
 const Homepage = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
 
-      
   const categories = [
     { id: "all", name: "All Services", icon: "🌟" },
     { id: "translation", name: "Translation", icon: "📝" },
@@ -15,7 +15,7 @@ const Homepage = () => {
     { id: "relocation", name: "Relocation", icon: "🏠" },
   ];
 
- const fetchServices = async () => {
+  const fetchServices = async () => {
     try {
       const response = await fetch("http://localhost:3000/api/service");
       const data = await response.json();
@@ -50,6 +50,11 @@ const Homepage = () => {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-md">
+             <FavoriteService
+              serviceId={service.id}
+              initiallyFavorite={service.isFavorite}
+            />
+
           <span className="text-sm font-semibold text-gray-800">
             ⭐ {service.rating}
           </span>
@@ -97,6 +102,7 @@ const Homepage = () => {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center">
+        
             <span className="text-sm text-gray-500">
               ⭐ {service.rating} ({service.reviewCount} reviews)
             </span>
