@@ -1,192 +1,183 @@
-import React, { useState } from "react";
-import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { FaPaypal, FaApplePay, FaGooglePay, FaCreditCard } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import {
+  CardElement,
+  useStripe,
+  useElements,
+  PaymentRequestButtonElement,
+} from "@stripe/react-stripe-js";
+import { 
+  FaPaypal, 
+  FaApple, 
+  FaGoogle, 
+  FaCreditCard,
+  FaLock,
+  FaCheckCircle
+} from "react-icons/fa";
+import { SiSamsungpay } from "react-icons/si";
+import { PaymentOption } from "./PaymentOption";
 
 export const PaymentForm = () => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
+  const [clientSecret, setClientSecret] = useState(null);
+  const [paymentRequest, setPaymentRequest] = useState(null);
+  const [cardComplete, setCardComplete] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const stripePaymentMethod={
+    card:{name: "Credit/Debit Card",icon:<FaCreditCard/>},
+    paypal:{name:"PayPal",icon:<FaPaypal/>},
+    apple_pay:{name:"Apple Pay",icon:<FaApple/>},
+    google_pay:{name:"Google Pay",icon:<FaGoogle/>}
 
-    if (paymentMethod === "card") {
-      const cardElement = elements.getElement(CardElement);
-      if (!cardElement) return;
+  }
 
-      const { error, paymentIntent } = await stripe.confirmCardPayment(
-        "CLIENT_SECRET_FROM_BACKEND",
-        {
-          payment_method: {
-            card: cardElement,
-            billing_details: {
-              name: "Test User",
-              email: "test@test.com",
-            },
-          },
-        }
-      );
 
-      if (error) {
-        alert(error.message);
-      } else if (paymentIntent.status === "succeeded") {
-        window.location.href = "/confirmation";
+  useEffect(() => {
+    const createPaymentIntent = async () => {
+      try {
+        const response = await fetch("/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            amount: 1999, 
+            currency: "gbp",
+            payment_method_types: ["card", "paypal"] 
+          }), 
+        });
+        const data = await response.json();
+        setClientSecret(data.clientSecret);
+      } catch (err) {
+        setError("Failed to create payment intent");
       }
-    } else {
-      alert(`Redirecting to ${paymentMethod}...`);
-      setTimeout(() => {
-        window.location.href = "/confirmation";
-      }, 1500);
+    };
+
+    createPaymentIntent();
+  }, []);
+
+  useEffect(() => {
+    if (!stripe) return;
+
+    const pr = stripe.paymentRequest({
+      country: "GB", 
+      currency: "gbp",
+      total: { 
+        label: "Order Total", 
+        amount: 1999, 
+      },
+      requestPayerName: true,
+      requestPayerEmail: true,
+      displayItems: [
+        {
+          label: "Product/service",
+          amount: 1999,
+        }
+      ],
+    });
+
+    pr.on('paymentmethod', async (ev) => {
+     
+      setIsLoading(true);
+      try {
+     
+        const {error: confirmError} = await stripe.confirmCardPayment(
+          clientSecret,
+          {payment_method: ev.paymentMethod.id},
+          {handleActions: false}
+        );
+
+        if (confirmError) {
+          ev.complete('fail');
+          setError(confirmError.message);
+        } else {
+          ev.complete('success');
+    
+          window.location.href = "/confirmation";
+        }
+      } catch (err) {
+        ev.complete('fail');
+        setError("Payment failed");
+      }
+      setIsLoading(false);
+    });
+
+    pr.canMakePayment().then((result) => {
+      if (result) {
+        setPaymentRequest(pr);
+      }
+    });
+  }, [stripe, clientSecret]);
+
+  const handleCardChange = (event) => {
+    setCardComplete(event.complete);
+    setError(event.error ? event.error.message : "");
+  };
+
+
+    const handleSubmit=async(e)=>{
+       e.preventDefault();
+       setIsLoading(true);
+       setError("");
+       try {
+        if(paymentMethod==="card"){
+          if(!stripe || !elements){
+            return
+          }
+          if(!cardComplete){
+            setError("Please complete your card details");
+            setIsLoading(false);
+            return;
+          }
+          const{error:stripeError,paymentIntent}=await stripe.confirmCardPayment(clientSecret,{
+            payment_method:{
+              card:elements.getElement(CardElement)
+            }
+          });
+          if(stripeError){
+            setError(stripeError.message);
+          }
+          else if(paymentIntent.status==="succeeded"){
+            window.location.href="/confirmation";
+          }
+          else if(paymentMethod==="paypal"){
+            alert ("directing to Paypal....");
+             setTimeout(()=>{
+              window.location.href="/confirmation"
+             },1500)
+          }
+          else{
+            // Handle Apple Pay/Google we use the Payment Request
+            if(paymentRequest){
+              paymentRequest.show();
+            }
+          }
+        }
+       } catch (error) {
+       setError("An unexpected error occurred",error); 
+       }
+       setIsLoading(false);
     }
 
-    setIsLoading(false);
+
+  const cardElementOptions = {
+    style: {
+      base: {
+        fontSize: "16px",
+        color: "#424770",
+        "::placeholder": {
+          color: "#aab7c4",
+        },
+        padding: "10px 12px",
+      },
+    },
+    hidePostalCode: true,
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#f2f7ff]">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-3xl shadow-xl w-96 space-y-6"
-      >
-        <h2 className="text-2xl font-semibold text-gray-800 text-center">
-          Payment
-        </h2>
-
-        {/* Payment Method Selection */}
-        <div className="space-y-3">
-          <label className="block text-gray-600 font-medium">
-            Select Payment Method
-          </label>
-          <div className="space-y-3">
-            {/* Card */}
-            <div
-              className={`flex items-center justify-between p-3 rounded-2xl border cursor-pointer transition ${
-                paymentMethod === "card"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200"
-              }`}
-              onClick={() => setPaymentMethod("card")}
-            >
-              <div className="flex items-center space-x-3">
-                <FaCreditCard
-                  className={`text-xl ${
-                    paymentMethod === "card" ? "text-blue-600" : "text-gray-400"
-                  }`}
-                />
-                <span className="font-medium text-gray-700">Credit / Debit Card</span>
-              </div>
-              <input
-                type="radio"
-                checked={paymentMethod === "card"}
-                onChange={() => setPaymentMethod("card")}
-              />
-            </div>
-
-            {/* PayPal */}
-            <div
-              className={`flex items-center justify-between p-3 rounded-2xl border cursor-pointer transition ${
-                paymentMethod === "paypal"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200"
-              }`}
-              onClick={() => setPaymentMethod("paypal")}
-            >
-              <div className="flex items-center space-x-3">
-                <FaPaypal
-                  className={`text-xl ${
-                    paymentMethod === "paypal"
-                      ? "text-blue-600"
-                      : "text-gray-400"
-                  }`}
-                />
-                <span className="font-medium text-gray-700">PayPal</span>
-              </div>
-              <input
-                type="radio"
-                checked={paymentMethod === "paypal"}
-                onChange={() => setPaymentMethod("paypal")}
-              />
-            </div>
-
-            {/* Apple Pay */}
-            <div
-              className={`flex items-center justify-between p-3 rounded-2xl border cursor-pointer transition ${
-                paymentMethod === "applepay"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200"
-              }`}
-              onClick={() => setPaymentMethod("applepay")}
-            >
-              <div className="flex items-center space-x-3">
-                <FaApplePay
-                  className={`text-xl ${
-                    paymentMethod === "applepay"
-                      ? "text-blue-600"
-                      : "text-gray-400"
-                  }`}
-                />
-                <span className="font-medium text-gray-700">Apple Pay</span>
-              </div>
-              <input
-                type="radio"
-                checked={paymentMethod === "applepay"}
-                onChange={() => setPaymentMethod("applepay")}
-              />
-            </div>
-
-            {/* Google Pay */}
-            <div
-              className={`flex items-center justify-between p-3 rounded-2xl border cursor-pointer transition ${
-                paymentMethod === "googlepay"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200"
-              }`}
-              onClick={() => setPaymentMethod("googlepay")}
-            >
-              <div className="flex items-center space-x-3">
-                <FaGooglePay
-                  className={`text-xl ${
-                    paymentMethod === "googlepay"
-                      ? "text-blue-600"
-                      : "text-gray-400"
-                  }`}
-                />
-                <span className="font-medium text-gray-700">Google Pay</span>
-              </div>
-              <input
-                type="radio"
-                checked={paymentMethod === "googlepay"}
-                onChange={() => setPaymentMethod("googlepay")}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Card Input for Credit/Debit */}
-        {paymentMethod === "card" && (
-          <div className="border border-gray-300 rounded-2xl p-4 bg-gray-50">
-            <CardElement options={{ style: { base: { fontSize: "16px" } } }} />
-          </div>
-        )}
-
-        {/* Order total */}
-        <div className="flex justify-between items-center pt-2">
-          <span className="text-gray-500 font-medium">Order Total</span>
-          <span className="text-gray-700 font-semibold text-lg">$40.00</span>
-        </div>
-
-        {/* Confirm Button */}
-        <button
-          disabled={isLoading}
-          className={`w-full bg-blue-600 text-white py-3 rounded-2xl font-semibold hover:bg-blue-700 transition ${
-            isLoading && "opacity-60 cursor-not-allowed"
-          }`}
-        >
-          {isLoading ? "Processing..." : "Confirm Order"}
-        </button>
-      </form>
+    <div className="flex justify-center items-center min-h-screen bg-gray-50 py-8">
+     
     </div>
   );
 };
