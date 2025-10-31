@@ -93,6 +93,7 @@ function ServiceDetails() {
             Add to Cart <i className="fa-solid fa-cart-shopping"></i>
           </button>
         </div>
+        
       </div>
 
       {/* Reviews */}
