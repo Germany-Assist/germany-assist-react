@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext, useAuth } from "./AuthProvider";
-<<<<<<< HEAD
 import { BACKEND_URL } from "../config/api";
-=======
->>>>>>> e668e6a (Integrating API with Sign up and Login Page (#24))
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,50 +10,14 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
-<<<<<<< HEAD
 
 const handleLogin = async (e) => {
-=======
- 
-  const handleLogin = async (e) => {
->>>>>>> e668e6a (Integrating API with Sign up and Login Page (#24))
   e.preventDefault();
   setIsLoading(true);
   setError("");
 
   try {
-<<<<<<< HEAD
     await login({ email, password }); 
-=======
-    const response = await fetch("http://localhost:3000/api/user/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-      // ❌ API error
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Login failed");
-    }
-
-    // ✅ Parse the response JSON
-    const data = await response.json();
-
-    // Example: token + user
-    login(data.accessToken, data.user);
-
-    toast.success("User login successfully");
-    navigate("/"); // Redirect to homepage
-  } catch (error) {
-    console.error(error);
-    setError(error.message);
-    toast.error(error.message || "Login failed. Try again!");
-  } finally {
-    setIsLoading(false);
-  }
-};
->>>>>>> e668e6a (Integrating API with Sign up and Login Page (#24))
 
     toast.success("User login successfully");
     navigate("/"); 

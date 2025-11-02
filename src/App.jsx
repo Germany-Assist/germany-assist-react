@@ -12,6 +12,7 @@ import ServiceDetails from './components/Services/ServiceDetails.jsx';
 import Login from './pages/login.jsx';
 >>>>>>> ccdf717 (Integrating API with Sign up and Login Page (#24))
 import { HeaderWithAlert } from './components/Dashboard/HeaderWithAlert.jsx';
+import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 
 function App() {
   return (
@@ -100,6 +101,18 @@ function App() {
            <DashboardHeader />
           <UserProfile />
           </>}></Route>
+
+           <Route
+          path="/payment"
+          element={
+            <>
+              <DashboardHeader />
+              <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                <StripeContainer />
+              </div>
+            </>
+          }
+        ></Route>
       </Routes>
     </Router>
   );
