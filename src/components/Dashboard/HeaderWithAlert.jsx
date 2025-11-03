@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAlert } from '../alerts/useAlert'
 import { AlertNotify } from '../alerts/AlertNotify'
-import DashboardHeader from './DashboardHeader'
+import {DashboardHeader} from './DashboardHeader'
 
 export const HeaderWithAlert = ({ children }) => {
   const { alert, clearAlert } = useAlert();

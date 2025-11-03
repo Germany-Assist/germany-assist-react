@@ -466,11 +466,7 @@ export const ServiceList = () => {
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="rating">Best Rating</option>
-<<<<<<< HEAD
                 <option value="views">Highest Views</option>
-=======
-                <option value="featured">Featured First</option>
->>>>>>> d324baa (Update homepage and service components, add about page)
                 <option value="price-low-high">Price: Low to High</option>
                 <option value="price-high-low">Price: High to Low</option>
                 <option value="reviews">Most Reviews</option>
@@ -478,29 +474,7 @@ export const ServiceList = () => {
             </div>
           </div>
         </div>
-<<<<<<< HEAD
       )}
-=======
-      </div>
-
-      {/* Services Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-
-        {filteredServices.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No services found</h3>
-            <p className="text-gray-500">Try adjusting your search or filter criteria</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredServices.map((service) => (
-              <ServiceCard key={service.id} service={service} />
-            ))}
-          </div>
-        )}
-      </div>
->>>>>>> d324baa (Update homepage and service components, add about page)
     </div>
   );
 };

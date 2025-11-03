@@ -1,37 +1,37 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { AuthContext, useAuth } from "./AuthProvider";
-import { BACKEND_URL } from "../config/api";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthProvider';
+
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
 
-const handleLogin = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
-  setError("");
+ const { login } = useAuth();
 
-  try {
-    await login({ email, password }); 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-    toast.success("User login successfully");
-    navigate("/"); 
-  } catch (error) {
-    console.error(error);
-    setError(error.message);
-    toast.error(error.message || "Login failed. Try again!");
-  } finally {
-    setIsLoading(false);
-  }
-};
+    try {
+      await login({ email, password } );
+      console.log("User login successfully");
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      setError(error.message);
+      console.error(error.message || "Login failed. Try again!");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // TODO: Implement actual Google OAuth
   const handleGoogleLogin = () => {
-    console.log("Google login initiated");
+    console.log('Google login initiated');
     // TODO: Integrate with Google OAuth
     // Example: window.location.href = '/auth/google';
     // Or use Google OAuth library

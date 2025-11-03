@@ -4,7 +4,8 @@ import Login from './pages/login';
 import About from './pages/about';
 import Jobs from './pages/jobs';
 import OnboardingPage from './pages/onboarding';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import UserProfile from "./components/Candidate/userProfile.jsx";
 import {ServiceList} from './components/Services/serviceList.jsx';
 import Homepage from './components/Homepage/Homepage.jsx';
@@ -16,7 +17,7 @@ import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 
 function App() {
   return (
-    <Router>
+ 
       <Routes>
         <Route
           path="/"
@@ -74,7 +75,7 @@ function App() {
         } ></Route>
         <Route path="/serviceDetails/:id" element={
           <>
-            <DashboardHeader />
+            <HeaderWithAlert />
             <ServiceDetails />
           </>
         } ></Route>
@@ -98,7 +99,7 @@ function App() {
         }></Route>
         <Route path="/userProfile" element={
           <>
-           <DashboardHeader />
+           <HeaderWithAlert />
           <UserProfile />
           </>}></Route>
 
@@ -106,7 +107,7 @@ function App() {
           path="/payment"
           element={
             <>
-              <DashboardHeader />
+              <HeaderWithAlert />
               <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <StripeContainer />
               </div>
@@ -114,7 +115,7 @@ function App() {
           }
         ></Route>
       </Routes>
-    </Router>
+    
   );
 }
 

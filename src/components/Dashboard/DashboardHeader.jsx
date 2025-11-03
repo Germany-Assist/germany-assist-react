@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 
-const DashboardHeader = () => {
+export const DashboardHeader = () => {
   const location = useLocation();
   
   // TODO: Replace with actual authentication context/state management
