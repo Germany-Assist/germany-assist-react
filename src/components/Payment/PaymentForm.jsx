@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from "react";
 import {
   CardElement,
@@ -16,11 +15,6 @@ import {
 } from "react-icons/fa";
 import { SiSamsungpay } from "react-icons/si";
 import { PaymentOption } from "./PaymentOption";
-=======
-import React, { useState } from "react";
-import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { FaPaypal, FaApplePay, FaGooglePay, FaCreditCard } from "react-icons/fa";
->>>>>>> 88f8c9d (integrating payment request button with payment form)
 
 export const PaymentForm = () => {
   const stripe = useStripe();
