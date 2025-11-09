@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { BACKEND_URL } from "../../config/api.js";
 import { ReviewSection } from "../Reviews/ReviewSection.jsx";
 import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { useAuth } from "../../pages/AuthProvider.jsx";
 
 function ServiceDetails() {
   const { id } = useParams();
+  const navigate=useNavigate();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); 
-
+  const [error, setError] = useState(null);
+const { user } = useAuth();
   useEffect(() => {
     fetchServiceDetails();
   }, [id]);
@@ -30,6 +32,22 @@ function ServiceDetails() {
       setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCheckout=async()=>{
+ try{
+  const orderId=Date.now();
+       navigate(`/checkout/${service.id}`, {
+        state: {
+          serviceId: id,
+          orderId,
+          userId:user?.userId,
+          price: service.price,
+        },
+      });
+    } catch (err) {
+      console.error("Error creating order", err);
     }
   };
 
@@ -63,7 +81,8 @@ function ServiceDetails() {
           <p className="text-lg text-gray-700">{service?.description}</p>
 
           <div className="text-blue-900 font-semibold">
-            Type: <span className="text-gray-700 font-normal">{service?.type}</span>
+            Type:{" "}
+            <span className="text-gray-700 font-normal">{service?.type}</span>
           </div>
 
           <div className="text-lg font-bold text-green-700">
@@ -87,13 +106,12 @@ function ServiceDetails() {
           </div>
 
           <button
-            onClick={() => handleTheCart(service)}
-            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-md transition"
+            onClick={handleCheckout}
+            className="mt-4 bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg shadow-md transition"
           >
-            Add to Cart <i className="fa-solid fa-cart-shopping"></i>
+            Proceed to Checkout <i className="fa-solid fa-credit-card ml-2"></i>
           </button>
         </div>
-        
       </div>
 
       {/* Reviews */}
@@ -117,7 +135,9 @@ function ServiceDetails() {
                     {Array.from({ length: r.rating }).map((_, i) => (
                       <i key={i} className="fas fa-star" />
                     ))}
-                    <span className="text-gray-400 font-normal">({r.rating})</span>
+                    <span className="text-gray-400 font-normal">
+                      ({r.rating})
+                    </span>
                   </span>
                 </div>
                 <p className="text-gray-700">

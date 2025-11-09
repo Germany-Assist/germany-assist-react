@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FavoriteService } from "../Services/FavoriteService";
-
+import { BACKEND_URL } from "../../config/api";
 const Homepage = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
@@ -15,17 +15,23 @@ const Homepage = () => {
     { id: "relocation", name: "Relocation", icon: "🏠" },
   ];
 
-  const fetchServices = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/service");
-      const data = await response.json();
-      console.log("data", data);
-      setServices(data);
-      setFilteredServices(data);
-    } catch (error) {
-      console.error("Error fetching services:", error);
-    }
-  };
+const fetchServices = async () => {
+  try {
+    const response = await fetch(`${BACKEND_URL}/service`);
+    const result = await response.json();
+
+    console.log("Fetched result:", result);
+
+    // ✅ Extract only the actual array of services
+    const servicesArray = Array.isArray(result.data) ? result.data : [];
+
+    setServices(servicesArray);
+    setFilteredServices(servicesArray);
+  } catch (error) {
+    console.error("Error fetching services:", error);
+  }
+};
+
 
   useEffect(() => {
     fetchServices();
@@ -46,7 +52,7 @@ const Homepage = () => {
       <div className="relative">
         <img
           src={service.image}
-          alt={service.provider}
+          alt={service.serviceProvider}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-md">
@@ -59,7 +65,8 @@ const Homepage = () => {
             ⭐ {service.rating}
           </span>
         </div>
-        {service.views && (
+        {service.views !== undefined && (
+
           <div className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-full shadow-md">
             <span className="text-xs font-bold">✨{service.views} Views</span>
           </div>
@@ -83,7 +90,7 @@ const Homepage = () => {
         <div className="flex items-center mb-4">
           <span className="text-sm text-gray-500">by</span>
           <span className="text-sm font-semibold text-gray-900 ml-1">
-            {service.provider}
+            {service.serviceProvider}
           </span>
           <span className="text-gray-300 mx-2">•</span>
           <span className="text-sm text-gray-500">{service.location}</span>
@@ -300,13 +307,10 @@ const Homepage = () => {
 
         {/* Show only featured services (limit to 6) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-           {
-    filteredServices
-      .filter((service) => service.views)
-      .slice(0, 6)
-      .map((service) => (
-        <ServiceCard key={service.id} service={service} />
-      ))}
+        {filteredServices.slice(0, 6).map((service) => (
+  <ServiceCard key={service.id} service={service} />
+))}
+
         </div>
 
         {filteredServices.filter((service) => service.views).length ===

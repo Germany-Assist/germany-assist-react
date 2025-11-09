@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FavoriteService } from './FavoriteService';
+import { useAlert } from '../alerts/useAlert';
 
 export const ServiceList = () => {
   const [services, setServices] = useState([]);
