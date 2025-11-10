@@ -18,10 +18,11 @@ import {
 import { SiSamsungpay } from "react-icons/si";
 import { PaymentOption } from "./PaymentOption";
 import { BACKEND_URL } from "../../config/api";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 export const PaymentForm = () => {
   const stripe = useStripe();
-  const {serviceId} = useParams();
+  const { serviceId } = useParams();
+  const location = useLocation();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -29,8 +30,9 @@ export const PaymentForm = () => {
   const [paymentRequest, setPaymentRequest] = useState(null);
   const [cardComplete, setCardComplete] = useState(false);
   const [error, setError] = useState("");
-  const [price, setPrice] = useState(0);
 
+  const { price, serviceName } = location.state || {};
+  const displayPrice = price ? (price / 100).toFixed(2) : "0.00";
   const stripePaymentMethod = {
     card: { name: "Credit/Debit Card", icon: <FaCreditCard /> },
     paypal: { name: "PayPal", icon: <FaPaypal /> },
@@ -246,27 +248,27 @@ export const PaymentForm = () => {
         <button
           type="submit"
           disabled={isLoading || (paymentMethod === "card" && !cardComplete)}
-          className={`w-full py-4 rounded-xl  font-semibold text-lg transition-all ${
+          className={`w-full py-4 rounded-xl font-semibold text-lg transition-all ${
             isLoading || (paymentMethod === "card" && !cardComplete)
               ? "bg-gray-400 cursor-not-allowed text-gray-200"
-              : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl "
+              : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl"
           }`}
         >
           {isLoading ? (
             <div className="flex items-center justify-center gap-2">
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin">
-                Processing Payment...
-              </div>{" "}
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Processing Payment...</span>
             </div>
           ) : (
-            `Pay £19.99 ${
-              paymentMethod !== "card"
+            <>
+              {`Pay £${displayPrice} `}
+              {paymentMethod !== "card"
                 ? `with ${
                     stripePaymentMethod[paymentMethod]?.name ||
                     "selected method"
                   }`
-                : "Now"
-            }`
+                : "Now"}
+            </>
           )}
         </button>
       </form>
