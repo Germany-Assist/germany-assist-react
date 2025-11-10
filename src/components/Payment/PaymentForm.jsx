@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import {
-  CardElement,
   useStripe,
   useElements,
-  PaymentRequestButtonElement,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
 } from "@stripe/react-stripe-js";
+
 import {
   FaPaypal,
   FaApple,
@@ -113,62 +115,59 @@ export const PaymentForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!stripe || !elements) return;
+
+    if (price === 0) {
+      alert("No payment needed. Redirecting...");
+      window.location.href = "/confirmation";
+      return;
+    }
+
     setIsLoading(true);
     setError("");
-    try {
-      if (paymentMethod === "card") {
-        if (!stripe || !elements) {
-          return;
-        }
-        if (!cardComplete) {
-          setError("Please complete your card details");
-          setIsLoading(false);
-          return;
-        }
-        const { error: stripeError, paymentIntent } =
-          await stripe.confirmCardPayment(clientSecret, {
-            payment_method: {
-              card: elements.getElement(CardElement),
-            },
-          });
-        if (stripeError) {
-          setError(stripeError.message);
-        } else if (paymentIntent.status === "succeeded") {
-          window.location.href = "/confirmation";
-        } else if (paymentMethod === "paypal") {
-          alert("directing to Paypal....");
-          setTimeout(() => {
-            window.location.href = "/confirmation";
-          }, 1500);
-        } else {
-          // Handle Apple Pay/Google we use the Payment Request
-          if (paymentRequest) {
-            paymentRequest.show();
-          }
-        }
+
+    const cardElement = elements.getElement(CardElement);
+
+    // Confirm the payment
+    const { error, paymentIntent } = await stripe.confirmCardPayment(
+      clientSecret,
+      {
+        payment_method: {
+          card: cardElement,
+        },
       }
-    } catch (error) {
-      setError("An unexpected error occurred", error);
+    );
+
+    if (error) {
+      setError(error.message);
+    } else if (paymentIntent && paymentIntent.status === "succeeded") {
+      alert("Payment successful!");
+      window.location.href = "/confirmation";
     }
 
     setIsLoading(false);
   };
 
-  const cardElementOptions = {
+ const cardStyle = {
     style: {
       base: {
+        color: "#32325d",
+        fontFamily: "Arial, sans-serif",
+        fontSmoothing: "antialiased",
         fontSize: "16px",
-        color: "#424770",
         "::placeholder": {
-          color: "#aab7c4",
+          color: "#a0aec0",
         },
-        padding: "10px 12px",
+      },
+      invalid: {
+        color: "#fa755a",
+        iconColor: "#fa755a",
       },
     },
-    hidePostalCode: true,
   };
 
-     return (
+  return (
     <div className="flex justify-center items-center min-h-screen py-8">
       <form
         onSubmit={handleSubmit}
@@ -259,13 +258,32 @@ export const PaymentForm = () => {
         </div>
         {/* Card Input Numbers */}
         {paymentMethod === "card" && (
-          <div className="space-y-3">
-            <div className="border-2 border-gray-200 rounded-xl p-4 bg-white hover:border-blue-300 transition-colors">
-              <CardElement
-                options={cardElementOptions}
-                onChange={handleCardChange}
-              />
+          <div className="space-y-4">
+            {/* Card Number */}
+            <div className="border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
+              <label className="block text-gray-700 font-medium mb-1">
+                Card Number
+              </label>
+              <CardNumberElement options={cardStyle} />
             </div>
+
+        
+            <div className="flex space-x-3">
+              <div className="flex-1 border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
+                <label className="block text-gray-700 font-medium mb-1">
+                  Expiry Date
+                </label>
+                <CardExpiryElement options={cardStyle} />
+              </div>
+
+              <div className="flex-1 border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
+                <label className="block text-gray-700 font-medium mb-1">
+                  CVC
+                </label>
+                <CardCvcElement options={cardStyle} />
+              </div>
+            </div>
+
             {error && (
               <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
                 {error}
@@ -273,6 +291,7 @@ export const PaymentForm = () => {
             )}
           </div>
         )}
+
         {/* Confirm Order Button */}
         <button
           type="submit"
