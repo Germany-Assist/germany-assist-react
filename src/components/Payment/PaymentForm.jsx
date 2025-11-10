@@ -17,9 +17,11 @@ import {
 } from "react-icons/fa";
 import { SiSamsungpay } from "react-icons/si";
 import { PaymentOption } from "./PaymentOption";
-
+import { BACKEND_URL } from "../../config/api";
+import { useParams } from "react-router-dom";
 export const PaymentForm = () => {
   const stripe = useStripe();
+  const {serviceId} = useParams();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -27,6 +29,7 @@ export const PaymentForm = () => {
   const [paymentRequest, setPaymentRequest] = useState(null);
   const [cardComplete, setCardComplete] = useState(false);
   const [error, setError] = useState("");
+  const [price, setPrice] = useState(0);
 
   const stripePaymentMethod = {
     card: { name: "Credit/Debit Card", icon: <FaCreditCard /> },
@@ -36,120 +39,68 @@ export const PaymentForm = () => {
   };
 
   useEffect(() => {
-    const createPaymentIntent = async () => {
+    const getClientSecret = async () => {
       try {
-        const response = await fetch("/create-payment-intent", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: 1999,
-            currency: "gbp",
-            payment_method_types: ["card", "paypal"],
-          }),
-        });
+        const response = await fetch(
+          `${BACKEND_URL}/api/order/pay/${serviceId}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+
         const data = await response.json();
-        setClientSecret(data.clientSecret);
+        console.log("Payment Intent Response:", data);
+
+        if (data.success && data.message.clientSecret) {
+          setClientSecret(data.message.clientSecret);
+        } else {
+          throw new Error("Failed to get client secret");
+        }
       } catch (err) {
+        console.error(err);
         setError("Failed to create payment intent");
       }
     };
 
-    createPaymentIntent();
-  }, []);
-
-  useEffect(() => {
-    if (!stripe) return;
-
-    const pr = stripe.paymentRequest({
-      country: "GB",
-      currency: "gbp",
-      total: {
-        label: "Order Total",
-        amount: 1999,
-      },
-      requestPayerName: true,
-      requestPayerEmail: true,
-      displayItems: [
-        {
-          label: "Product/service",
-          amount: 1999,
-        },
-      ],
-    });
-
-    pr.on("paymentmethod", async (ev) => {
-      setIsLoading(true);
-      try {
-        const { error: confirmError } = await stripe.confirmCardPayment(
-          clientSecret,
-          { payment_method: ev.paymentMethod.id },
-          { handleActions: false }
-        );
-
-        if (confirmError) {
-          ev.complete("fail");
-          setError(confirmError.message);
-        } else {
-          ev.complete("success");
-
-          window.location.href = "/confirmation";
-        }
-      } catch (err) {
-        ev.complete("fail");
-        setError("Payment failed");
-      }
-      setIsLoading(false);
-    });
-
-    pr.canMakePayment().then((result) => {
-      if (result) {
-        setPaymentRequest(pr);
-      }
-    });
-  }, [stripe, clientSecret]);
-
-  const handleCardChange = (event) => {
-    setCardComplete(event.complete);
-    setError(event.error ? event.error.message : "");
-  };
+    getClientSecret();
+  }, [serviceId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!stripe || !elements) return;
-
-    if (price === 0) {
-      alert("No payment needed. Redirecting...");
-      window.location.href = "/confirmation";
-      return;
-    }
-
     setIsLoading(true);
-    setError("");
 
-    const cardElement = elements.getElement(CardElement);
-
-    // Confirm the payment
-    const { error, paymentIntent } = await stripe.confirmCardPayment(
-      clientSecret,
-      {
-        payment_method: {
-          card: cardElement,
-        },
+    try {
+      if (price === 0) {
+        alert("Free service, skipping payment.");
+        window.location.href = "/confirmation";
+        return;
       }
-    );
 
-    if (error) {
-      setError(error.message);
-    } else if (paymentIntent && paymentIntent.status === "succeeded") {
-      alert("Payment successful!");
-      window.location.href = "/confirmation";
+      const cardNumberElement = elements.getElement(CardNumberElement);
+
+      const { error: stripeError, paymentIntent } =
+        await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: cardNumberElement,
+          },
+        });
+
+      if (stripeError) {
+        setError(stripeError.message);
+      } else if (paymentIntent.status === "succeeded") {
+        alert("Payment successful!");
+        window.location.href = "/confirmation";
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Payment failed");
     }
 
     setIsLoading(false);
   };
 
- const cardStyle = {
+  const cardStyle = {
     style: {
       base: {
         color: "#32325d",
@@ -267,7 +218,6 @@ export const PaymentForm = () => {
               <CardNumberElement options={cardStyle} />
             </div>
 
-        
             <div className="flex space-x-3">
               <div className="flex-1 border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
                 <label className="block text-gray-700 font-medium mb-1">

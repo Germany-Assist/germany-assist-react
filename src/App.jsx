@@ -75,7 +75,7 @@ function App() {
       ></Route>
 
       <Route
-        path="/checkout/:id"
+        path="/checkout/:serviceId"
         element={
           <>
             <HeaderWithAlert />
