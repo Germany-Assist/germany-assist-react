@@ -19,10 +19,12 @@ import { SiSamsungpay } from "react-icons/si";
 import { PaymentOption } from "./PaymentOption";
 import { BACKEND_URL } from "../../config/api";
 import { useLocation, useParams } from "react-router-dom";
+import { useAuth } from "../../pages/AuthProvider";
 export const PaymentForm = () => {
   const stripe = useStripe();
   const { serviceId } = useParams();
   const location = useLocation();
+  const { accessToken } = useAuth();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -44,10 +46,11 @@ export const PaymentForm = () => {
     const getClientSecret = async () => {
       try {
         const response = await fetch(
-          `${BACKEND_URL}/api/order/pay/${serviceId}`,
+          `${BACKEND_URL}/order/pay/${serviceId}`,
           {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+            method: "GET",
+            headers: { "Content-Type": "application/json",Authorization:`Bearer ${accessToken}` },
+          
           }
         );
 
@@ -71,35 +74,35 @@ export const PaymentForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
+
+    if (!stripe || !elements) return;
+
+    const cardElement = elements.getElement(CardNumberElement);
 
     try {
-      if (price === 0) {
-        alert("Free service, skipping payment.");
-        window.location.href = "/confirmation";
-        return;
-      }
-
-      const cardNumberElement = elements.getElement(CardNumberElement);
-
-      const { error: stripeError, paymentIntent } =
-        await stripe.confirmCardPayment(clientSecret, {
+      const { paymentIntent, error } = await stripe.confirmCardPayment(
+        clientSecret,
+        {
           payment_method: {
-            card: cardNumberElement,
+            card: cardElement,
           },
-        });
+        }
+      );
 
-      if (stripeError) {
-        setError(stripeError.message);
+      if (error) {
+        console.error("Payment failed:", error.message);
+        setError(error.message);
       } else if (paymentIntent.status === "succeeded") {
-        alert("Payment successful!");
+        console.log("Payment successful:", paymentIntent);
         window.location.href = "/confirmation";
       }
     } catch (err) {
-      console.error(err);
-      setError("Payment failed");
+      console.error("Error confirming payment:", err);
+      setError("Unexpected error occurred");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const cardStyle = {
@@ -261,7 +264,7 @@ export const PaymentForm = () => {
             </div>
           ) : (
             <>
-              {`Pay £${displayPrice} `}
+              {`Pay ${displayPrice} `}
               {paymentMethod !== "card"
                 ? `with ${
                     stripePaymentMethod[paymentMethod]?.name ||

@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    console.log(`⏳ Access token valid for ${(remaining / 1000).toFixed(0)} seconds`);
+    console.log(` Access token valid for ${(remaining / 1000).toFixed(0)} seconds`);
     const timer = setTimeout(() => {
       console.log(" Token expired — refreshing now...");
       refreshAccessToken();
