@@ -36,7 +36,7 @@ export const PaymentForm = () => {
   const [error, setError] = useState("");
 
   const { price, serviceName } = location.state || {};
-  const displayPrice = price ? (price / 100).toFixed(2) : "0.00";
+  const displayPrice = price ;
   const stripePaymentMethod = {
     card: { name: "Credit/Debit Card", icon: <FaCreditCard /> },
     paypal: { name: "PayPal", icon: <FaPaypal /> },
@@ -75,54 +75,61 @@ export const PaymentForm = () => {
 
 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
 
-    if (!stripe || !elements) {
-      setError("Stripe is not loaded yet.");
+  if (!stripe || !elements) {
+    setError("Stripe is not loaded yet.");
+    setIsLoading(false);
+    return;
+  }
+
+  try {
+    const cardNumber = elements.getElement(CardNumberElement);
+
+    const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
+      type: "card",
+      card: cardNumber,
+    });
+
+    if (pmError) {
+      console.error("PaymentMethod creation failed:", pmError);
+      setError(pmError.message);
       setIsLoading(false);
       return;
     }
 
-    try {
-      const cardNumber = elements.getElement(CardNumberElement);
+    console.log(" PaymentMethod created:", paymentMethod);
 
-      const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
-        type: "card",
-        card: cardNumber,
-      });
-
-      if (pmError) {
-        setError(pmError.message);
-        setIsLoading(false);
-        return;
+    const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
+      clientSecret,
+      {
+        payment_method: paymentMethod.id,
       }
+    );
 
-      console.log("PaymentMethod created:", paymentMethod.id);
+    console.log(" Full Stripe Response:", {
+      clientSecret,
+      paymentMethod,
+      paymentIntent,
+      confirmError,
+    });
 
-      const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
-        clientSecret,
-        {
-          payment_method: paymentMethod.id,
-        }
-      );
-
-      if (confirmError) {
-        setError(confirmError.message);
-        console.error("Payment failed:", confirmError);
-      } else if (paymentIntent.status === "succeeded") {
-        console.log(" Payment successful:", paymentIntent);
-        window.location.href = "/confirmation";
-      }
-    } catch (err) {
-      console.error("Error confirming payment:", err);
-      setError("Unexpected error occurred");
-    } finally {
-      setIsLoading(false);
+    if (confirmError) {
+      console.error("Payment failed:", confirmError);
+      setError(confirmError.message);
+    } else if (paymentIntent?.status === "succeeded") {
+      console.log(" Payment successful:", paymentIntent);
     }
-  };
+  } catch (err) {
+    console.error("Unexpected error confirming payment:", err);
+    setError("Unexpected error occurred");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const cardStyle = {
     style: {
