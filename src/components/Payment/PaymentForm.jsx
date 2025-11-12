@@ -31,6 +31,8 @@ export const PaymentForm = () => {
   const [clientSecret, setClientSecret] = useState(null);
   const [paymentRequest, setPaymentRequest] = useState(null);
   const [cardComplete, setCardComplete] = useState(false);
+  const [expiryComplete, setExpiryComplete] = useState(false);
+  const [cvcComplete, setCvcComplete] = useState(false);
   const [error, setError] = useState("");
 
   const { price, serviceName } = location.state || {};
@@ -42,7 +44,7 @@ export const PaymentForm = () => {
     google_pay: { name: "Google Pay", icon: <FaGoogle /> },
   };
 
-  useEffect(() => {
+   useEffect(() => {
     const getClientSecret = async () => {
       try {
         const response = await fetch(
@@ -71,30 +73,47 @@ export const PaymentForm = () => {
     getClientSecret();
   }, [serviceId]);
 
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    if (!stripe || !elements) return;
-
-    const cardElement = elements.getElement(CardNumberElement);
+    if (!stripe || !elements) {
+      setError("Stripe is not loaded yet.");
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      const { paymentIntent, error } = await stripe.confirmCardPayment(
+      const cardNumber = elements.getElement(CardNumberElement);
+
+      const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
+        type: "card",
+        card: cardNumber,
+      });
+
+      if (pmError) {
+        setError(pmError.message);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log("PaymentMethod created:", paymentMethod.id);
+
+      const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
         clientSecret,
         {
-          payment_method: {
-            card: cardElement,
-          },
+          payment_method: paymentMethod.id,
         }
       );
 
-      if (error) {
-        console.error("Payment failed:", error.message);
-        setError(error.message);
+      if (confirmError) {
+        setError(confirmError.message);
+        console.error("Payment failed:", confirmError);
       } else if (paymentIntent.status === "succeeded") {
-        console.log("Payment successful:", paymentIntent);
+        console.log(" Payment successful:", paymentIntent);
         window.location.href = "/confirmation";
       }
     } catch (err) {
@@ -108,21 +127,14 @@ export const PaymentForm = () => {
   const cardStyle = {
     style: {
       base: {
+        fontSize: "16px",
         color: "#32325d",
         fontFamily: "Arial, sans-serif",
-        fontSmoothing: "antialiased",
-        fontSize: "16px",
-        "::placeholder": {
-          color: "#a0aec0",
-        },
+        "::placeholder": { color: "#a0aec0" },
       },
-      invalid: {
-        color: "#fa755a",
-        iconColor: "#fa755a",
-      },
+      invalid: { color: "#fa755a" },
     },
   };
-
   return (
     <div className="flex justify-center items-center min-h-screen py-8">
       <form
@@ -217,26 +229,34 @@ export const PaymentForm = () => {
           <div className="space-y-4">
             {/* Card Number */}
             <div className="border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
-              <label className="block text-gray-700 font-medium mb-1">
-                Card Number
-              </label>
-              <CardNumberElement options={cardStyle} />
-            </div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Card Number
+          </label>
+          <CardNumberElement
+            options={cardStyle}
+            onChange={(event) => setCardComplete(event.complete)}
+          />
+        </div>
 
-            <div className="flex space-x-3">
-              <div className="flex-1 border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
-                <label className="block text-gray-700 font-medium mb-1">
-                  Expiry Date
-                </label>
-                <CardExpiryElement options={cardStyle} />
-              </div>
+        {/* Expiry + CVC */}
+        <div className="flex space-x-3">
+          <div className="flex-1 border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
+            <label className="block text-gray-700 font-medium mb-1">
+              Expiry Date
+            </label>
+            <CardExpiryElement
+              options={cardStyle}
+              onChange={(event) => setCardComplete(event.complete)}
+            />
+          </div>
 
-              <div className="flex-1 border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
-                <label className="block text-gray-700 font-medium mb-1">
-                  CVC
-                </label>
-                <CardCvcElement options={cardStyle} />
-              </div>
+          <div className="flex-1 border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
+            <label className="block text-gray-700 font-medium mb-1">CVC</label>
+            <CardCvcElement
+              options={cardStyle}
+              onChange={(event) => setCardComplete(event.complete)}
+            />
+          </div>
             </div>
 
             {error && (
@@ -248,11 +268,11 @@ export const PaymentForm = () => {
         )}
 
         {/* Confirm Order Button */}
-        <button
+       <button
           type="submit"
           disabled={isLoading || (paymentMethod === "card" && !cardComplete)}
           className={`w-full py-4 rounded-xl font-semibold text-lg transition-all ${
-            isLoading || (paymentMethod === "card" && !cardComplete)
+            isLoading || !cardComplete
               ? "bg-gray-400 cursor-not-allowed text-gray-200"
               : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl"
           }`}
@@ -263,15 +283,7 @@ export const PaymentForm = () => {
               <span>Processing Payment...</span>
             </div>
           ) : (
-            <>
-              {`Pay ${displayPrice} `}
-              {paymentMethod !== "card"
-                ? `with ${
-                    stripePaymentMethod[paymentMethod]?.name ||
-                    "selected method"
-                  }`
-                : "Now"}
-            </>
+            <>Pay {displayPrice} Now</>
           )}
         </button>
       </form>
