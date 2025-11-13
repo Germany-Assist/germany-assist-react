@@ -36,7 +36,7 @@ export const PaymentForm = () => {
   const [error, setError] = useState("");
 
   const { price, serviceName } = location.state || {};
-  const displayPrice = price ;
+  const displayPrice = price > 0 ? price : 4000;
   const stripePaymentMethod = {
     card: { name: "Credit/Debit Card", icon: <FaCreditCard /> },
     paypal: { name: "PayPal", icon: <FaPaypal /> },
@@ -44,17 +44,16 @@ export const PaymentForm = () => {
     google_pay: { name: "Google Pay", icon: <FaGoogle /> },
   };
 
-   useEffect(() => {
+  useEffect(() => {
     const getClientSecret = async () => {
       try {
-        const response = await fetch(
-          `${BACKEND_URL}/order/pay/${serviceId}`,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json",Authorization:`Bearer ${accessToken}` },
-          
-          }
-        );
+        const response = await fetch(`${BACKEND_URL}/order/pay/${serviceId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
 
         const data = await response.json();
         console.log("Payment Intent Response:", data);
@@ -71,157 +70,207 @@ export const PaymentForm = () => {
     };
 
     getClientSecret();
-  }, [serviceId]);
+  }, [serviceId, accessToken]);
+  // Handle payment with Apple Pay / Google Pay
+  useEffect(() => {
+    if (!stripe) return;
 
+    // Ensure the price is a positive integer in cents
+    const priceInCents = Math.max(Math.round((displayPrice || 0) * 100), 1);
 
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
-  setError("");
-
-  if (!stripe || !elements) {
-    setError("Stripe is not loaded yet.");
-    setIsLoading(false);
-    return;
-  }
-
-  try {
-    const cardNumber = elements.getElement(CardNumberElement);
-
-    const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
-      type: "card",
-      card: cardNumber,
+    const pr = stripe.paymentRequest({
+      country: "US",
+      currency: "usd",
+      total: {
+        label: serviceName || "Service Payment",
+        amount: priceInCents, // must be an integer in smallest currency unit
+      },
+      requestPayerName: true,
+      requestPayerEmail: true,
     });
 
-    if (pmError) {
-      console.error("PaymentMethod creation failed:", pmError);
-      setError(pmError.message);
+    pr.on("paymentmethod", async (event) => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/order/pay/${serviceId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        const data = await res.json();
+        const secret = data?.message?.clientSecret;
+
+        if (!secret) {
+          throw new Error("Client secret not found.");
+        }
+
+        const { error, paymentIntent } = await stripe.confirmCardPayment(
+          secret,
+          {
+            payment_method: event.paymentMethod.id,
+          }
+        );
+
+        if (error) {
+          event.complete("fail");
+          console.error(" Payment failed:", error.message);
+          alert(`Payment failed: ${error.message}`);
+        } else if (paymentIntent?.status === "succeeded") {
+          event.complete("success");
+          console.log("Payment succeeded:", paymentIntent);
+          alert("Payment successful!");
+        } else {
+          event.complete("fail");
+          console.warn(" Unexpected payment status:", paymentIntent?.status);
+        }
+      } catch (err) {
+        console.error("Error confirming payment:", err);
+        event.complete("fail");
+        alert("An unexpected error occurred while processing your payment.");
+      }
+    });
+
+    pr.canMakePayment().then((result) => {
+      if (result) {
+        console.log("Google Pay / Apple Pay available", result);
+      } else {
+        console.log("No payment methods available");
+      }
+    });
+  }, [stripe, serviceName, displayPrice, serviceId, accessToken]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    if (!stripe || !elements) {
+      setError("Stripe is not loaded yet.");
       setIsLoading(false);
       return;
     }
 
-    console.log(" PaymentMethod created:", paymentMethod);
+    try {
+      const cardNumber = elements.getElement(CardNumberElement);
 
-    const { paymentIntent, error: confirmError } = await stripe.confirmCardPayment(
-      clientSecret,
-      {
-        payment_method: paymentMethod.id,
+      const { paymentMethod, error: pmError } =
+        await stripe.createPaymentMethod({
+          type: "card",
+          card: cardNumber,
+        });
+
+      if (pmError) {
+        console.error("PaymentMethod creation failed:", pmError);
+        setError(pmError.message);
+        setIsLoading(false);
+        return;
       }
-    );
 
-    console.log(" Full Stripe Response:", {
-      clientSecret,
-      paymentMethod,
-      paymentIntent,
-      confirmError,
-    });
+      console.log(" PaymentMethod created:", paymentMethod);
 
-    if (confirmError) {
-      console.error("Payment failed:", confirmError);
-      setError(confirmError.message);
-    } else if (paymentIntent?.status === "succeeded") {
-      console.log(" Payment successful:", paymentIntent);
+      const { paymentIntent, error: confirmError } =
+        await stripe.confirmCardPayment(clientSecret, {
+          payment_method: paymentMethod.id,
+        });
+
+      console.log(" Full Stripe Response:", {
+        clientSecret,
+        paymentMethod,
+        paymentIntent,
+        confirmError,
+      });
+
+      if (confirmError) {
+        console.error("Payment failed:", confirmError);
+        setError(confirmError.message);
+      } else if (paymentIntent?.status === "succeeded") {
+        console.log(" Payment successful:", paymentIntent);
+      }
+    } catch (err) {
+      console.error("Unexpected error confirming payment:", err);
+      setError("Unexpected error occurred");
+    } finally {
+      setIsLoading(false);
     }
-  } catch (err) {
-    console.error("Unexpected error confirming payment:", err);
-    setError("Unexpected error occurred");
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-  const cardStyle = {
-    style: {
-      base: {
-        fontSize: "16px",
-        color: "#32325d",
-        fontFamily: "Arial, sans-serif",
-        "::placeholder": { color: "#a0aec0" },
-      },
-      invalid: { color: "#fa755a" },
-    },
   };
+
   return (
-    <div className="flex justify-center items-center min-h-screen py-8">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10 px-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md space-y-6 border border-gray-100"
+        className="bg-white/90 backdrop-blur-sm border border-gray-200 shadow-xl rounded-3xl w-full max-w-lg p-8 space-y-8"
       >
-        <div className="text-center ">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2 ">
-            Payment Method
+        {/* Header */}
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-1">
+            Complete Your Payment
           </h2>
-          <p className="text-gray-600">Complete your purchase securely</p>
+          <p className="text-gray-600">
+            Choose a method and securely pay for your service
+          </p>
         </div>
-        {/* Securely  badge */}
-        <div className="flex items-center justify-center gap-2 text-sm text-green-600 bg-green-50 py-2 rounded-lg ">
-          <FaLock className="text-xs" />
+
+        {/* Security Badge */}
+        <div className="flex items-center justify-center gap-2 text-sm font-medium text-green-600 bg-green-50 border border-green-100 py-2 rounded-xl">
+          <FaLock className="text-green-600 text-sm" />
           <span>Secure SSL Encryption</span>
         </div>
-        {/* Payment Method Options */}
+
+        {/* Payment Options */}
         <div className="space-y-4">
           <label className="block text-gray-700 font-semibold text-lg">
             Select Payment Method
           </label>
+
           <div className="grid gap-3">
+            {/* Credit/Debit Card */}
             <PaymentOption
-              icon={<FaCreditCard className="text-blue-600" />}
-              label="Credit/Debit Card"
-              description="Pay with Visa, Mastercard, or American Express"
+              icon={<FaCreditCard className="text-blue-600 text-lg" />}
+              label="Credit / Debit Card"
+              description="Pay securely with Visa, Mastercard, or American Express"
               selected={paymentMethod === "card"}
               onClick={() => setPaymentMethod("card")}
             />
-            {/* Paypal */}
-            <PaymentOption
-              icon={<FaPaypal className="text-bue-600" />}
-              label="PayPal"
-              description="Pay with your PayPal account"
-              selected={paymentMethod === "paypal"}
-              onClick={() => setPaymentMethod("paypal")}
-            />
 
-            {/* Handling Apple Pay && Google Pay */}
+            {/* Wallet Payment (Apple / Google Pay) */}
             {paymentRequest && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                  onClick={() => setPaymentMethod("wallet")}
+                  className={`flex items-center justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${
                     paymentMethod === "wallet"
                       ? "border-blue-500 bg-blue-50"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
-                  onClick={() => setPaymentMethod("wallet")}
                 >
-                  <div className="flex items-center justify-content">
-                    <div className="flex items-center gap-3">
-                      <div className="flex gap-1">
-                        <FaApple className="text-gray-800" />
-                        <FaGoogle className="text-gray-800" />
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-1">
+                      <FaApple className="text-gray-800 text-lg" />
+                      <FaGoogle className="text-gray-800 text-lg" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">
+                        Apple Pay / Google Pay
                       </div>
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          Apple Pay / Google Pay
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          Fast and secure payment
-                        </div>
+                      <div className="text-sm text-gray-500">
+                        Fast and secure payment
                       </div>
                     </div>
-                    {paymentMethod === "wallet" && (
-                      <FaCheckCircle className="text-blue-600 text-lg" />
-                    )}
                   </div>
+                  {paymentMethod === "wallet" && (
+                    <FaCheckCircle className="text-blue-600 text-lg" />
+                  )}
                 </div>
+
                 {paymentMethod === "wallet" && (
                   <div className="mt-2">
                     <PaymentRequestButtonElement
-                      option={{
+                      options={{
                         paymentRequest,
                         style: {
-                          paymentRequest: {
-                            theme: "dark",
-                            height: "44px",
-                          },
+                          paymentRequest: { theme: "dark", height: "48px" },
                         },
                       }}
                     />
@@ -231,68 +280,97 @@ const handleSubmit = async (e) => {
             )}
           </div>
         </div>
-        {/* Card Input Numbers */}
+
         {paymentMethod === "card" && (
           <div className="space-y-4">
             {/* Card Number */}
-            <div className="border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
-          <label className="block text-gray-700 font-medium mb-1">
-            Card Number
-          </label>
-          <CardNumberElement
-            options={cardStyle}
-            onChange={(event) => setCardComplete(event.complete)}
-          />
-        </div>
+            <div className="border-2 border-gray-200 rounded-2xl p-4 bg-white shadow-sm hover:border-blue-400 transition">
+              <label className="block text-gray-700 font-semibold mb-1">
+                Card Number
+              </label>
+              <CardNumberElement
+                options={{
+                  style: {
+                    base: {
+                      fontSize: "16px",
+                      color: "#1a1a1a",
+                      "::placeholder": { color: "#a0a0a0" },
+                    },
+                  },
+                }}
+                onChange={(event) => setCardComplete(event.complete)}
+              />
+            </div>
 
-        {/* Expiry + CVC */}
-        <div className="flex space-x-3">
-          <div className="flex-1 border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
-            <label className="block text-gray-700 font-medium mb-1">
-              Expiry Date
-            </label>
-            <CardExpiryElement
-              options={cardStyle}
-              onChange={(event) => setCardComplete(event.complete)}
-            />
-          </div>
-
-          <div className="flex-1 border-2 border-gray-200 rounded-xl p-3 bg-white shadow-sm hover:border-blue-400 transition-colors">
-            <label className="block text-gray-700 font-medium mb-1">CVC</label>
-            <CardCvcElement
-              options={cardStyle}
-              onChange={(event) => setCardComplete(event.complete)}
-            />
-          </div>
+            {/* Expiry + CVC */}
+            <div className="flex space-x-4">
+              <div className="flex-1 border-2 border-gray-200 rounded-2xl p-4 bg-white shadow-sm hover:border-blue-400 transition">
+                <label className="block text-gray-700 font-semibold mb-1">
+                  Expiry Date
+                </label>
+                <CardExpiryElement
+                  options={{
+                    style: {
+                      base: {
+                        fontSize: "16px",
+                        color: "#1a1a1a",
+                        "::placeholder": { color: "#a0a0a0" },
+                      },
+                    },
+                  }}
+                />
+              </div>
+              <div className="flex-1 border-2 border-gray-200 rounded-2xl p-4 bg-white shadow-sm hover:border-blue-400 transition">
+                <label className="block text-gray-700 font-semibold mb-1">
+                  CVC
+                </label>
+                <CardCvcElement
+                  options={{
+                    style: {
+                      base: {
+                        fontSize: "16px",
+                        color: "#1a1a1a",
+                        "::placeholder": { color: "#a0a0a0" },
+                      },
+                    },
+                  }}
+                />
+              </div>
             </div>
 
             {error && (
-              <div className="text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+              <div className="text-red-600 text-sm bg-red-50 border border-red-200 p-3 rounded-lg">
                 {error}
               </div>
             )}
           </div>
         )}
 
-        {/* Confirm Order Button */}
-       <button
+        {/* Confirm the Order */}
+        <button
           type="submit"
           disabled={isLoading || (paymentMethod === "card" && !cardComplete)}
-          className={`w-full py-4 rounded-xl font-semibold text-lg transition-all ${
-            isLoading || !cardComplete
-              ? "bg-gray-400 cursor-not-allowed text-gray-200"
-              : "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl"
+          className={`w-full py-4 rounded-2xl font-semibold text-lg transition-all flex justify-center items-center gap-2 ${
+            isLoading || (paymentMethod === "card" && !cardComplete)
+              ? "bg-gray-300 cursor-not-allowed text-gray-500"
+              : "bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white shadow-lg hover:shadow-xl"
           }`}
         >
           {isLoading ? (
-            <div className="flex items-center justify-center gap-2">
+            <>
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Processing Payment...</span>
-            </div>
+              <span>Processing...</span>
+            </>
           ) : (
-            <>Pay {displayPrice} Now</>
+            <>Pay ${(displayPrice / 100).toFixed(2)} Now</>
           )}
         </button>
+
+        {/* Footer */}
+        <div className="text-center text-sm text-gray-500 mt-4">
+          Powered by{" "}
+          <span className="font-semibold text-blue-600">Stripe Payments</span>
+        </div>
       </form>
     </div>
   );

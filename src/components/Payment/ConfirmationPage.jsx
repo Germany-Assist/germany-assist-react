@@ -4,7 +4,7 @@ export const ConfirmationPage = () => {
   return (
     <div className='flex flex-col items-center justify-center h-screen bg-blue-50 '>
         <div className='bg-white p-8 rounded-2xl shadow-lg text-center '>
-            <div className='text-6xl text-blue-500 mb-4'>✔️</div>
+            <div className='text-6xl text-blue-500 mb-4'>Success</div>
             <h2 className='text-xl font-bold mb-2'>Order Confirmed</h2>
             <p className='text-gray-600  mb-4'>
                  Thank you for your order. A confirmation email has been sent.
