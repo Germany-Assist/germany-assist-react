@@ -45,15 +45,23 @@ export const PaymentForm = () => {
   };
 
   useEffect(() => {
+     console.log("GET CLIENT SECRET useEffect RUNNING...");
+     console.log("serviceId =", serviceId);
+console.log("accessToken =", accessToken);
+console.log("FULL URL:", `${BACKEND_URL}/order/pay/${serviceId}`);
+
     const getClientSecret = async () => {
       try {
         const response = await fetch(`${BACKEND_URL}/order/pay/${serviceId}`, {
+
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
         });
+        console.log(BACKEND_URL)
+
 
         const data = await response.json();
         console.log("Payment Intent Response:", data);
@@ -71,11 +79,64 @@ export const PaymentForm = () => {
 
     getClientSecret();
   }, [serviceId, accessToken]);
+   const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    if (!stripe || !elements) {
+      setError("Stripe is not loaded yet.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const cardNumber = elements.getElement(CardNumberElement);
+
+      const { paymentMethod, error: pmError } =
+        await stripe.createPaymentMethod({
+          type: "card",
+          card: cardNumber,
+        });
+
+      if (pmError) {
+        console.error("PaymentMethod creation failed:", pmError);
+        setError(pmError.message);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log(" PaymentMethod created:", paymentMethod);
+
+      const { paymentIntent, error: confirmError } =
+        await stripe.confirmCardPayment(clientSecret, {
+          payment_method: paymentMethod.id,
+        });
+
+      console.log(" Full Stripe Response:", {
+        clientSecret,
+        paymentMethod,
+        paymentIntent,
+        confirmError,
+      });
+
+      if (confirmError) {
+        console.error("Payment failed:", confirmError);
+        setError(confirmError.message);
+      } else if (paymentIntent?.status === "succeeded") {
+        console.log(" Payment successful:", paymentIntent);
+      }
+    } catch (err) {
+      console.error("Unexpected error confirming payment:", err);
+      setError("Unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   // Handle payment with Apple Pay / Google Pay
   useEffect(() => {
     if (!stripe) return;
 
-    // Ensure the price is a positive integer in cents
     const priceInCents = Math.max(Math.round((displayPrice || 0) * 100), 1);
 
     const pr = stripe.paymentRequest({
@@ -83,7 +144,7 @@ export const PaymentForm = () => {
       currency: "usd",
       total: {
         label: serviceName || "Service Payment",
-        amount: priceInCents, // must be an integer in smallest currency unit
+        amount: priceInCents, 
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -141,60 +202,7 @@ export const PaymentForm = () => {
     });
   }, [stripe, serviceName, displayPrice, serviceId, accessToken]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
-    if (!stripe || !elements) {
-      setError("Stripe is not loaded yet.");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const cardNumber = elements.getElement(CardNumberElement);
-
-      const { paymentMethod, error: pmError } =
-        await stripe.createPaymentMethod({
-          type: "card",
-          card: cardNumber,
-        });
-
-      if (pmError) {
-        console.error("PaymentMethod creation failed:", pmError);
-        setError(pmError.message);
-        setIsLoading(false);
-        return;
-      }
-
-      console.log(" PaymentMethod created:", paymentMethod);
-
-      const { paymentIntent, error: confirmError } =
-        await stripe.confirmCardPayment(clientSecret, {
-          payment_method: paymentMethod.id,
-        });
-
-      console.log(" Full Stripe Response:", {
-        clientSecret,
-        paymentMethod,
-        paymentIntent,
-        confirmError,
-      });
-
-      if (confirmError) {
-        console.error("Payment failed:", confirmError);
-        setError(confirmError.message);
-      } else if (paymentIntent?.status === "succeeded") {
-        console.log(" Payment successful:", paymentIntent);
-      }
-    } catch (err) {
-      console.error("Unexpected error confirming payment:", err);
-      setError("Unexpected error occurred");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+ 
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10 px-4">
