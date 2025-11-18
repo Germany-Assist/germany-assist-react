@@ -1,52 +1,92 @@
-
-import './App.css'
+import "./App.css";
 import Signup from "./pages/signup";
-import UserProfile from './pages/userProfile';
-import DashboardHeader from './components/Dashboard/DashboardHeader';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from "./pages/login";
+import About from "./pages/about";
+import Jobs from "./pages/jobs";
+import OnboardingPage from "./pages/onboarding";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import {ServiceList} from './components/Services/serviceList.jsx';
-
-import ServiceDetails from './components/Services/ServiceDetails.jsx';
-import LoginPage from './pages/loginPage.jsx';
-import BusinessProvider from './components/Buisnesses/BusinessProvider.jsx';
-
+import UserProfile from "./components/Candidate/userProfile.jsx";
+import { ServiceList } from "./components/Services/serviceList.jsx";
+import Homepage from "./components/Homepage/Homepage.jsx";
+import ServiceDetails from "./components/Services/ServiceDetails.jsx";
+import { HeaderWithAlert } from "./components/Dashboard/HeaderWithAlert.jsx";
+import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 
 function App() {
-
-
   return (
-    <>
-   
-     <Router>
-      <Routes>
-
-        <Route path="/"  element={
+    <Routes>
+      <Route
+        path="/"
+        element={
           <>
-        <DashboardHeader/>
-          <div id="services">
-        <ServiceList />
-      </div>
-        </>
-        }></Route>
-        <Route path="/signup" element={<Signup/>}></Route>
-        <Route path="/login" element={<LoginPage/>}></Route>
-        <Route path="/services" element={<ServiceList/>}></Route>
-        <Route path="/userProfile" element={<UserProfile/>}></Route>
-        <Route path="/businessProfile" element={<BusinessProvider/>}></Route>
-        <Route path="/serviceDetails/:slug" element={<ServiceDetails/>}></Route>
+            <HeaderWithAlert />
+            <Homepage />
+          </>
+        }
+      ></Route>
+      <Route
+        path="/about"
+        element={
+          <>
+            <HeaderWithAlert />
+            <About />
+          </>
+        }
+      ></Route>
+      <Route
+        path="/jobs"
+        element={
+          <>
+            <HeaderWithAlert />
+            <Jobs />
+          </>
+        }
+      ></Route>
+      <Route
+        path="/serviceDetails/:id"
+        element={
+          <>
+            <HeaderWithAlert />
+            <ServiceDetails />
+          </>
+        }
+      ></Route>
+      <Route path="/onboarding" element={<OnboardingPage />}></Route>
+      <Route path="/login" element={<Login />}></Route>
+      <Route path="/signup" element={<Signup />}></Route>
+      <Route
+        path="/services"
+        element={
+          <>
+            <HeaderWithAlert />
+            <ServiceList />
+          </>
+        }
+      ></Route>
+      <Route
+        path="/userProfile"
+        element={
+          <>
+            <HeaderWithAlert />
+            <UserProfile />
+          </>
+        }
+      ></Route>
 
-      </Routes>
-     </Router>
-
-
-     
-
-     
-
-    </>
-    
-  )
+      <Route
+        path="/checkout/:serviceId"
+        element={
+          <>
+            <HeaderWithAlert />
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+              <StripeContainer />
+            </div>
+          </>
+        }
+      />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
