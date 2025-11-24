@@ -15,8 +15,16 @@ import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 
 // to delete just for deployment testing
 setInterval(async () => {
-  await fetch("/health");
-}, 600000);
+  console.log("fetching health");
+  try {
+    const res = await fetch("/health");
+    const res2 = await fetch("health");
+    console.log("res1", res);
+    console.log("res2", res2);
+  } catch (error) {
+    console.log(error);
+  }
+}, 10000);
 
 function App() {
   return (
