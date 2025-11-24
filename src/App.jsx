@@ -17,10 +17,8 @@ import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 setInterval(async () => {
   console.log("fetching health");
   try {
-    const res = await fetch("/health");
-    const res2 = await fetch("health");
+    const res = await fetch("/api/health");
     console.log("res1", res);
-    console.log("res2", res2);
   } catch (error) {
     console.log(error);
   }
