@@ -12,6 +12,7 @@ import Homepage from "./components/Homepage/Homepage.jsx";
 import ServiceDetails from "./components/Services/ServiceDetails.jsx";
 import { HeaderWithAlert } from "./components/Dashboard/HeaderWithAlert.jsx";
 import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
+import { TimelinePage } from "./components/ServiceTimeLine/TimelinePage.jsx";
 
 function App() {
   return (
@@ -70,6 +71,15 @@ function App() {
           <>
             <HeaderWithAlert />
             <UserProfile />
+          </>
+        }
+      ></Route>
+      <Route
+        path="/serviceTimeline/:serviceId"
+        element={
+          <>
+            <HeaderWithAlert />
+            <TimelinePage />
           </>
         }
       ></Route>

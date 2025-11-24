@@ -2,14 +2,16 @@ import React, { useEffect, useState } from "react";
 import { BACKEND_URL } from "../../config/api";
 import { useAuth } from "../../pages/AuthProvider";
 import { Timeline } from "./Timeline";
-export const TimelinePage = ({ timelineId }) => {
+import { useParams } from "react-router-dom";
+export const TimelinePage = () => {
+  const {serviceId}= useParams();
   const [timeline, setTimeline] = useState(null);
   const { accessToken } = useAuth();
   useEffect(() => {
     const fetchTimeLine = async () => {
       try {
         const response = await fetch(
-          `${BACKEND_URL}/service/timeline/client/${timelineId}`,
+          `${BACKEND_URL}/service/timeline/serviceProvider/${serviceId}`,
           {
             method: "GET",
             headers: { Authorization: `Bearer ${accessToken} ` },
@@ -22,7 +24,7 @@ export const TimelinePage = ({ timelineId }) => {
       }
     };
     fetchTimeLine();
-  }, [timelineId]);
+  }, [serviceId]);
 
   if (!timeline) return <p className="text-center">Loading...</p>;
   return (

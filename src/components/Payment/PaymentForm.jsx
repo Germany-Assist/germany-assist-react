@@ -37,31 +37,29 @@ export const PaymentForm = () => {
 
   const { price, serviceName } = location.state || {};
   const displayPrice = price > 0 ? price : 4000;
-  const stripePaymentMethod = {
-    card: { name: "Credit/Debit Card", icon: <FaCreditCard /> },
-    paypal: { name: "PayPal", icon: <FaPaypal /> },
-    apple_pay: { name: "Apple Pay", icon: <FaApple /> },
-    google_pay: { name: "Google Pay", icon: <FaGoogle /> },
-  };
+  // const stripePaymentMethod = {
+  //   card: { name: "Credit/Debit Card", icon: <FaCreditCard /> },
+  //   paypal: { name: "PayPal", icon: <FaPaypal /> },
+  //   apple_pay: { name: "Apple Pay", icon: <FaApple /> },
+  //   google_pay: { name: "Google Pay", icon: <FaGoogle /> },
+  // };
 
   useEffect(() => {
-     console.log("GET CLIENT SECRET useEffect RUNNING...");
-     console.log("serviceId =", serviceId);
-console.log("accessToken =", accessToken);
-console.log("FULL URL:", `${BACKEND_URL}/order/pay/${serviceId}`);
+    console.log("GET CLIENT SECRET useEffect RUNNING...");
+    console.log("serviceId =", serviceId);
+    console.log("accessToken =", accessToken);
+    console.log("FULL URL:", `${BACKEND_URL}/order/pay/${serviceId}`);
 
     const getClientSecret = async () => {
       try {
         const response = await fetch(`${BACKEND_URL}/order/pay/${serviceId}`, {
-
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        console.log(BACKEND_URL)
-
+        console.log(BACKEND_URL);
 
         const data = await response.json();
         console.log("Payment Intent Response:", data);
@@ -79,7 +77,7 @@ console.log("FULL URL:", `${BACKEND_URL}/order/pay/${serviceId}`);
 
     getClientSecret();
   }, [serviceId, accessToken]);
-   const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
@@ -144,7 +142,7 @@ console.log("FULL URL:", `${BACKEND_URL}/order/pay/${serviceId}`);
       currency: "usd",
       total: {
         label: serviceName || "Service Payment",
-        amount: priceInCents, 
+        amount: priceInCents,
       },
       requestPayerName: true,
       requestPayerEmail: true,
@@ -201,8 +199,6 @@ console.log("FULL URL:", `${BACKEND_URL}/order/pay/${serviceId}`);
       }
     });
   }, [stripe, serviceName, displayPrice, serviceId, accessToken]);
-
- 
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-10 px-4">
