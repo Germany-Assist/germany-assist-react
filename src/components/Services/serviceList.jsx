@@ -38,7 +38,7 @@ export const ServiceList = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // TODO: Replace with actual API call
-      const response = await fetch(`http://localhost:3000/api/services`);
+      const response = await fetch(`/api/services`);
 
       if (!response.ok) {
         // Try to get error message from body

@@ -13,6 +13,11 @@ import ServiceDetails from "./components/Services/ServiceDetails.jsx";
 import { HeaderWithAlert } from "./components/Dashboard/HeaderWithAlert.jsx";
 import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 
+// to delete just for deployment testing
+setInterval(async () => {
+  await fetch("/health");
+}, 600000);
+
 function App() {
   return (
     <Routes>
