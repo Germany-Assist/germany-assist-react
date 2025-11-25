@@ -17,8 +17,10 @@ import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 setInterval(async () => {
   try {
     console.log("im just here to test the app connection v1");
-    const res = await fetch("http://127.0.0.1:3000/health");
+    const res = await fetch("backend/health");
+    const res2 = await fetch("backend/api/service");
     console.log(res);
+    console.log(res2);
   } catch (error) {
     console.log(error);
   }
