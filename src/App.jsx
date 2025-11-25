@@ -16,13 +16,17 @@ import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 // to delete just for deployment testing
 setInterval(async () => {
   try {
-    console.log("im just here to test the app connection v2");
+    console.log("Testing backend connection v5");
+
     const res = await fetch("backend/health");
+    const healthData = await res.json();
+    console.log("Health response:", healthData);
+
     const res2 = await fetch("backend/api/service");
-    console.log(await res.json());
-    console.log(await res2.json());
+    const serviceData = await res2.json(); // parse JSON
+    console.log("Service response:", serviceData);
   } catch (error) {
-    console.log(error);
+    console.error("Fetch error:", error);
   }
 }, 10000);
 
