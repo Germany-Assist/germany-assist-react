@@ -19,8 +19,7 @@ setInterval(async () => {
     console.log("Testing backend connection v5");
 
     const res = await fetch("backend/health");
-    const healthData = await res.json();
-    console.log("Health response:", healthData);
+    console.log("Health response:", res.status);
 
     const res2 = await fetch("backend/api/service");
     const serviceData = await res2.json(); // parse JSON
