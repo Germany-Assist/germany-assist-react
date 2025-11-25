@@ -1,43 +1,39 @@
-import React from 'react'
+import React from 'react';
 
-export const Timeline = ({posts}) => {
-  return (
-    <div className='relative border-1   border-gray-300  pl-6 ml-4'>
-    {posts?.map((post,index)=>(
-        <div key={post.id} className="mb-10 relative">
-            <div className='absolute left-3 top-1 w-6 h-6 rounded-full bg-blue-500'>
-                <div className='bg-white p-4 rounded-lg shadow-sm border'>
-                    <h3 className='text-lg font-semibold mb-2'>
-                        Post #{index + 1}
-                    </h3>
-                    <p className='text-gray-700 mb-3 '>{post.description}</p>
+const SanitizeUrl=(url)=>{
+    if(!url) return '#';
+    return url.startWith('http') ? url : `https//${url}`;
+}
+
+const FileIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+  </svg>
+);
 
 
-                    {/* Attachment */}
-                   {posts?.attachments && post?.attachments?.length > 0 &&(
-                    <div className='mt-2 p-3 bg-gray-50 rounded '>
-                        <p className='text-sm font-semibold'>Attachment: </p>
-                         {post?.attachments?.map((file,i)=>(
-                            <a key={i} href={file} className='text-blue-600 underline text-sm block'>{file}</a>
-                         ))}
 
-                         {/* Comments */}
-                         {posts?.comments?.length > 0 && (
-                            <div className="mt-4 ml-4 border-1 pl-4">
-                                <p className='font-semibold mb-2 text-sm'>Comments: </p>
-                                {post.comments.map((c)=>(
-                                    <div key={c.id} className='mb-2 '>
-                                        <p className='text-gray-600 text-sm'>{c.body}</p>
-                                    </div>
-                                ))}
-                            </div>
-                         )}
-                    </div>
-                   )}
-                </div>
+const CommentIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+  </svg>
+);
+// Attachment component seperation from main card
+const AttachmentDisplay=({attachment})=>{
+    // Handle  if  attachment is empty or null
+    if(!attachment || attachment.url) return null;
+    return(
+        <div className='mt-3 mb-4'>
+            <div className='flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-mb hover:bg-slate-100 transition-color'>
+              <div className='p-2 bg-white rounded-full text-blue-500 shadow-md'>
+                  <FileIcon/>
+              </div>
+              <div className='flex  flex-col min-w-0'>
+                <span className='text-xs font-bold text-slate-400 uppercase tracking-wider'>Attachment</span>
+                <a href={SanitizeUrl(attachment.url)}  target="_blank" rel="noopener noreferrer" className='text-sm font-medium text-blue-700 hover:underline  truncate block'
+                title={attachment?.name}>{attachment.name || "Download File"}</a>
+              </div>
             </div>
         </div>
-    ))}
-    </div>
-  )
+    );
 }
