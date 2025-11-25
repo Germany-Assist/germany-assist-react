@@ -37,3 +37,23 @@ const AttachmentDisplay=({attachment})=>{
         </div>
     );
 }
+
+const commentSection=({comments})=>{
+    if(!comments || comments.length==0) return null;
+    return(
+      <div className='mt-4 pt-4 border-t border-gray-100  '>
+        <div className='flex items-center gap-2 mb-3 text-gray-500'>
+            <CommentIcon/>
+            <span className='text-sm font-semibold '>Comments ({comments.length})</span>
+        </div>
+        <ul className='space-y-3'>
+            {comments.map((comment,index)=>(
+              <li key={comment.id||index} className='bg-gray-50 p-3 rounded-md text-sm text-gray-700'>
+                {comment.body  ||comment.text}
+              </li>
+            ))}
+        </ul>
+      </div>
+    );
+  
+}
