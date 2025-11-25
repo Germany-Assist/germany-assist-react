@@ -19,7 +19,7 @@ const CommentIcon = () => (
   </svg>
 );
 // Attachment component seperation from main card
-const AttachmentDisplay=({attachment})=>{
+export const AttachmentDisplay=({attachment})=>{
     // Handle  if  attachment is empty or null
     if(!attachment || attachment.url) return null;
     return(
@@ -38,7 +38,7 @@ const AttachmentDisplay=({attachment})=>{
     );
 }
 
-const commentSection=({comments})=>{
+export const commentSection=({comments})=>{
     if(!comments || comments.length==0) return null;
     return(
       <div className='mt-4 pt-4 border-t border-gray-100  '>
@@ -56,4 +56,31 @@ const commentSection=({comments})=>{
       </div>
     );
   
+}
+
+export const TimelineCard=({post,index})=>{
+return(
+    <div className='relative pl-8 pb-10 last:pb-0'>
+        <div  className='absolute -left-[9] top-0 bg-white border-2 border-gray-100 rounded-full w-5 h-5 flex items-center justify-center z-10 '>
+            <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
+        </div>
+
+        {/* Card Content */}
+        <article className='bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md  transition-shadow duration-200'>
+            <header className='flex justify-between items-start mb-3 '>
+                <h3 className='text-md font-bold tet-gray-900 '>Post {index+1}</h3>
+                {post.id &&(
+                    <span className='text-xs text-gray-400 font-mono bg-gray-50 px-2 py-2 rounded'>{post.id}</span>
+                )}
+            </header>
+         <p className='text-gray-600 mb-2 leading-relaxed whitespace-pre-wrap'>
+            {post.description || "No description provided "}
+         </p>
+
+         {/* Attachment component */}
+         <AttachmentDisplay attachment={post.attachments}/>
+
+        </article>
+    </div>
+)
 }
