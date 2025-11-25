@@ -14,15 +14,15 @@ import { HeaderWithAlert } from "./components/Dashboard/HeaderWithAlert.jsx";
 import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 
 // to delete just for deployment testing
-// setInterval(async () => {
-//   console.log("fetching health");
-//   try {
-//     const res = await fetch("/api/health");
-//     console.log("res1", res);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }, 10000);
+setInterval(async () => {
+  try {
+    console.log("im just here to test the app connection");
+    const res = await fetch("/backend/health");
+    console.log(res);
+  } catch (error) {
+    console.log(error);
+  }
+}, 10000);
 
 function App() {
   return (
