@@ -2,7 +2,7 @@ import React from "react";
 
 const SanitizeUrl = (url) => {
   if (!url) return "#";
-  return url.startWith("http") ? url : `https//${url}`;
+  return url.startsWith("http") ? url : `https//${url}`;
 };
 
 const FileIcon = () => (
@@ -39,27 +39,27 @@ const CommentIcon = () => (
   </svg>
 );
 // Attachment component seperation from main card
-export const AttachmentDisplay = ({ attachment }) => {
-  // Handle  if  attachment is empty or null
-  if (!attachment || attachment.url) return null;
+export const AttachmentDisplay = ({ attachments }) => {
+  // Handle  if  attachments is empty or null
+ if (!attachments || !attachments.url) return null;
   return (
     <div className="mt-3 mb-4">
-      <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-mb hover:bg-slate-100 transition-color">
+      <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-100 rounded-md hover:bg-slate-100 transition-colors">
         <div className="p-2 bg-white rounded-full text-blue-500 shadow-md">
           <FileIcon />
         </div>
         <div className="flex  flex-col min-w-0">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-            Attachment
+            Attachments
           </span>
           <a
-            href={SanitizeUrl(attachment.url)}
+            href={SanitizeUrl(attachments.url)}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm font-medium text-blue-700 hover:underline  truncate block"
-            title={attachment?.name}
+            title={attachments?.name}
           >
-            {attachment.name || "Download File"}
+            {attachments.name || "Download File"}
           </a>
         </div>
       </div>
@@ -68,7 +68,7 @@ export const AttachmentDisplay = ({ attachment }) => {
 };
 
 export const CommentSection = ({ comments }) => {
-  if (!comments || comments.length == 0) return null;
+  if (!comments || comments.length === 0) return null;
   return (
     <div className="mt-4 pt-4 border-t border-gray-100  ">
       <div className="flex items-center gap-2 mb-3 text-gray-500">
@@ -103,7 +103,7 @@ export const TimelineCard = ({ post, index }) => {
         <header className="flex justify-between items-start mb-3 ">
           <h3 className="text-md font-bold tet-gray-900 ">Post {index + 1}</h3>
           {post.id && (
-            <span className="text-xs text-gray-400 font-mono bg-gray-50 px-2 py-2 rounded">
+            <span className="text-xs text-gray-900 font-mono bg-gray-50 px-2 py-2 rounded">
               {post.id}
             </span>
           )}
@@ -113,23 +113,22 @@ export const TimelineCard = ({ post, index }) => {
         </p>
 
         {/* Attachment component */}
-        <AttachmentDisplay attachment={post.attachments} />
+        <AttachmentDisplay attachments={post.attachments} />
         <CommentSection comments={post.comments} />
       </article>
     </div>
   );
 };
 
-
-export const Timeline=({posts})=>{
-    if(!posts ||posts.length==0)return null;
-return (
- <div className="max-w-2xl mx-auto p-6">
-    <div  className="relative border-1-2 border-gray-200 ml-3 ">
-        {posts.map((post,index)=>(
-            <TimelineCard key={post.id || index} post={post} index={index}/>
+export const Timeline = ({ posts }) => {
+  if (!posts || posts.length === 0) return null;
+  return (
+    <div className="max-w-2xl mx-auto p-6">
+      <div className="relative border-1-2 border-gray-200 ml-3 ">
+        {posts.map((post, index) => (
+          <TimelineCard key={post.id || index} post={post} index={index} />
         ))}
+      </div>
     </div>
- </div>
-);
-}
+  );
+};
