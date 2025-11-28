@@ -8,7 +8,7 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend,
+  Legend, 
   ArcElement,
 } from "chart.js";
 import { SideBarBusiness } from "./SideBarBusiness";
@@ -16,7 +16,8 @@ import { ServiceList } from "../Services/serviceList";
 import ServiceCard from "../Services/serviceCard";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import {BACKEND_URL} from "../../config/api.js";
+import { useAuth } from "../../pages/AuthProvider.jsx";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -32,6 +33,7 @@ export default function BusinessProvider() {
   const [IsBarActive, SetIsBarActive] = useState(false);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { accessToken } = useAuth();
 
   const navigate = useNavigate();
   const chartData = {
@@ -73,9 +75,14 @@ export default function BusinessProvider() {
   };
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/service")
+      .get(`${BACKEND_URL}/service/provider/services`,{
+       headers: { Authorization: `Bearer ${accessToken}` },
+        params: { page: 1, limit: 10 }
+            },
+        
+      )
       .then((res) => {
-        setServices(res.data);
+        setServices(res.data.data);
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
@@ -195,7 +202,7 @@ export default function BusinessProvider() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((service) => (
+            {Array.isArray(services) && services.map((service) => (
               <ServiceCard
                 key={service.id}
                 service={service}
