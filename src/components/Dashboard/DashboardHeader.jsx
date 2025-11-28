@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 
-const DashboardHeader = () => {
+export const DashboardHeader = () => {
   const location = useLocation();
+  
   // TODO: Replace with actual authentication context/state management
   // For now, using local state - in production, this would come from:
   // - AuthContext, Redux, Zustand, or similar state management
@@ -75,9 +76,6 @@ const DashboardHeader = () => {
             </Link>
             <Link to="/about" className={getLinkStyles('/about')}>
               About
-            </Link>
-            <Link to="/businessProfile" className={getLinkStyles('/businessProfile')}>
-              Business Profile
             </Link>
             <Link to="/services" className={getLinkStyles('/services')}>
               Services

@@ -5,7 +5,7 @@ const AuthInputs = ({label,onClick}) => {
     <div>
       <button
       onClick={onClick}
-      className='w-full bg-blue-400 text-white py-2 rounded-md hover"bg-blue-700 transition'
+      className='w-full bg-blue-700 text-white py-2 rounded-md hover"bg-blue-700 transition'
       >{label}</button>
     </div>
   )
