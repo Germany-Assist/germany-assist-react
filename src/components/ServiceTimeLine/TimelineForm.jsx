@@ -1,13 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { BACKEND_URL } from '../../config/api'
 import { useAuth } from '../../pages/AuthProvider';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 export const TimelineForm = () => {
-    const{serviceId}=useParams();
+    const{id:serviceId}=useParams();
     const {accessToken}=useAuth();
     const [label, setLabel] = useState("");
-     async function createServiceTimeline=()=>{
-        return await axios.post(`${BACKEND_URL}service/timeline/${serviceId}`,{
-            headers:{Authentication:`Bearer ${accessToken}`,
+    const createServiceTimeline=async()=>{
+        return await axios.post(`${BACKEND_URL}service/timeline/${serviceId}`,
+             { label },  {
+            headers:{Authorization: `Bearer ${accessToken}`, 
                  "Content-Type": "application/json",
             }
         });
