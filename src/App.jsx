@@ -15,6 +15,7 @@ import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 import { TimelinePage } from "./components/ServiceTimeLine/TimelinePage.jsx";
 import BusinessProvider from "./components/Buisnesses/BusinessProvider.jsx";
 import { TimelineForm } from "./components/ServiceTimeLine/TimelineForm.jsx";
+import { CreatePostForm } from "./components/ServiceTimeLine/CreatePostForm.jsx";
 
 // to delete just for deployment testing
 setInterval(async () => {
@@ -116,6 +117,15 @@ function App() {
           <>
             <HeaderWithAlert />
             <TimelineForm />
+          </>
+        }
+      />
+      <Route
+        path="/provider/services/:id/post"
+        element={
+          <>
+            <HeaderWithAlert />
+            <CreatePostForm />
           </>
         }
       />

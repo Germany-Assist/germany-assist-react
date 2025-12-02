@@ -80,6 +80,9 @@ const ServiceCard = ({ service, onDelete, isProvider = false }) => {
           </span>
           <span className="text-gray-300 mx-2">•</span>
           <span className="text-sm text-gray-500">{service.location}</span>
+          <span className="text-sm text-gray-500">
+            ⭐ {service.rating} ({service.reviewCount} reviews)
+          </span>
         </div>
 
         {/* <div className="flex flex-wrap gap-2 mb-4">
@@ -95,17 +98,23 @@ const ServiceCard = ({ service, onDelete, isProvider = false }) => {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <span className="text-sm text-gray-500">
-              ⭐ {service.rating} ({service.reviewCount} reviews)
-            </span>
+            <Link
+              to={`/serviceDetails/${service.id}`}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+            >
+              View Details
+            </Link>
           </div>
 
-          <Link
-            to={`/serviceDetails/${service.id}`}
+          <button
+            onClick={() =>
+              navigate(`/provider/services/${service.id}/post`)
+            }
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+            // title="New Post"
           >
-            View Details
-          </Link>
+          New Post 
+          </button>
         </div>
       </div>
     </div>
