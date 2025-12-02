@@ -121,7 +121,7 @@ function App() {
         }
       />
       <Route
-        path="/provider/services/:id/post"
+        path="/provider/services/:serviceId/post"
         element={
           <>
             <HeaderWithAlert />
