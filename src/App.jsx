@@ -16,16 +16,16 @@ import { TimelinePage } from "./components/ServiceTimeLine/TimelinePage.jsx";
 import BusinessProvider from "./components/Buisnesses/BusinessProvider.jsx";
 import { TimelineForm } from "./components/ServiceTimeLine/TimelineForm.jsx";
 import { CreatePostForm } from "./components/ServiceTimeLine/CreatePostForm.jsx";
-
+import { BACKEND_URL } from "./config/api.js";
 // to delete just for deployment testing
 setInterval(async () => {
   try {
     console.log("Testing backend connection v5");
 
-    const res = await fetch("backend/health");
+    const res = await fetch(`health/health`);
     console.log("Health response:", res.status);
 
-    const res2 = await fetch("backend/api/service");
+    const res2 = await fetch(`${BACKEND_URL}/service`);
     const serviceData = await res2.json(); // parse JSON
     console.log("Service response:", serviceData);
   } catch (error) {
