@@ -17,6 +17,7 @@ import BusinessProvider from "./components/Buisnesses/BusinessProvider.jsx";
 import { TimelineForm } from "./components/ServiceTimeLine/TimelineForm.jsx";
 import { CreatePostForm } from "./components/ServiceTimeLine/CreatePostForm.jsx";
 import { BACKEND_URL } from "./config/api.js";
+import { ServiceTimelineClient } from "./components/ServiceTimeLine/ServiceTimelineClient.jsx";
 // to delete just for deployment testing
 setInterval(async () => {
   try {
@@ -117,6 +118,15 @@ function App() {
           <>
             <HeaderWithAlert />
             <TimelineForm />
+          </>
+        }
+      />
+      <Route
+        path="/client/services/:serviceId/timeline"
+        element={
+          <>
+            <HeaderWithAlert />
+            <ServiceTimelineClient />
           </>
         }
       />
