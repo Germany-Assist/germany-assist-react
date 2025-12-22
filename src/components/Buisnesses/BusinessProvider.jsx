@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Line, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -8,11 +8,16 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend,
+  Legend, 
   ArcElement,
 } from "chart.js";
 import { SideBarBusiness } from "./SideBarBusiness";
-
+import { ServiceList } from "../Services/serviceList";
+import ServiceCard from "../Services/serviceCard";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import {BACKEND_URL} from "../../config/api.js";
+import { useAuth } from "../../pages/AuthProvider.jsx";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -26,7 +31,11 @@ ChartJS.register(
 
 export default function BusinessProvider() {
   const [IsBarActive, SetIsBarActive] = useState(false);
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { accessToken } = useAuth();
 
+  const navigate = useNavigate();
   const chartData = {
     labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     datasets: [
@@ -64,6 +73,23 @@ export default function BusinessProvider() {
       },
     ],
   };
+  useEffect(() => {
+    axios
+      .get(`${BACKEND_URL}/service/provider/services`,{
+       headers: { Authorization: `Bearer ${accessToken}` },
+        params: { page: 1, limit: 10 }
+            },
+        
+      )
+      .then((res) => {
+        setServices(res.data.data);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p>Loading services...</p>;
+  if (services.length === 0) return <p>No services found.</p>;
 
   return (
     <div className="flex h-screen">
@@ -162,6 +188,31 @@ export default function BusinessProvider() {
           />
         </div>
 
+        {/* Services */}
+
+        <div className="bg-white p-6 rounded-xl shadow mb-10">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-800">My Services</h3>
+            <button
+              onClick={() => navigate("/provider/services/create")}
+              className="bg-[#205781] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              + Add New  TimeLine
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {Array.isArray(services) && services.map((service) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                onEdit={(s) => console.log("Edit:", s)}
+                onDelete={(id) => console.log("Delete:", id)}
+                isProvider={true}
+              />
+            ))}
+          </div>
+        </div>
         {/* Charts */}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">

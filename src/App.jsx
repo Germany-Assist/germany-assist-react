@@ -13,16 +13,20 @@ import ServiceDetails from "./components/Services/ServiceDetails.jsx";
 import { HeaderWithAlert } from "./components/Dashboard/HeaderWithAlert.jsx";
 import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 import { TimelinePage } from "./components/ServiceTimeLine/TimelinePage.jsx";
-
+import BusinessProvider from "./components/Buisnesses/BusinessProvider.jsx";
+import { TimelineForm } from "./components/ServiceTimeLine/TimelineForm.jsx";
+import { CreatePostForm } from "./components/ServiceTimeLine/CreatePostForm.jsx";
+import { BACKEND_URL } from "./config/api.js";
+import { ServiceTimelineClient } from "./components/ServiceTimeLine/ServiceTimelineClient.jsx";
 // to delete just for deployment testing
 setInterval(async () => {
   try {
     console.log("Testing backend connection v5");
 
-    const res = await fetch("backend/health");
+    const res = await fetch(`health/health`);
     console.log("Health response:", res.status);
 
-    const res2 = await fetch("backend/api/service");
+    const res2 = await fetch(`${BACKEND_URL}/service`);
     const serviceData = await res2.json(); // parse JSON
     console.log("Service response:", serviceData);
   } catch (error) {
@@ -91,6 +95,15 @@ function App() {
         }
       ></Route>
       <Route
+        path="/userProviderProfile"
+        element={
+          <>
+            <HeaderWithAlert />
+            <BusinessProvider />
+          </>
+        }
+      ></Route>
+      <Route
         path="/serviceTimeline/:serviceId"
         element={
           <>
@@ -99,6 +112,33 @@ function App() {
           </>
         }
       ></Route>
+      <Route
+        path="/provider/services/:id/timeline/new"
+        element={
+          <>
+            <HeaderWithAlert />
+            <TimelineForm />
+          </>
+        }
+      />
+      <Route
+        path="/client/services/:serviceId/timeline"
+        element={
+          <>
+            <HeaderWithAlert />
+            <ServiceTimelineClient />
+          </>
+        }
+      />
+      <Route
+        path="/provider/services/:serviceId/post"
+        element={
+          <>
+            <HeaderWithAlert />
+            <CreatePostForm />
+          </>
+        }
+      />
 
       <Route
         path="/checkout/:serviceId"
