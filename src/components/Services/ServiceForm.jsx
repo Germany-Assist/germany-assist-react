@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { BACKEND_URL } from "../../config/api";
 
 export const ServiceForm = ({ isEdit }) => {
   const { id } = useParams();
@@ -50,12 +51,12 @@ export const ServiceForm = ({ isEdit }) => {
     e.preventDefault();
     try {
       if(isEdit && id){
-
-       await axios.patch(`http://localhost:3000/api/service/edit/${id}`,formData);
+        `${BACKEND_URL}/service`
+        await axios.patch(`${BACKEND_URL}/api/service/edit/${id}`,formData);
           alert("Service updated successfully!");
       }
       else{
-  const response = await axios.post(`http://localhost:3000/api/service`);
+        const response = await axios.post(`${BACKEND_URL}/api/service`);
       setFormData(response.data);
          alert("Service created successfully!");
       }
@@ -69,7 +70,7 @@ export const ServiceForm = ({ isEdit }) => {
   useEffect(() => {
     try {
         if (isEdit && id) {
-        const response = axios.get(`http://localhost:3000/api/service/${id}`);
+          const response = axios.get(`${BACKEND_URL}/api/service/${id}`);
         setFormData(response.data);
         setSelectedCategories(response.data.categories || []);
       } }catch (error) {

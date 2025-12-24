@@ -4,6 +4,7 @@ import AuthInputs from "../components/AuthInputs";
 import { AuthContext, useAuth } from "./AuthProvider";
 import { ToastContainer, toast } from "react-toastify";
 import axios from 'axios';
+import { BACKEND_URL } from '../config/api';
 const LoginPage = () => {
   const[email,setEmail]= useState('');
   const[password,setPassword] = useState('');
@@ -26,7 +27,7 @@ const handleLogin = async () => {
   setLoading(true);
   try {
     const response = await axios.post(
-      "http://localhost:3000/api/user/login",
+      `${BACKEND_URL}/api/user/login`,
       {
         email: emailToSend,
         password
@@ -51,7 +52,7 @@ const handleLogin = async () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/user/login",
+        `${BACKEND_URL}/api/user/login`,
         {
           email: emailToSend,
           password,
