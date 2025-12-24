@@ -1,37 +1,16 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useAuth } from '../../pages/AuthProvider';
 
 export const DashboardHeader = () => {
   const location = useLocation();
+  const { user, accessToken, logOut } = useAuth();
   
-  // TODO: Replace with actual authentication context/state management
-  // For now, using local state - in production, this would come from:
-  // - AuthContext, Redux, Zustand, or similar state management
-  // - JWT token validation
-  // - Session storage/cookies
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  // Determine if user is logged in based on auth context
+  const isLoggedIn = !!user && !!accessToken;
 
-  // TODO: Replace with actual logout functionality
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUser(null);
-    // In production: clear tokens, call logout API, redirect, etc.
-  };
-
-  // TODO: This would typically be handled by your auth system
-  // Example: After successful login, you would call:
-  // setIsLoggedIn(true);
-  // setUser({ name: 'John Doe', email: 'john@example.com' });
-
-  // Temporary function for testing - remove in production
-  const toggleLoginState = () => {
-    setIsLoggedIn(!isLoggedIn);
-    if (!isLoggedIn) {
-      setUser({ name: 'Test User', email: 'test@example.com' });
-    } else {
-      setUser(null);
-    }
+  // Handle logout using the actual logout function from auth context
+  const handleLogout = async () => {
+    await logOut();
   };
 
   // Helper function to determine if a link is active
@@ -94,7 +73,7 @@ export const DashboardHeader = () => {
             )}
           </nav>
 
-          {/* Auth Section */}
+            {/* Auth Section */}
           <div className="flex items-center space-x-4">
             {/* Auth Buttons - Conditional based on login status */}
             <div className="flex items-center space-x-3">
@@ -103,7 +82,11 @@ export const DashboardHeader = () => {
                 <>
                   <div className="hidden lg:flex items-center space-x-3">
                     <div className="text-sm text-gray-600">
-                      Welcome back!
+                      {user?.firstName || user?.email ? (
+                        <span>Welcome back, {user.firstName || user.email}!</span>
+                      ) : (
+                        <span>Welcome back!</span>
+                      )}
                     </div>
                   </div>
                   <button 
@@ -129,15 +112,6 @@ export const DashboardHeader = () => {
                 </>
               )}
             </div>
-
-            {/* Temporary Test Button - Remove in production */}
-            <button 
-              onClick={toggleLoginState}
-              className="hidden lg:block bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-medium hover:bg-gray-300 transition-colors duration-200"
-              title="Test login state toggle"
-            >
-              {isLoggedIn ? 'Test Logout' : 'Test Login'}
-            </button>
 
             {/* Mobile Menu Button */}
             <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-gray-50">

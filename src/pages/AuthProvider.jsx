@@ -19,7 +19,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const res = await axios.post(`${BACKEND_URL}/user/login`, credentials, {
+      const res = await axios.post(`${BACKEND_URL}/api/user/login`, credentials, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const { user, accessToken, refreshToken } = res.data;
@@ -37,8 +41,11 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("tokenExpiry", expiryTime);
 
       console.log(`Logged in. Access token expires at: ${new Date(expiryTime).toLocaleTimeString()}`);
+      return { user, accessToken, refreshToken };
     } catch (err) {
       console.error("Login failed:", err.response?.data || err.message);
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || "Login failed. Please check your credentials.";
+      throw new Error(errorMessage);
     }
   };
 
@@ -71,7 +78,7 @@ export const AuthProvider = ({ children }) => {
 
   const logOut = async () => {
     try {
-      await axios.get(`${BACKEND_URL}/user/logout`, { withCredentials: true });
+      await axios.get(`${BACKEND_URL}/api/user/logout`, { withCredentials: true });
     } catch {
       console.warn("Logout API failed — clearing locally only.");
     }
