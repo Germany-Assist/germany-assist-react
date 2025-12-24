@@ -51,7 +51,7 @@ export const CreatePostForm = ({ onPostCreated }) => {
       };
 
       
-      await axios.post(`${BACKEND_URL}/post`, payload, { 
+      await axios.post(`${BACKEND_URL}/api/post`, payload, { 
         headers: {
           Authorization: `Bearer ${accessToken}`, 
         },

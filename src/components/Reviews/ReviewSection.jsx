@@ -25,7 +25,7 @@ export const ReviewSection = ({ serviceId }) => {
       setLoading(true);
       setError("");
       const response = await axios.post(
-        `${BACKEND_URL}/review`,
+        `${BACKEND_URL}/api/review`,
         {
           body: newReview,
           id: serviceId,

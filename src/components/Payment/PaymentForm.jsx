@@ -50,7 +50,7 @@ useEffect(() => {
     console.log("GET CLIENT SECRET useEffect RUNNING...");
     console.log("serviceId =", serviceId);
     console.log("accessToken =", accessToken);
-    console.log("FULL URL:", `${BACKEND_URL}/order/pay/${serviceId}`);
+    console.log("FULL URL:", `${BACKEND_URL}/api/order/pay/${serviceId}`);
 
     if (!serviceId || !accessToken) {
         console.log("Dependency missing. Skipping client secret fetch.");
@@ -60,7 +60,7 @@ useEffect(() => {
 
     const getClientSecret = async () => {
         try {
-            const response = await fetch(`${BACKEND_URL}/order/pay/${serviceId}`, {
+            const response = await fetch(`${BACKEND_URL}/api/order/pay/${serviceId}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -177,7 +177,7 @@ useEffect(() => {
 
     pr.on("paymentmethod", async (event) => {
       try {
-        const res = await fetch(`${BACKEND_URL}/order/pay/${serviceId}`, {
+        const res = await fetch(`${BACKEND_URL}/api/order/pay/${serviceId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

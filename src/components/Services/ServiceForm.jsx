@@ -51,7 +51,6 @@ export const ServiceForm = ({ isEdit }) => {
     e.preventDefault();
     try {
       if(isEdit && id){
-        `${BACKEND_URL}/service`
         await axios.patch(`${BACKEND_URL}/api/service/edit/${id}`,formData);
           alert("Service updated successfully!");
       }
