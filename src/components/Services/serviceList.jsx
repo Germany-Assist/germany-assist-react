@@ -39,7 +39,7 @@ export const ServiceList = () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // TODO: Replace with actual API call
-      const response = await fetch(`${BACKEND_URL}/service/service`);
+      const response = await fetch(`${BACKEND_URL}/service`);
       console.log(BACKEND_URL);
       if (!response.ok) {
         // Try to get error message from body
