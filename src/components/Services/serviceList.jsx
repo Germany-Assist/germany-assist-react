@@ -37,7 +37,6 @@ export const ServiceList = () => {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
       // TODO: Replace with actual API call
-      console.log("testing", API_URL);
       const response = await fetch(`${API_URL}/service`);
       if (!response.ok) {
         // Try to get error message from body
@@ -66,44 +65,44 @@ export const ServiceList = () => {
     fetchServices();
   }, []);
 
-  useEffect(() => {
-    let filtered = services;
+  // useEffect(() => {
+  //   let filtered = services;
 
-    // Filter by category
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter(
-        (service) => service.category === selectedCategory
-      );
-    }
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (service) =>
-          service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          service.provider.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          service.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    // Sort the filtered results
-    // const sortedFiltered = [...filtered].sort((a, b) => {
-    //   switch (sortBy) {
-    //     case "rating":
-    //       return b.rating - a.rating;
-    //     case "price-low-high":
-    //       return a.price - b.price;
-    //     case "price-high-low":
-    //       return b.price - a.price;
-    //     case "reviews":
-    //       return b.total_reviews - a.total_reviews;
-    //     case "views":
-    //       return b.views - a.views;
-    //     default:
-    //       return b.rating - a.rating;
-    //   }
-    // });
+  //   // Filter by category
+  //   if (selectedCategory !== "all") {
+  //     filtered = filtered.filter(
+  //       (service) => service.category === selectedCategory
+  //     );
+  //   }
+  //   // Filter by search term
+  //   if (searchTerm) {
+  //     filtered = filtered.filter(
+  //       (service) =>
+  //         service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //         service.provider.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //         service.description.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
+  //   }
+  //   Sort the filtered results
+  //   const sortedFiltered = [...filtered].sort((a, b) => {
+  //     switch (sortBy) {
+  //       case "rating":
+  //         return b.rating - a.rating;
+  //       case "price-low-high":
+  //         return a.price - b.price;
+  //       case "price-high-low":
+  //         return b.price - a.price;
+  //       case "reviews":
+  //         return b.total_reviews - a.total_reviews;
+  //       case "views":
+  //         return b.views - a.views;
+  //       default:
+  //         return b.rating - a.rating;
+  //     }
+  //   });
 
-    setFilteredServices(sortedFiltered);
-  }, [selectedCategory, searchTerm, services, sortBy]);
+  //   setFilteredServices(sortedFiltered);
+  // }, [selectedCategory, searchTerm, services, sortBy]);
 
   const ServiceCard = ({ service }) => (
     <div
