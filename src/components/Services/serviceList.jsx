@@ -36,9 +36,10 @@ export const ServiceList = () => {
 
     try {
       // Simulate API call delay
+      console.log(BACKEND_URL);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       // TODO: Replace with actual API call
-      const response = await fetch(`${BACKEND_URL}/service`);
+      const response = await fetch(`/${BACKEND_URL}/service`);
       if (!response.ok) {
         // Try to get error message from body
         let errorMsg = "Failed to fetch services";
