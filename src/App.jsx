@@ -23,7 +23,7 @@ setInterval(async () => {
   try {
     console.log("Testing backend connection v5");
 
-    const res = await fetch(`health/health`);
+    const res = await fetch(`${BACKEND_URL}/health`);
     console.log("Health response:", res.status);
 
     const res2 = await fetch(`${BACKEND_URL}/service`);
