@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FavoriteService } from "./FavoriteService";
 import { useAlert } from "../alerts/useAlert";
 import { AlertNotify } from "../alerts/AlertNotify";
-import { API_URL, BACKEND_URL } from "../../config/api";
+import { API_URL } from "../../config/api";
 export const ServiceList = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
@@ -52,7 +52,7 @@ export const ServiceList = () => {
 
       const data = await response.json();
       // Demo data matching Germany Assist context
-      setServices(data.data);
+      setServices(data);
       // setFilteredServices(data);
     } catch (err) {
       showAlert(err.message || "Something went wrong.", "error");

@@ -17,12 +17,12 @@ const Homepage = () => {
 
 const fetchServices = async () => {
   try {
-    const response = await fetch(`${BACKEND_URL}/service`);
+    const response = await fetch(`${BACKEND_URL}/api/service`);
     const result = await response.json();
 
     console.log("Fetched result:", result);
-
     // ✅ Extract only the actual array of services
+
     const servicesArray = Array.isArray(result.data) ? result.data : [];
 
     setServices(servicesArray);

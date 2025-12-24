@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { ValidateSignUPInputs } from '../components/ValidateSignUPInputs';
 import { useAuth } from './AuthProvider';
+import { BACKEND_URL } from '../config/api';
 
 const Signup = () => {
   const [firstName, setFirstName] = useState('');
@@ -42,7 +43,7 @@ const handleSignup = async (e) => {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/api/user", {
+    const response = await fetch(`${BACKEND_URL}/api/user`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ firstName, lastName, email, password }),
