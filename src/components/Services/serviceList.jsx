@@ -33,11 +33,11 @@ export const ServiceList = () => {
   const fetchServices = async () => {
     setIsLoading(true);
     setError("");
-
     try {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
       // TODO: Replace with actual API call
+      console.log("testing", API_URL);
       const response = await fetch(`${API_URL}/service`);
       if (!response.ok) {
         // Try to get error message from body

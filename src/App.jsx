@@ -19,20 +19,20 @@ import { CreatePostForm } from "./components/ServiceTimeLine/CreatePostForm.jsx"
 import { API_URL, BACKEND_URL } from "./config/api.js";
 import { ServiceTimelineClient } from "./components/ServiceTimeLine/ServiceTimelineClient.jsx";
 // to delete just for deployment testing
-setInterval(async () => {
-  try {
-    console.log("Testing backend connection v5");
+// setInterval(async () => {
+//   try {
+//     console.log("Testing backend connection v5");
 
-    const res = await fetch(`${API_URL}/health`);
-    console.log("Health response:", res.status);
+//     const res = await fetch(`${API_URL}/health`);
+//     console.log("Health response:", res.status);
 
-    const res2 = await fetch(`${BACKEND_URL}/service`);
-    const serviceData = await res2.json(); // parse JSON
-    console.log("Service response:", serviceData);
-  } catch (error) {
-    console.error("Fetch error:", error);
-  }
-}, 10000);
+//     const res2 = await fetch(`${BACKEND_URL}/service`);
+//     const serviceData = await res2.json(); // parse JSON
+//     console.log("Service response:", serviceData);
+//   } catch (error) {
+//     console.error("Fetch error:", error);
+//   }
+// }, 10000);
 
 function App() {
   return (
