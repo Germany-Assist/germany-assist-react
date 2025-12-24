@@ -11,7 +11,7 @@ export const TimelinePage = () => {
     const fetchTimeLine = async () => {
       try {
         const response = await fetch(
-          `${BACKEND_URL}/service/timeline/serviceProvider/${serviceId}`,
+          `${BACKEND_URL}/api/service/timeline/serviceProvider/${serviceId}`,
           {
             method: "GET",
             headers: { Authorization: `Bearer ${accessToken} ` },

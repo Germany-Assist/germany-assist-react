@@ -33,7 +33,7 @@ const UserProfile = () => {
   const fetchAllData = async () => {
     try {
       const [userRes] = await Promise.all([
-        axios.get(`${BACKEND_URL}/user/profile`, {
+        axios.get(`${BACKEND_URL}/api/user/profile`, {
           headers: { Authorization: `Bearer ${accessToken}` },
           withCredentials: true,
         }),

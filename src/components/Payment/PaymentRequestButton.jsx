@@ -24,7 +24,7 @@ export const PaymentRequestButton = () => {
 
     pr.on("paymentmethod", async (event) => {
       try {
-        const res = await fetch(`${BACKEND_URL}/create-payment-intent`, {
+        const res = await fetch(`${BACKEND_URL}/api/create-payment-intent`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ amount: 4000 }),

@@ -17,7 +17,7 @@ export const FavoriteService = ({ serviceId, initiallyFavorite = false }) => {
     setIsFavorite((prev) => !prev);
 
     try {
-      const url = `${BACKEND_URL}/service/client/favorite/${serviceId}`;
+      const url = `${BACKEND_URL}/api/service/client/favorite/${serviceId}`;
 
       if (isFavorite) {
         const res = await axios({

@@ -22,7 +22,7 @@ const { user } = useAuth();
       setLoading(true);
       setError(null);
 
-      const res = await axios.get(`${BACKEND_URL}/service/${id}`);
+      const res = await axios.get(`${BACKEND_URL}/api/service/${id}`);
       const serviceData = Array.isArray(res.data) ? res.data[0] : res.data;
       setService(serviceData);
 
