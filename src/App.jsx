@@ -18,6 +18,7 @@ import { TimelineForm } from "./components/ServiceTimeLine/TimelineForm.jsx";
 import { CreatePostForm } from "./components/ServiceTimeLine/CreatePostForm.jsx";
 import { API_URL, BACKEND_URL } from "./config/api.js";
 import { ServiceTimelineClient } from "./components/ServiceTimeLine/ServiceTimelineClient.jsx";
+import AdminDashboard from "./components/Dashboard/AdminDashboard.jsx";
 // to delete just for deployment testing
 // setInterval(async () => {
 //   try {
@@ -148,6 +149,15 @@ function App() {
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
               <StripeContainer />
             </div>
+          </>
+        }
+      />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <>
+            <HeaderWithAlert />
+            <AdminDashboard />
           </>
         }
       />
