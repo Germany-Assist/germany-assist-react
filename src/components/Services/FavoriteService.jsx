@@ -1,8 +1,8 @@
 import axios from "axios";
 import React, { useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { BACKEND_URL } from "../../config/api";
-import { useAuth } from "../../pages/AuthProvider";
+import { API_URL } from "../../config/api";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const FavoriteService = ({ serviceId, initiallyFavorite = false }) => {
   const [isFavorite, setIsFavorite] = useState(initiallyFavorite);
@@ -17,7 +17,7 @@ export const FavoriteService = ({ serviceId, initiallyFavorite = false }) => {
     setIsFavorite((prev) => !prev);
 
     try {
-      const url = `${BACKEND_URL}/api/service/client/favorite/${serviceId}`;
+      const url = `${API_URL}/api/service/client/favorite/${serviceId}`;
 
       if (isFavorite) {
         const res = await axios({
@@ -47,7 +47,6 @@ export const FavoriteService = ({ serviceId, initiallyFavorite = false }) => {
         error.response?.data || error.message
       );
 
-  
       setIsFavorite((prev) => !prev);
     }
   };
@@ -55,7 +54,6 @@ export const FavoriteService = ({ serviceId, initiallyFavorite = false }) => {
   return (
     <button
       onClick={toggleFavorite}
-      
       title={isFavorite ? "Remove from favorites" : "Add to favorites"}
     >
       <i

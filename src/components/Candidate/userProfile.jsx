@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { CandidateSideBar } from "./CandidateSideBar";
-import { useAuth } from "../../pages/AuthProvider";
-import { BACKEND_URL } from "../../config/api";
-import {usePagination} from "../hooks/usePagination";
-import {Pagination} from "../../pages/Pagination.jsx";
+import { useAuth } from "../../contexts/AuthContext.jsx";
+import { API_URL } from "../../config/api";
+import { usePagination } from "../hooks/usePagination";
+import { Pagination } from "../../pages/Pagination.jsx";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 const UserProfile = () => {
   const { userId, accessToken } = useAuth();
@@ -33,7 +33,7 @@ const UserProfile = () => {
   const fetchAllData = async () => {
     try {
       const [userRes] = await Promise.all([
-        axios.get(`${BACKEND_URL}/api/user/profile`, {
+        axios.get(`${API_URL}/api/user/profile`, {
           headers: { Authorization: `Bearer ${accessToken}` },
           withCredentials: true,
         }),

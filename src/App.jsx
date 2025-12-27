@@ -5,7 +5,6 @@ import About from "./pages/about";
 import Jobs from "./pages/jobs";
 import OnboardingPage from "./pages/onboarding";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
 import UserProfile from "./components/Candidate/userProfile.jsx";
 import { ServiceList } from "./components/Services/serviceList.jsx";
 import Homepage from "./components/Homepage/Homepage.jsx";
@@ -16,26 +15,31 @@ import { TimelinePage } from "./components/ServiceTimeLine/TimelinePage.jsx";
 import BusinessProvider from "./components/Buisnesses/BusinessProvider.jsx";
 import { TimelineForm } from "./components/ServiceTimeLine/TimelineForm.jsx";
 import { CreatePostForm } from "./components/ServiceTimeLine/CreatePostForm.jsx";
-import { API_URL, BACKEND_URL } from "./config/api.js";
+import { API_URL } from "./config/api.js";
 import { ServiceTimelineClient } from "./components/ServiceTimeLine/ServiceTimelineClient.jsx";
 import AdminDashboard from "./components/Dashboard/AdminDashboard.jsx";
-// to delete just for deployment testing
-// setInterval(async () => {
-//   try {
-//     console.log("Testing backend connection v5");
-
-//     const res = await fetch(`${API_URL}/health`);
-//     console.log("Health response:", res.status);
-
-//     const res2 = await fetch(`${BACKEND_URL}/service`);
-//     const serviceData = await res2.json(); // parse JSON
-//     console.log("Service response:", serviceData);
-//   } catch (error) {
-//     console.error("Fetch error:", error);
-//   }
-// }, 10000);
+import { useEffect } from "react";
+import { useProfile } from "./contexts/profileContext.jsx";
+import { useAuth } from "./contexts/AuthContext.jsx";
 
 function App() {
+  const { user, isAuthenticated, refreshAccessToken } = useAuth();
+  const { fetchProfile } = useProfile();
+
+  useEffect(() => {
+    const initialize = async () => {
+      console.log(isAuthenticated);
+      if (!isAuthenticated) return;
+      try {
+        await fetchProfile(user.id);
+      } catch (error) {
+        console.error("Failed to load profile", error);
+      }
+    };
+
+    initialize();
+  }, [isAuthenticated, user?.id]);
+
   return (
     <Routes>
       <Route

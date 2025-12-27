@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { BACKEND_URL } from "../../config/api.js";
+import { API_URL } from "../../config/api.js";
 import { ReviewSection } from "../Reviews/ReviewSection.jsx";
 import axios from "axios";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { useAuth } from "../../pages/AuthProvider.jsx";
+import { useAuth } from "../../contexts/AuthContext.jsx";
 
 function ServiceDetails() {
   const { id } = useParams();
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-const { user } = useAuth();
+  const { user } = useAuth();
   useEffect(() => {
     fetchServiceDetails();
   }, [id]);
@@ -22,7 +22,7 @@ const { user } = useAuth();
       setLoading(true);
       setError(null);
 
-      const res = await axios.get(`${BACKEND_URL}/api/service/${id}`);
+      const res = await axios.get(`${API_URL}/api/service/${id}`);
       const serviceData = Array.isArray(res.data) ? res.data[0] : res.data;
       setService(serviceData);
 
@@ -35,14 +35,14 @@ const { user } = useAuth();
     }
   };
 
-  const handleCheckout=async()=>{
- try{
-  const orderId=Date.now();
-       navigate(`/checkout/${service.id}`, {
+  const handleCheckout = async () => {
+    try {
+      const orderId = Date.now();
+      navigate(`/checkout/${service.id}`, {
         state: {
           serviceId: id,
           orderId,
-          userId:user?.userId,
+          userId: user?.userId,
           price: service.price,
         },
       });

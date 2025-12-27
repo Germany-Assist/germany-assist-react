@@ -17,9 +17,9 @@ import {
 } from "react-icons/fa";
 import { SiSamsungpay } from "react-icons/si";
 import { PaymentOption } from "./PaymentOption";
-import { BACKEND_URL } from "../../config/api";
+import { API_URL } from "../../config/api";
 import { useLocation, useParams } from "react-router-dom";
-import { useAuth } from "../../pages/AuthProvider";
+import { useAuth } from "../../contexts/AuthContext";
 export const PaymentForm = () => {
   const stripe = useStripe();
   const { serviceId } = useParams();
@@ -46,51 +46,59 @@ export const PaymentForm = () => {
 
   // Tracking client secret to resolve mismatching key
 
-useEffect(() => {
+  useEffect(() => {
     console.log("GET CLIENT SECRET useEffect RUNNING...");
     console.log("serviceId =", serviceId);
     console.log("accessToken =", accessToken);
-    console.log("FULL URL:", `${BACKEND_URL}/api/order/pay/${serviceId}`);
+    console.log("FULL URL:", `${API_URL}/api/order/pay/${serviceId}`);
 
     if (!serviceId || !accessToken) {
-        console.log("Dependency missing. Skipping client secret fetch.");
-        setClientSecret(null);
-        return;
+      console.log("Dependency missing. Skipping client secret fetch.");
+      setClientSecret(null);
+      return;
     }
 
     const getClientSecret = async () => {
-        try {
-            const response = await fetch(`${BACKEND_URL}/api/order/pay/${serviceId}`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-            
-            // Check for non-200 responses explicitly
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ message: 'Server error' }));
-                throw new Error(`HTTP Error ${response.status}: ${errorData.message || 'Failed to fetch'}`);
-            }
+      try {
+        const response = await fetch(`${API_URL}/api/order/pay/${serviceId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
 
-            const data = await response.json();
-            console.log("Payment Intent Response:", data);
-
-            if (data.success && data.message.clientSecret) {
-                setClientSecret(data.message.clientSecret);
-            } else {
-                throw new Error("Failed to get client secret from successful response body");
-            }
-        } catch (err) {
-            console.error(err);
-            setError("Failed to create payment intent");
-            setClientSecret(null); 
+        // Check for non-200 responses explicitly
+        if (!response.ok) {
+          const errorData = await response
+            .json()
+            .catch(() => ({ message: "Server error" }));
+          throw new Error(
+            `HTTP Error ${response.status}: ${
+              errorData.message || "Failed to fetch"
+            }`
+          );
         }
+
+        const data = await response.json();
+        console.log("Payment Intent Response:", data);
+
+        if (data.success && data.message.clientSecret) {
+          setClientSecret(data.message.clientSecret);
+        } else {
+          throw new Error(
+            "Failed to get client secret from successful response body"
+          );
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Failed to create payment intent");
+        setClientSecret(null);
+      }
     };
 
     getClientSecret();
-}, [serviceId, accessToken]); 
+  }, [serviceId, accessToken]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -98,66 +106,63 @@ useEffect(() => {
     setError("");
 
     if (!stripe || !elements) {
-        setError("Stripe is not loaded yet.");
-        setLoading(false);
-        return;
+      setError("Stripe is not loaded yet.");
+      setLoading(false);
+      return;
     }
-    
+
     if (!clientSecret) {
-        setError("Payment Intent not ready. Please try again.");
-        setLoading(false);
-        return;
+      setError("Payment Intent not ready. Please try again.");
+      setLoading(false);
+      return;
     }
 
     try {
-        const cardNumber = elements.getElement(CardNumberElement);
+      const cardNumber = elements.getElement(CardNumberElement);
 
-        // 2. Create Payment Method
-        const { paymentMethod, error: pmError } =
-            await stripe.createPaymentMethod({
-                type: "card",
-                card: cardNumber,
-            });
-
-        if (pmError) {
-            console.error("PaymentMethod creation failed:", pmError);
-            setError(pmError.message);
-            setLoading(false);
-            return;
-        }
-
-        console.log("PaymentMethod created:", paymentMethod);
-
-        // 3. Confirm Card Payment (Crucial Change: Added return_url)
-        const { paymentIntent, error: confirmError } =
-            await stripe.confirmCardPayment(clientSecret, {
-                payment_method: paymentMethod.id,
-               return_url: `${window.location.origin}/order/success/${serviceId}`, 
-            });
-
-        console.log("Full Stripe Response:", {
-            clientSecret,
-            paymentMethod,
-            paymentIntent,
-            confirmError,
+      // 2. Create Payment Method
+      const { paymentMethod, error: pmError } =
+        await stripe.createPaymentMethod({
+          type: "card",
+          card: cardNumber,
         });
 
-        if (confirmError) {
-            console.error("Payment failed:", confirmError);
-            setError(confirmError.message);
-        } else if (paymentIntent?.status === "succeeded") {
-            console.log("Payment successful:", paymentIntent);
-      
-        } 
-     
-
-    } catch (err) {
-        console.error("Unexpected error confirming payment:", err);
-        setError("Unexpected error occurred");
-    } finally {
+      if (pmError) {
+        console.error("PaymentMethod creation failed:", pmError);
+        setError(pmError.message);
         setLoading(false);
+        return;
+      }
+
+      console.log("PaymentMethod created:", paymentMethod);
+
+      // 3. Confirm Card Payment (Crucial Change: Added return_url)
+      const { paymentIntent, error: confirmError } =
+        await stripe.confirmCardPayment(clientSecret, {
+          payment_method: paymentMethod.id,
+          return_url: `${window.location.origin}/order/success/${serviceId}`,
+        });
+
+      console.log("Full Stripe Response:", {
+        clientSecret,
+        paymentMethod,
+        paymentIntent,
+        confirmError,
+      });
+
+      if (confirmError) {
+        console.error("Payment failed:", confirmError);
+        setError(confirmError.message);
+      } else if (paymentIntent?.status === "succeeded") {
+        console.log("Payment successful:", paymentIntent);
+      }
+    } catch (err) {
+      console.error("Unexpected error confirming payment:", err);
+      setError("Unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
-};
+  };
   // Handle payment with Apple Pay / Google Pay
   useEffect(() => {
     if (!stripe) return;
@@ -177,7 +182,7 @@ useEffect(() => {
 
     pr.on("paymentmethod", async (event) => {
       try {
-        const res = await fetch(`${BACKEND_URL}/api/order/pay/${serviceId}`, {
+        const res = await fetch(`${API_URL}/api/order/pay/${serviceId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -379,13 +384,19 @@ useEffect(() => {
 
         {/* Confirm the Order */}
         <button
-    type="submit"
-    disabled={!clientSecret || isLoading || (paymentMethod === "card" && !cardComplete)}
-    className={`w-full py-4 rounded-2xl font-semibold text-lg transition-all flex justify-center items-center gap-2 ${
-        !clientSecret || isLoading || (paymentMethod === "card" && !cardComplete)
-            ? "bg-gray-300 cursor-not-allowed text-gray-500"
-            : "bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white shadow-lg hover:shadow-xl"
-    }`}
+          type="submit"
+          disabled={
+            !clientSecret ||
+            isLoading ||
+            (paymentMethod === "card" && !cardComplete)
+          }
+          className={`w-full py-4 rounded-2xl font-semibold text-lg transition-all flex justify-center items-center gap-2 ${
+            !clientSecret ||
+            isLoading ||
+            (paymentMethod === "card" && !cardComplete)
+              ? "bg-gray-300 cursor-not-allowed text-gray-500"
+              : "bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white shadow-lg hover:shadow-xl"
+          }`}
         >
           {isLoading ? (
             <>

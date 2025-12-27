@@ -1,10 +1,10 @@
-import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../pages/AuthProvider';
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const DashboardHeader = () => {
   const location = useLocation();
   const { user, accessToken, logOut } = useAuth();
-  
+
   // Determine if user is logged in based on auth context
   const isLoggedIn = !!user && !!accessToken;
 
@@ -15,15 +15,16 @@ export const DashboardHeader = () => {
 
   // Helper function to determine if a link is active
   const isActivePath = (path) => {
-    if (path === '/') {
-      return location.pathname === '/';
+    if (path === "/") {
+      return location.pathname === "/";
     }
     return location.pathname.startsWith(path);
   };
 
   // Get active link styles
   const getLinkStyles = (path) => {
-    const baseStyles = "font-medium transition-all duration-200 px-3 py-2 rounded-lg";
+    const baseStyles =
+      "font-medium transition-all duration-200 px-3 py-2 rounded-lg";
     if (isActivePath(path)) {
       return `${baseStyles} bg-blue-100 text-blue-700 border-b-2 border-blue-600`;
     }
@@ -38,9 +39,24 @@ export const DashboardHeader = () => {
           {/* Logo Section */}
           <Link to="/" className="flex items-center group">
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-xl mr-3 group-hover:shadow-lg transition-all duration-200">
-              <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              <svg
+                className="h-8 w-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
               </svg>
             </div>
             <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -50,16 +66,16 @@ export const DashboardHeader = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-2">
-            <Link to="/" className={getLinkStyles('/')}>
+            <Link to="/" className={getLinkStyles("/")}>
               Home
             </Link>
-            <Link to="/about" className={getLinkStyles('/about')}>
+            <Link to="/about" className={getLinkStyles("/about")}>
               About
             </Link>
-            <Link to="/services" className={getLinkStyles('/services')}>
+            <Link to="/services" className={getLinkStyles("/services")}>
               Services
             </Link>
-            <Link to="/jobs" className={getLinkStyles('/jobs')}>
+            <Link to="/jobs" className={getLinkStyles("/jobs")}>
               Jobs
               <span className="ml-1 bg-orange-100 text-orange-600 text-xs px-2 py-0.5 rounded-full">
                 Soon
@@ -67,13 +83,13 @@ export const DashboardHeader = () => {
             </Link>
             {/* Only show Profile link when user is logged in */}
             {isLoggedIn && (
-              <Link to="/userProfile" className={getLinkStyles('/userProfile')}>
+              <Link to="/userProfile" className={getLinkStyles("/userProfile")}>
                 Profile
               </Link>
             )}
           </nav>
 
-            {/* Auth Section */}
+          {/* Auth Section */}
           <div className="flex items-center space-x-4">
             {/* Auth Buttons - Conditional based on login status */}
             <div className="flex items-center space-x-3">
@@ -83,13 +99,15 @@ export const DashboardHeader = () => {
                   <div className="hidden lg:flex items-center space-x-3">
                     <div className="text-sm text-gray-600">
                       {user?.firstName || user?.email ? (
-                        <span>Welcome back, {user.firstName || user.email}!</span>
+                        <span>
+                          Welcome back, {user.firstName || user.email}!
+                        </span>
                       ) : (
                         <span>Welcome back!</span>
                       )}
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={handleLogout}
                     className="text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200"
                   >
@@ -115,14 +133,22 @@ export const DashboardHeader = () => {
 
             {/* Mobile Menu Button */}
             <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-blue-600 hover:bg-gray-50">
-              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             </button>
           </div>
         </div>
-
-
       </div>
     </header>
   );

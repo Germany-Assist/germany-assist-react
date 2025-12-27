@@ -8,7 +8,7 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend, 
+  Legend,
   ArcElement,
 } from "chart.js";
 import { SideBarBusiness } from "./SideBarBusiness";
@@ -16,8 +16,8 @@ import { ServiceList } from "../Services/serviceList";
 import ServiceCard from "../Services/serviceCard";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {BACKEND_URL} from "../../config/api.js";
-import { useAuth } from "../../pages/AuthProvider.jsx";
+import { API_URL } from "../../config/api.js";
+import { useAuth } from "../../contexts/AuthContext.jsx";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -75,12 +75,10 @@ export default function BusinessProvider() {
   };
   useEffect(() => {
     axios
-      .get(`${BACKEND_URL}/api/service/provider/services`,{
-       headers: { Authorization: `Bearer ${accessToken}` },
-        params: { page: 1, limit: 10 }
-            },
-        
-      )
+      .get(`${API_URL}/api/service/provider/services`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        params: { page: 1, limit: 10 },
+      })
       .then((res) => {
         setServices(res.data.data);
       })
@@ -197,20 +195,21 @@ export default function BusinessProvider() {
               onClick={() => navigate("/provider/services/create")}
               className="bg-[#205781] text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
             >
-              + Add New  TimeLine
+              + Add New TimeLine
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.isArray(services) && services.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                onEdit={(s) => console.log("Edit:", s)}
-                onDelete={(id) => console.log("Delete:", id)}
-                isProvider={true}
-              />
-            ))}
+            {Array.isArray(services) &&
+              services.map((service) => (
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  onEdit={(s) => console.log("Edit:", s)}
+                  onDelete={(id) => console.log("Delete:", id)}
+                  isProvider={true}
+                />
+              ))}
           </div>
         </div>
         {/* Charts */}
