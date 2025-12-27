@@ -7,50 +7,42 @@ import { useAuth } from "../../pages/AuthProvider";
 export const FavoriteService = ({ serviceId, initiallyFavorite = false }) => {
   const [isFavorite, setIsFavorite] = useState(initiallyFavorite);
   const { accessToken } = useAuth();
+const toggleFavorite = async () => {
+  if (!accessToken) {
+    alert("You need to log in.");
+    return;
+  }
 
-  const toggleFavorite = async () => {
-    if (!accessToken) {
-      alert("You need to log in to favorite services.");
-      return;
-    }
-
-    setIsFavorite((prev) => !prev);
-
-    try {
-      const url = `${BACKEND_URL}/service/client/favorite/${serviceId}`;
-
-      if (isFavorite) {
-        const res = await axios({
-          method: "delete",
-          url,
-          data: { id: serviceId },
-          headers: { Authorization: `Bearer ${accessToken}` },
-          withCredentials: true,
-        });
-
-        if (res.status !== 200) throw new Error("Failed removing favorite");
-      } else {
-        const res = await axios.post(
-          url,
-          { id: serviceId },
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-            withCredentials: true,
-          }
-        );
-
-        if (res.status !== 201) throw new Error("Failed adding favorite");
-      }
-    } catch (error) {
-      console.error(
-        "Error toggling favorite:",
-        error.response?.data || error.message
-      );
-
+  // 1. Determine the NEW state locally
+  const nextFavoriteStatus = !isFavorite;
   
-      setIsFavorite((prev) => !prev);
+  // 2. Optimistic Update
+  setIsFavorite(nextFavoriteStatus);
+
+  try {
+    const url = `${BACKEND_URL}/service/client/favorite/${serviceId}`;
+
+    if (!nextFavoriteStatus) {
+      const res = await axios.delete(url, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+   
+      });
+    
+      if (res.status < 200 || res.status >= 300) throw new Error();
+    } else {
+   
+      const res = await axios.put(url, {}, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+   
+      });
+      if (res.status < 200 || res.status >= 300) throw new Error();
     }
-  };
+  } catch (error) {
+    console.error("Error toggling favorite:", error);
+
+    setIsFavorite(!nextFavoriteStatus);
+  }
+};
 
   return (
     <button

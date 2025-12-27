@@ -122,7 +122,7 @@ function App() {
         }
       />
       <Route
-        path="/client/services/:serviceId/timeline"
+        path="/client/services/timeline"
         element={
           <>
             <HeaderWithAlert />
@@ -130,6 +130,7 @@ function App() {
           </>
         }
       />
+
       <Route
         path="/provider/services/:serviceId/post"
         element={

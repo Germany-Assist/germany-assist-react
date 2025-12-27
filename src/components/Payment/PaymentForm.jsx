@@ -41,6 +41,7 @@ export const PaymentForm = () => {
 
   const { price, serviceName } = location.state || {};
   const displayPrice = price > 0 ? price : 4000;
+  localStorage.setItem("paid_service_id", serviceId);
   // const stripePaymentMethod = {
   //   card: { name: "Credit/Debit Card", icon: <FaCreditCard /> },
   //   paypal: { name: "PayPal", icon: <FaPaypal /> },
@@ -67,7 +68,7 @@ export const PaymentForm = () => {
           },
         });
 
-        // Check for non-200 responses explicitly
+     
         if (!response.ok) {
           const errorData = await response
             .json()
@@ -141,20 +142,16 @@ export const PaymentForm = () => {
           return_url: `${window.location.origin}/client/services/${serviceId}/timeline`,
         });
 
-      if (confirmError) {
-        setError(confirmError.message);
-      }  else if (paymentIntent?.status === "succeeded") {
+ if (confirmError) {
+  setError(confirmError.message);
+} else if (paymentIntent?.status === "succeeded") {
   setSuccess(true);
 
   setTimeout(() => {
-    navigate("/client/services/timeline", {
-      state: {
-        serviceId,
-        paymentIntentId: paymentIntent.id,
-      },
-    });
+    navigate("/client/services/timeline");
   }, 1500);
 }
+
 
    
     } catch (err) {
