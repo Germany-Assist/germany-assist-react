@@ -52,7 +52,10 @@ export const ServiceList = () => {
 
       const data = await response.json();
       // Demo data matching Germany Assist context
-      setServices(data);
+      setServices(data.data);
+      console.log("services.data",services.data);
+      console.log("data.data",data.data);
+      
       // setFilteredServices(data);
     } catch (err) {
       showAlert(err.message || "Something went wrong.", "error");

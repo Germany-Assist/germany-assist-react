@@ -19,8 +19,8 @@ import { SiSamsungpay } from "react-icons/si";
 import { PaymentOption } from "./PaymentOption";
 import { API_URL } from "../../config/api";
 import { useLocation, useParams } from "react-router-dom";
-import { useAuth } from "../../pages/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 export const PaymentForm = () => {
   const stripe = useStripe();
@@ -60,7 +60,7 @@ export const PaymentForm = () => {
 
     const getClientSecret = async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/order/pay/${serviceId}`, {
+        const response = await fetch(`${API_URL}/order/pay/${serviceId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

@@ -9,7 +9,7 @@ export const TimelineForm = () => {
   const [label, setLabel] = useState("");
   const createServiceTimeline = async () => {
     return await axios.post(
-      `${API_URL}/api/service/timeline/${serviceId}`,
+      `${API_URL}/service/timeline/${serviceId}`,
       { label },
       {
         headers: {

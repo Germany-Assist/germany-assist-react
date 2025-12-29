@@ -14,10 +14,12 @@ export const FavoriteService = ({ serviceId, initiallyFavorite = false }) => {
       return;
     }
 
-    setIsFavorite((prev) => !prev);
+    const nextFavoriteStatus = !isFavorite;
+
+    setIsFavorite(nextFavoriteStatus);
 
     try {
-      const url = `${API_URL}/api/service/client/favorite/${serviceId}`;
+      const url = `${API_URL}/service/client/favorite/${serviceId}`;
 
       if (isFavorite) {
         const res = await axios({
@@ -42,19 +44,11 @@ export const FavoriteService = ({ serviceId, initiallyFavorite = false }) => {
         if (res.status !== 201) throw new Error("Failed adding favorite");
       }
     } catch (error) {
-      console.error(
-        "Error toggling favorite:",
-        error.response?.data || error.message
-      );
+      console.error("Error toggling favorite:", error);
 
-      setIsFavorite((prev) => !prev);
+      setIsFavorite(!nextFavoriteStatus);
     }
-  } catch (error) {
-    console.error("Error toggling favorite:", error);
-
-    setIsFavorite(!nextFavoriteStatus);
-  }
-};
+  };
 
   return (
     <button

@@ -51,10 +51,10 @@ export const ServiceForm = ({ isEdit }) => {
     e.preventDefault();
     try {
       if (isEdit && id) {
-        await axios.patch(`${API_URL}/api/service/edit/${id}`, formData);
+        await axios.patch(`${API_URL}/service/edit/${id}`, formData);
         alert("Service updated successfully!");
       } else {
-        const response = await axios.post(`${API_URL}/api/service`);
+        const response = await axios.post(`${API_URL}/service`);
         setFormData(response.data);
         alert("Service created successfully!");
       }
@@ -68,7 +68,7 @@ export const ServiceForm = ({ isEdit }) => {
   useEffect(() => {
     try {
       if (isEdit && id) {
-        const response = axios.get(`${API_URL}/api/service/${id}`);
+        const response = axios.get(`${API_URL}/service/${id}`);
         setFormData(response.data);
         setSelectedCategories(response.data.categories || []);
       }

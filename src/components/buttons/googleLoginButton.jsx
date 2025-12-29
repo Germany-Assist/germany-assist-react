@@ -1,6 +1,6 @@
 import { useAuth } from "../../contexts/AuthContext";
 import { useEffect } from "react";
-import { GOOGLE_CLIENT_ID } from "../../config/api";
+// import { GOOGLE_CLIENT_ID } from "../../config/api";
 
 export default function GoogleLoginButton() {
   const { googleLogin } = useAuth();
@@ -8,7 +8,7 @@ export default function GoogleLoginButton() {
     if (!window.google) return;
     // Initialize Google Identity Services
     window.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
+      // client_id: GOOGLE_CLIENT_ID,
       callback: handleCredentialResponse,
     });
     window.google.accounts.id.renderButton(

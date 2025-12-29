@@ -2,7 +2,7 @@ import { api } from "../api/client";
 
 export const loginRequest = async (credentials) => {
   console.log(credentials);
-  const res = await api.post("/auth/login", credentials, {
+  const res = await api.post("/user/login", credentials, {
     headers: { "Content-Type": "application/json" },
     skipAuthRefresh: true,
   });

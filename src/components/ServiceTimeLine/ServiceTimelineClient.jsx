@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { BACKEND_URL } from "../../config/api";
+import { API_URL } from "../../config/api";
 
 import {
   CheckCircle2,
@@ -10,7 +10,7 @@ import {
   AlertCircle,
   Loader2,
 } from "lucide-react";
-import { useAuth } from "../../pages/AuthProvider";
+import { useAuth } from "../../contexts/AuthContext";
 export const ServiceTimelineClient = () => {
   const [timelineData, setTimelineData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,7 +31,7 @@ export const ServiceTimelineClient = () => {
     const fetchTimeline = async () => {
       try {
         const response = await axios.get(
-          `${BACKEND_URL}/service/timeline/client/${serviceId}`,
+          `${API_URL}/service/timeline/client/${serviceId}`,
           {
             signal: controller.signal,
             headers: {

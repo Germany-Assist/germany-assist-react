@@ -39,7 +39,7 @@ const handleSubmit = async (e) => {
       if (response.status === 201) {
         window.alert("successful added new review ");
       }
-    );
+    
 
     // If backend now sends the object via res.json(newReview)
     setReviews((prev) => [...prev, response.data]);

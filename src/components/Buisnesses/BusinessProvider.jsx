@@ -75,7 +75,7 @@ export default function BusinessProvider() {
   };
   useEffect(() => {
     axios
-      .get(`${API_URL}/api/service/provider/services`, {
+      .get(`${API_URL}/service/provider/services`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         params: { page: 1, limit: 10 },
       })

@@ -15,26 +15,26 @@ const Homepage = () => {
     { id: "relocation", name: "Relocation", icon: "🏠" },
   ];
 
-  // const fetchServices = async () => {
-  //   try {
-  //     const response = await fetch(`${API_URL}/api/service`);
-  //     const result = await response.json();
+  const fetchServices = async () => {
+    try {
+      const response = await fetch(`${API_URL}/service`);
+      const result = await response.json();
 
-  //     console.log("Fetched result:", result);
-  //     // ✅ Extract only the actual array of services
+      console.log("Fetched result:", result);
+      // ✅ Extract only the actual array of services
 
-  //     const servicesArray = Array.isArray(result.data) ? result.data : [];
+      const servicesArray = Array.isArray(result.data) ? result.data : [];
 
-  //     setServices(servicesArray);
-  //     setFilteredServices(servicesArray);
-  //   } catch (error) {
-  //     console.error("Error fetching services:", error);
-  //   }
-  // };
+      setServices(servicesArray);
+      setFilteredServices(servicesArray);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+    }
+  };
 
-  // useEffect(() => {
-  //   fetchServices();
-  // }, []);
+  useEffect(() => {
+    fetchServices();
+  }, []);
 
   useEffect(() => {
     // Simply set filtered services to all services for homepage
