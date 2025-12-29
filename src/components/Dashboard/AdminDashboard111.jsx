@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../pages/AuthProvider";
-import { BACKEND_URL } from "../../config/api";
-import axios from "axios";
+import { useAuth } from "../../contexts/AuthContext";
+import { API_URL } from "../../config/api";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,6 +14,7 @@ import {
   Legend,
 } from "chart.js";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
+import { api } from "../../api/client";
 
 ChartJS.register(
   CategoryScale,
@@ -28,27 +28,24 @@ ChartJS.register(
   Legend
 );
 
-const AdminDashboard = () => {
+const AdminDashboard1 = () => {
   const { accessToken } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
 
   useEffect(() => {
-    fetchDashboardData();
+    // fetchDashboardData();
   }, []);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(
-        `${BACKEND_URL}/api/admin/dashboard`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const response = await api.get(`${API_URL}/api/admin/dashboard`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       setDashboardData(response.data);
       setError(null);
     } catch (err) {
@@ -139,7 +136,9 @@ const AdminDashboard = () => {
     datasets: [
       {
         label: "New Registrations",
-        data: dashboardData.users.registrationFrequency.map((item) => item.count),
+        data: dashboardData.users.registrationFrequency.map(
+          (item) => item.count
+        ),
         borderColor: "rgba(59, 130, 246, 1)",
         backgroundColor: "rgba(59, 130, 246, 0.1)",
         tension: 0.4,
@@ -592,5 +591,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
-
+export default AdminDashboard1;

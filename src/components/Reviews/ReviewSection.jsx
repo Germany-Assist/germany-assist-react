@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import AuthInputs from "../AuthInputs";
 import InputFields from "../InputFields";
-import { BACKEND_URL } from "../../config/api";
-import { useAuth } from "../../pages/AuthProvider";
+import { API_URL } from "../../config/api";
+import { useAuth } from "../../contexts/AuthContext";
 export const ReviewSection = ({ serviceId }) => {
   const [newReview, setNewReview] = useState("");
   const [reviews, setReviews] = useState([]);
@@ -25,7 +25,7 @@ export const ReviewSection = ({ serviceId }) => {
       setLoading(true);
       setError("");
       const response = await axios.post(
-        `${BACKEND_URL}/api/review`,
+        `${API_URL}/api/review`,
         {
           body: newReview,
           id: serviceId,
