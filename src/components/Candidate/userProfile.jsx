@@ -35,7 +35,7 @@ const UserProfile = () => {
       const [userRes] = await Promise.all([
         axios.get(`${API_URL}/api/user/profile`, {
           headers: { Authorization: `Bearer ${accessToken}` },
-          withCredentials: true,
+          // withCredentials: true,
         }),
       ]);
 

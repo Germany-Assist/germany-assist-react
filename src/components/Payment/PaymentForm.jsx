@@ -19,7 +19,9 @@ import { SiSamsungpay } from "react-icons/si";
 import { PaymentOption } from "./PaymentOption";
 import { API_URL } from "../../config/api";
 import { useLocation, useParams } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../pages/AuthProvider";
+import { useNavigate } from "react-router-dom";
+
 export const PaymentForm = () => {
   const stripe = useStripe();
   const { serviceId } = useParams();
@@ -34,9 +36,12 @@ export const PaymentForm = () => {
   const [expiryComplete, setExpiryComplete] = useState(false);
   const [cvcComplete, setCvcComplete] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
 
   const { price, serviceName } = location.state || {};
   const displayPrice = price > 0 ? price : 4000;
+  localStorage.setItem("paid_service_id", serviceId);
   // const stripePaymentMethod = {
   //   card: { name: "Credit/Debit Card", icon: <FaCreditCard /> },
   //   paypal: { name: "PayPal", icon: <FaPaypal /> },
@@ -47,11 +52,6 @@ export const PaymentForm = () => {
   // Tracking client secret to resolve mismatching key
 
   useEffect(() => {
-    console.log("GET CLIENT SECRET useEffect RUNNING...");
-    console.log("serviceId =", serviceId);
-    console.log("accessToken =", accessToken);
-    console.log("FULL URL:", `${API_URL}/api/order/pay/${serviceId}`);
-
     if (!serviceId || !accessToken) {
       console.log("Dependency missing. Skipping client secret fetch.");
       setClientSecret(null);
@@ -60,7 +60,7 @@ export const PaymentForm = () => {
 
     const getClientSecret = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/order/pay/${serviceId}`, {
+        const response = await fetch(`${BACKEND_URL}/order/pay/${serviceId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -68,7 +68,7 @@ export const PaymentForm = () => {
           },
         });
 
-        // Check for non-200 responses explicitly
+     
         if (!response.ok) {
           const errorData = await response
             .json()

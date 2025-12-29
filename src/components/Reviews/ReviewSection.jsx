@@ -13,13 +13,9 @@ export const ReviewSection = ({ serviceId }) => {
   const [loading, setLoading] = useState(false);
   const { userId, user, accessToken } = useAuth();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!newReview.trim()) return;
-    if (!serviceId) {
-      setError("Service ID is missing!");
-      return;
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!newReview.trim() || !serviceId) return;
 
     try {
       setLoading(true);
@@ -43,15 +39,20 @@ export const ReviewSection = ({ serviceId }) => {
       if (response.status === 201) {
         window.alert("successful added new review ");
       }
-    } catch (error) {
-      setError(
-        error.response?.data?.message ||
-          error.message ||
-          "Failed to post Review"
-      );
-    }
-  };
+    );
 
+    // If backend now sends the object via res.json(newReview)
+    setReviews((prev) => [...prev, response.data]);
+    setNewReview("");
+    setRating(0);
+    window.alert("Review added successfully!");
+
+  } catch (error) {
+    setError(error.response?.data?.message || "Failed to post Review");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="bg-blue-50  rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">

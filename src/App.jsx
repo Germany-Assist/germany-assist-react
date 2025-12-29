@@ -107,7 +107,7 @@ function App() {
         }
       />
       <Route
-        path="/client/services/:serviceId/timeline"
+        path="/client/services/timeline"
         element={
           <>
             <MainNav />
@@ -115,6 +115,7 @@ function App() {
           </>
         }
       />
+
       <Route
         path="/provider/services/:serviceId/post"
         element={

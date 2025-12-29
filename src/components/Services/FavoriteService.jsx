@@ -49,7 +49,12 @@ export const FavoriteService = ({ serviceId, initiallyFavorite = false }) => {
 
       setIsFavorite((prev) => !prev);
     }
-  };
+  } catch (error) {
+    console.error("Error toggling favorite:", error);
+
+    setIsFavorite(!nextFavoriteStatus);
+  }
+};
 
   return (
     <button
