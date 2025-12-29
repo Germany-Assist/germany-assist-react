@@ -3,7 +3,7 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import React, { useEffect, useState } from "react";
-import { BACKEND_URL } from "../../config/api";
+import { API_URL } from "../../config/api";
 export const PaymentRequestButton = () => {
   const stripe = useStripe();
   const [paymentRequest, setPaymentRequest] = useState(null);
@@ -24,7 +24,7 @@ export const PaymentRequestButton = () => {
 
     pr.on("paymentmethod", async (event) => {
       try {
-        const res = await fetch(`${BACKEND_URL}/create-payment-intent`, {
+        const res = await fetch(`${API_URL}/api/create-payment-intent`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ amount: 4000 }),

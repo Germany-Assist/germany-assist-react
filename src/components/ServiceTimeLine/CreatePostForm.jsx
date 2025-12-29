@@ -1,16 +1,15 @@
 import React, { useState } from "react";
-import { BACKEND_URL } from "../../config/api";
-import { useAuth } from "../../pages/AuthProvider";
+import { API_URL } from "../../config/api";
+import { useAuth } from "../../contexts/AuthContext";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-
 
 export const CreatePostForm = ({ onPostCreated }) => {
   const { serviceId } = useParams();
   const [description, setDescription] = useState("");
   const [attachmentUrl, setAttachmentUrl] = useState("");
-  
-  const [attachments, setAttachments] = useState([]); 
+
+  const [attachments, setAttachments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -18,16 +17,17 @@ export const CreatePostForm = ({ onPostCreated }) => {
 
   //  Handle adding attachment URL
   const handleAddAttachment = () => {
-   
-    if (attachmentUrl.trim() !== "" && !attachments.find(a => a.url === attachmentUrl.trim())) {
+    if (
+      attachmentUrl.trim() !== "" &&
+      !attachments.find((a) => a.url === attachmentUrl.trim())
+    ) {
       setAttachments((prevAttachments) => [
         ...prevAttachments,
         { url: attachmentUrl.trim() },
       ]);
-      setAttachmentUrl(""); 
+      setAttachmentUrl("");
     }
   };
-
 
   const handleRemoveAttachment = (urlToRemove) => {
     setAttachments((prevAttachments) =>
@@ -39,21 +39,19 @@ export const CreatePostForm = ({ onPostCreated }) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    
-    setLoading(true); 
+
+    setLoading(true);
 
     try {
-      
       const payload = {
         serviceId,
         description,
-        attachments: attachments, 
+        attachments: attachments,
       };
 
-      
-      await axios.post(`${BACKEND_URL}/post`, payload, { 
+      await axios.post(`${API_URL}/api/post`, payload, {
         headers: {
-          Authorization: `Bearer ${accessToken}`, 
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -89,11 +87,10 @@ export const CreatePostForm = ({ onPostCreated }) => {
         )}
         {success && (
           <p className="p-2 mb-3 bg-green-100 text-green-700 rounded-md text-sm">
-             {success}
+            {success}
           </p>
         )}
 
-      
         <div className="mb-4">
           <label className="block mb-1 font-semibold text-gray-700">
             Description
@@ -108,7 +105,6 @@ export const CreatePostForm = ({ onPostCreated }) => {
           ></textarea>
         </div>
 
-      
         <label className="block font-semibold text-gray-700 mb-2">
           Add Attachment URL
         </label>
@@ -163,7 +159,7 @@ export const CreatePostForm = ({ onPostCreated }) => {
           </div>
         )}
 
-    {/* Create Post */}
+        {/* Create Post */}
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-semibold transition duration-200 disabled:opacity-50"

@@ -5,35 +5,20 @@ import About from "./pages/about";
 import Jobs from "./pages/jobs";
 import OnboardingPage from "./pages/onboarding";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
 import UserProfile from "./components/Candidate/userProfile.jsx";
 import { ServiceList } from "./components/Services/serviceList.jsx";
 import Homepage from "./components/Homepage/Homepage.jsx";
 import ServiceDetails from "./components/Services/ServiceDetails.jsx";
-import { HeaderWithAlert } from "./components/Dashboard/HeaderWithAlert.jsx";
 import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 import { TimelinePage } from "./components/ServiceTimeLine/TimelinePage.jsx";
 import BusinessProvider from "./components/Buisnesses/BusinessProvider.jsx";
 import { TimelineForm } from "./components/ServiceTimeLine/TimelineForm.jsx";
 import { CreatePostForm } from "./components/ServiceTimeLine/CreatePostForm.jsx";
-import { BACKEND_URL } from "./config/api.js";
 import { ServiceTimelineClient } from "./components/ServiceTimeLine/ServiceTimelineClient.jsx";
-// to delete just for deployment testing
-setInterval(async () => {
-  try {
-    console.log("Testing backend connection v5");
-
-    const res = await fetch(`health/health`);
-    console.log("Health response:", res.status);
-
-    const res2 = await fetch(`${BACKEND_URL}/service`);
-    const serviceData = await res2.json(); // parse JSON
-    console.log("Service response:", serviceData);
-  } catch (error) {
-    console.error("Fetch error:", error);
-  }
-}, 10000);
-
+import MainNav from "./components/Homepage/MainNav.jsx";
+import DashboardPanel from "./pages/dashboards/DashboardPanel.jsx";
+//TODO temp disable for unification to be updated and moved and refactored
+// import AdminDashboard from "./components/Dashboard/AdminDashboard.jsx";
 function App() {
   return (
     <Routes>
@@ -41,7 +26,7 @@ function App() {
         path="/"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <Homepage />
           </>
         }
@@ -50,7 +35,7 @@ function App() {
         path="/about"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <About />
           </>
         }
@@ -59,7 +44,7 @@ function App() {
         path="/jobs"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <Jobs />
           </>
         }
@@ -68,7 +53,7 @@ function App() {
         path="/serviceDetails/:id"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <ServiceDetails />
           </>
         }
@@ -80,7 +65,7 @@ function App() {
         path="/services"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <ServiceList />
           </>
         }
@@ -89,7 +74,7 @@ function App() {
         path="/userProfile"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <UserProfile />
           </>
         }
@@ -98,7 +83,7 @@ function App() {
         path="/userProviderProfile"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <BusinessProvider />
           </>
         }
@@ -107,7 +92,7 @@ function App() {
         path="/serviceTimeline/:serviceId"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <TimelinePage />
           </>
         }
@@ -116,7 +101,7 @@ function App() {
         path="/provider/services/:id/timeline/new"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <TimelineForm />
           </>
         }
@@ -125,7 +110,7 @@ function App() {
         path="/client/services/timeline"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <ServiceTimelineClient />
           </>
         }
@@ -135,23 +120,30 @@ function App() {
         path="/provider/services/:serviceId/post"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <CreatePostForm />
           </>
         }
       />
-
       <Route
         path="/checkout/:serviceId"
         element={
           <>
-            <HeaderWithAlert />
+            <MainNav />
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
               <StripeContainer />
             </div>
           </>
         }
       />
+      <Route
+        path="/dashboard"
+        element={
+          <>
+            <DashboardPanel />
+          </>
+        }
+      />{" "}
     </Routes>
   );
 }

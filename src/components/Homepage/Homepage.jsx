@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FavoriteService } from "../Services/FavoriteService";
-import { BACKEND_URL } from "../../config/api";
+import { API_URL } from "../../config/api";
 const Homepage = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
@@ -15,27 +15,26 @@ const Homepage = () => {
     { id: "relocation", name: "Relocation", icon: "🏠" },
   ];
 
-const fetchServices = async () => {
-  try {
-    const response = await fetch(`${BACKEND_URL}/service`);
-    const result = await response.json();
+  // const fetchServices = async () => {
+  //   try {
+  //     const response = await fetch(`${API_URL}/api/service`);
+  //     const result = await response.json();
 
-    console.log("Fetched result:", result);
+  //     console.log("Fetched result:", result);
+  //     // ✅ Extract only the actual array of services
 
-    // ✅ Extract only the actual array of services
-    const servicesArray = Array.isArray(result.data) ? result.data : [];
+  //     const servicesArray = Array.isArray(result.data) ? result.data : [];
 
-    setServices(servicesArray);
-    setFilteredServices(servicesArray);
-  } catch (error) {
-    console.error("Error fetching services:", error);
-  }
-};
+  //     setServices(servicesArray);
+  //     setFilteredServices(servicesArray);
+  //   } catch (error) {
+  //     console.error("Error fetching services:", error);
+  //   }
+  // };
 
-
-  useEffect(() => {
-    fetchServices();
-  }, []);
+  // useEffect(() => {
+  //   fetchServices();
+  // }, []);
 
   useEffect(() => {
     // Simply set filtered services to all services for homepage
@@ -56,17 +55,16 @@ const fetchServices = async () => {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-md">
-             <FavoriteService
-              serviceId={service.id}
-              initiallyFavorite={service.isFavorite}
-            />
+          <FavoriteService
+            serviceId={service.id}
+            initiallyFavorite={service.isFavorite}
+          />
 
           <span className="text-sm font-semibold text-gray-800">
             ⭐ {service.rating}
           </span>
         </div>
         {service.views !== undefined && (
-
           <div className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-full shadow-md">
             <span className="text-xs font-bold">✨{service.views} Views</span>
           </div>
@@ -109,7 +107,6 @@ const fetchServices = async () => {
 
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-        
             <span className="text-sm text-gray-500">
               ⭐ {service.rating} ({service.reviewCount} reviews)
             </span>
@@ -307,14 +304,12 @@ const fetchServices = async () => {
 
         {/* Show only featured services (limit to 6) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredServices.slice(0, 6).map((service) => (
-  <ServiceCard key={service.id} service={service} />
-))}
-
+          {filteredServices.slice(0, 6).map((service) => (
+            <ServiceCard key={service.id} service={service} />
+          ))}
         </div>
 
-        {filteredServices.filter((service) => service.views).length ===
-          0 && (
+        {filteredServices.filter((service) => service.views).length === 0 && (
           <div className="text-center py-8">
             <div className="text-4xl mb-4">🌟</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">

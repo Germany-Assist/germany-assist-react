@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FavoriteService } from './FavoriteService';
-import { useAlert } from '../alerts/useAlert';
-
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { FavoriteService } from "./FavoriteService";
+import { useAlert } from "../alerts/useAlert";
+import { AlertNotify } from "../alerts/AlertNotify";
+import { API_URL } from "../../config/api";
 export const ServiceList = () => {
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
@@ -11,7 +12,7 @@ export const ServiceList = () => {
   const [sortBy, setSortBy] = useState("rating");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const { alert, showAlert, clearAlert,  } = useAlert();
+  const { alert, showAlert, clearAlert } = useAlert();
 
   // TODO: Replace with actual API endpoint
   // const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
@@ -32,14 +33,11 @@ export const ServiceList = () => {
   const fetchServices = async () => {
     setIsLoading(true);
     setError("");
-
     try {
       // Simulate API call delay
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
       // TODO: Replace with actual API call
-      const response = await fetch(`/api/services`);
-
+      const response = await fetch(`${API_URL}/service`);
       if (!response.ok) {
         // Try to get error message from body
         let errorMsg = "Failed to fetch services";
@@ -53,13 +51,10 @@ export const ServiceList = () => {
       }
 
       const data = await response.json();
-
       // Demo data matching Germany Assist context
-
       setServices(data);
-      setFilteredServices(data);
+      // setFilteredServices(data);
     } catch (err) {
-          console.error(err);
       showAlert(err.message || "Something went wrong.", "error");
     } finally {
       setIsLoading(false);
@@ -70,52 +65,51 @@ export const ServiceList = () => {
     fetchServices();
   }, []);
 
-  useEffect(() => {
-    let filtered = services;
+  // useEffect(() => {
+  //   let filtered = services;
 
-    // Filter by category
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter(
-        (service) => service.category === selectedCategory
-      );
-    }
+  //   // Filter by category
+  //   if (selectedCategory !== "all") {
+  //     filtered = filtered.filter(
+  //       (service) => service.category === selectedCategory
+  //     );
+  //   }
+  //   // Filter by search term
+  //   if (searchTerm) {
+  //     filtered = filtered.filter(
+  //       (service) =>
+  //         service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //         service.provider.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //         service.description.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
+  //   }
+  //   Sort the filtered results
+  //   const sortedFiltered = [...filtered].sort((a, b) => {
+  //     switch (sortBy) {
+  //       case "rating":
+  //         return b.rating - a.rating;
+  //       case "price-low-high":
+  //         return a.price - b.price;
+  //       case "price-high-low":
+  //         return b.price - a.price;
+  //       case "reviews":
+  //         return b.total_reviews - a.total_reviews;
+  //       case "views":
+  //         return b.views - a.views;
+  //       default:
+  //         return b.rating - a.rating;
+  //     }
+  //   });
 
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (service) =>
-          service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          service.provider.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          service.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Sort the filtered results
-    const sortedFiltered = [...filtered].sort((a, b) => {
-      switch (sortBy) {
-        case "rating":
-          return b.rating - a.rating;
-        case 'price-low-high':
-          return a.price - b.price;
-        case 'price-high-low':
-          return b.price - a.price;
-        case 'reviews':
-          return b.total_reviews - a.total_reviews;
-        case 'views':
-        
-          return b.views - a.views;
-        default:
-          return b.rating - a.rating;
-      }
-    });
-
-    setFilteredServices(sortedFiltered);
-  }, [selectedCategory, searchTerm, services, sortBy]);
+  //   setFilteredServices(sortedFiltered);
+  // }, [selectedCategory, searchTerm, services, sortBy]);
 
   const ServiceCard = ({ service }) => (
-    <div className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group ${
-      service.views ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
-    }`}>
+    <div
+      className={`bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group ${
+        service.views ? "ring-2 ring-blue-500 ring-opacity-50" : ""
+      }`}
+    >
       <div className="relative">
         <img
           src={service.image}
@@ -123,12 +117,17 @@ export const ServiceList = () => {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow-md">
-          <FavoriteService   serviceId={service.id} initiallyFavorite={service.isFavorite}/>
-          <span className="text-sm font-semibold text-gray-800">⭐ {service.rating}</span>
+          <FavoriteService
+            serviceId={service.id}
+            initiallyFavorite={service.isFavorite}
+          />
+          <span className="text-sm font-semibold text-gray-800">
+            ⭐ {service.rating}
+          </span>
         </div>
         {service.views && (
           <div className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-3 py-1 rounded-full shadow-md">
-            <span className="text-xs font-bold">✨{service.views } Views</span>
+            <span className="text-xs font-bold">✨{service.views} Views</span>
           </div>
         )}
       </div>
@@ -149,20 +148,23 @@ export const ServiceList = () => {
 
         <div className="flex items-center mb-4">
           <span className="text-sm text-gray-500">by</span>
-          <span className="text-sm font-semibold text-gray-900 ml-1">{service.ProviderId}</span>
+          <span className="text-sm font-semibold text-gray-900 ml-1">
+            {service.ProviderId}
+          </span>
           <span className="text-gray-300 mx-2">•</span>
           <span className="text-sm text-gray-500">{service.location}</span>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-4">
-          {Array.isArray(service.badges) &&service.badges.map((badge, index) => (
-            <span
-              key={index}
-              className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
-            >
-              {badge}
-            </span>
-          ))}
+          {Array.isArray(service.badges) &&
+            service.badges.map((badge, index) => (
+              <span
+                key={index}
+                className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+              >
+                {badge}
+              </span>
+            ))}
         </div>
 
         <div className="flex items-center justify-between">
@@ -461,7 +463,7 @@ export const ServiceList = () => {
             {/* Sort Dropdown */}
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-500">Sort:</span>
-              <select 
+              <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"

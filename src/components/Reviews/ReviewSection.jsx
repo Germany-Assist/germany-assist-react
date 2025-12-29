@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import AuthInputs from "../AuthInputs";
 import InputFields from "../InputFields";
-import { BACKEND_URL } from "../../config/api";
-import { useAuth } from "../../pages/AuthProvider";
+import { API_URL } from "../../config/api";
+import { useAuth } from "../../contexts/AuthContext";
 export const ReviewSection = ({ serviceId }) => {
   const [newReview, setNewReview] = useState("");
   const [reviews, setReviews] = useState([]);
@@ -17,18 +17,27 @@ const handleSubmit = async (e) => {
   e.preventDefault();
   if (!newReview.trim() || !serviceId) return;
 
-  try {
-    setLoading(true);
-    const response = await axios.post(
-      `${BACKEND_URL}/review`,
-      {
-        body: newReview,
-        id: serviceId, 
-        rating,
-      },
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        withCredentials: true,
+    try {
+      setLoading(true);
+      setError("");
+      const response = await axios.post(
+        `${API_URL}/api/review`,
+        {
+          body: newReview,
+          id: serviceId,
+          author: user.userName || userId,
+          rating,
+        },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          withCredentials: true,
+        }
+      );
+      setReviews((prev) => [...prev, response.data]);
+      setNewReview("");
+      setRating(0);
+      if (response.status === 201) {
+        window.alert("successful added new review ");
       }
     );
 

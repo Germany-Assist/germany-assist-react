@@ -1,10 +1,11 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { API_URL } from "../../config/api";
 
 export const ServiceForm = ({ isEdit }) => {
   const { id } = useParams();
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -49,17 +50,15 @@ export const ServiceForm = ({ isEdit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if(isEdit && id){
-
-       await axios.patch(`http://localhost:3000/api/service/edit/${id}`,formData);
-          alert("Service updated successfully!");
+      if (isEdit && id) {
+        await axios.patch(`${API_URL}/api/service/edit/${id}`, formData);
+        alert("Service updated successfully!");
+      } else {
+        const response = await axios.post(`${API_URL}/api/service`);
+        setFormData(response.data);
+        alert("Service created successfully!");
       }
-      else{
-  const response = await axios.post(`http://localhost:3000/api/service`);
-      setFormData(response.data);
-         alert("Service created successfully!");
-      }
-    navigate("/provider/services");
+      navigate("/provider/services");
     } catch (error) {
       console.error("Failed create the service", error);
     }
@@ -68,18 +67,20 @@ export const ServiceForm = ({ isEdit }) => {
   // Fetching existence data of service before updating
   useEffect(() => {
     try {
-        if (isEdit && id) {
-        const response = axios.get(`http://localhost:3000/api/service/${id}`);
+      if (isEdit && id) {
+        const response = axios.get(`${API_URL}/api/service/${id}`);
         setFormData(response.data);
         setSelectedCategories(response.data.categories || []);
-      } }catch (error) {
-        console.error("failed fetching service data", error);
       }
-    
+    } catch (error) {
+      console.error("failed fetching service data", error);
+    }
   }, [id, isEdit]);
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-2xl shadow-lg">
-      <h2 className="text-2xl font-semibold mb-4">{isEdit ?"Update Service":"Create a New Service"}</h2>
+      <h2 className="text-2xl font-semibold mb-4">
+        {isEdit ? "Update Service" : "Create a New Service"}
+      </h2>
       <form submit={handleSubmit} className="space-y-4">
         {/* Title */}
         <div>
@@ -100,7 +101,7 @@ export const ServiceForm = ({ isEdit }) => {
             name="description"
             placeholder="Write a detailed description..."
             value={formData.description}
-            onChange={ handleChange}
+            onChange={handleChange}
             className="w-full mt-1 p-2 border rounded-lg"
             rows={4}
           />
@@ -113,7 +114,7 @@ export const ServiceForm = ({ isEdit }) => {
             name="price"
             placeholder="4999.99"
             value={formData.price}
-            onChange={ handleChange}
+            onChange={handleChange}
             className="w-full mt-1 p-2 border rounded-lg"
           />
         </div>
@@ -125,7 +126,7 @@ export const ServiceForm = ({ isEdit }) => {
             name="image"
             placeholder="https://example.com/service.jpg"
             value={formData.image}
-            onChange={ handleChange}
+            onChange={handleChange}
             className="w-full mt-1 p-2 border rounded-lg"
           />
         </div>

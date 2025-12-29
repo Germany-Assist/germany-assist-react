@@ -17,7 +17,7 @@ import {
 } from "react-icons/fa";
 import { SiSamsungpay } from "react-icons/si";
 import { PaymentOption } from "./PaymentOption";
-import { BACKEND_URL } from "../../config/api";
+import { API_URL } from "../../config/api";
 import { useLocation, useParams } from "react-router-dom";
 import { useAuth } from "../../pages/AuthProvider";
 import { useNavigate } from "react-router-dom";
@@ -136,24 +136,26 @@ export const PaymentForm = () => {
 
       console.log("PaymentMethod created:", paymentMethod);
 
+      // 3. Confirm Card Payment (Crucial Change: Added return_url)
       const { paymentIntent, error: confirmError } =
         await stripe.confirmCardPayment(clientSecret, {
           payment_method: paymentMethod.id,
-          return_url: `${window.location.origin}/client/services/${serviceId}/timeline`,
+          return_url: `${window.location.origin}/order/success/${serviceId}`,
         });
 
- if (confirmError) {
-  setError(confirmError.message);
-} else if (paymentIntent?.status === "succeeded") {
-  setSuccess(true);
+      console.log("Full Stripe Response:", {
+        clientSecret,
+        paymentMethod,
+        paymentIntent,
+        confirmError,
+      });
 
-  setTimeout(() => {
-    navigate("/client/services/timeline");
-  }, 1500);
-}
-
-
-   
+      if (confirmError) {
+        console.error("Payment failed:", confirmError);
+        setError(confirmError.message);
+      } else if (paymentIntent?.status === "succeeded") {
+        console.log("Payment successful:", paymentIntent);
+      }
     } catch (err) {
       console.error("Unexpected error confirming payment:", err);
       setError("Unexpected error occurred");
@@ -180,7 +182,7 @@ export const PaymentForm = () => {
 
     pr.on("paymentmethod", async (event) => {
       try {
-        const res = await fetch(`${BACKEND_URL}/order/pay/${serviceId}`, {
+        const res = await fetch(`${API_URL}/api/order/pay/${serviceId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
