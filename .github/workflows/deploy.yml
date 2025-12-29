@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout code
@@ -22,6 +23,11 @@ jobs:
         run: npm install
 
       - name: Build Vite app
+        env:
+          VITE_NODE_ENV: ${{vars.VITE_NODE_ENV}}
+          VITE_DROPLET_BACKEND_URL: ${{ vars.VITE_DROPLET_BACKEND_URL }}
+          VITE_LOCAL_BACKEND_URL: ${{ vars.VITE_LOCAL_BACKEND_URL }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
         run: npm run build
 
       - name: Upload frontend to server
