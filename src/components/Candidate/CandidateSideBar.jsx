@@ -13,7 +13,7 @@ import {
   Menu,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import DashboardHeader from "../Dashboard/DashboardHeader";
+import MainNav from "../Homepage/MainNav";
 import { useEffect } from "react";
 
 export const CandidateSideBar = () => {

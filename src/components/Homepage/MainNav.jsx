@@ -1,17 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-
-export const DashboardHeader = () => {
+import { useProfile } from "../../contexts/profileContext";
+import ProfileAvatar from "../profile/profileAvatar";
+const MainNav = () => {
   const location = useLocation();
-  const { user, accessToken, logOut } = useAuth();
-
-  // Determine if user is logged in based on auth context
-  const isLoggedIn = !!user && !!accessToken;
-
-  // Handle logout using the actual logout function from auth context
-  const handleLogout = async () => {
-    await logOut();
-  };
+  const { isAuthenticated } = useAuth();
+  const { profile } = useProfile();
+  const isLoggedIn = !!profile && !!isAuthenticated;
 
   // Helper function to determine if a link is active
   const isActivePath = (path) => {
@@ -31,9 +26,10 @@ export const DashboardHeader = () => {
     return `${baseStyles} text-gray-700 hover:text-blue-600 hover:bg-gray-50`;
   };
 
+  // TODO all of these should be separated into components
   return (
     <header className="w-full font-sans bg-white shadow-lg border-b border-gray-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 ">
         {/* Main Header */}
         <div className="flex justify-between items-center py-4">
           {/* Logo Section */}
@@ -64,6 +60,7 @@ export const DashboardHeader = () => {
             </div>
           </Link>
 
+          {/*TODO this nav should be dynamic depending on the rule for deferent needs */}
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-2">
             <Link to="/" className={getLinkStyles("/")}>
@@ -98,21 +95,11 @@ export const DashboardHeader = () => {
                 <>
                   <div className="hidden lg:flex items-center space-x-3">
                     <div className="text-sm text-gray-600">
-                      {user?.firstName || user?.email ? (
-                        <span>
-                          Welcome back, {user.firstName || user.email}!
-                        </span>
-                      ) : (
-                        <span>Welcome back!</span>
+                      {isAuthenticated && (
+                        <ProfileAvatar navDir={"/dashboard"} />
                       )}
                     </div>
                   </div>
-                  <button
-                    onClick={handleLogout}
-                    className="text-gray-700 hover:text-red-600 font-medium px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200"
-                  >
-                    Logout
-                  </button>
                 </>
               ) : (
                 // Logged out: Show login and signup
@@ -154,4 +141,4 @@ export const DashboardHeader = () => {
   );
 };
 
-export default DashboardHeader;
+export default MainNav;

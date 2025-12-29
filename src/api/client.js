@@ -53,3 +53,26 @@ export const setupInterceptors = ({
     }
   );
 };
+
+export const apiCaller = async ({ method, url, data, config }) => {
+  try {
+    let resp;
+    switch (method.toLowerCase()) {
+      case "get":
+      case "delete":
+        resp = await api[method](url, config);
+        break;
+      case "post":
+      case "put":
+      case "patch":
+        resp = await api[method](url, data, config);
+        break;
+      default:
+        throw new Error(`Unsupported method: ${method}`);
+    }
+    return resp.data;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};

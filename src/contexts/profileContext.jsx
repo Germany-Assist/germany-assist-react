@@ -1,12 +1,20 @@
-import { useState, useContext, createContext } from "react";
+import { useState, useContext, createContext, useEffect } from "react";
 import { profileRequest } from "../api/profile";
+import { useAuth } from "./AuthContext";
 
 const ProfileContext = createContext(null);
 
 export const ProfileProvider = ({ children }) => {
+  const { accessToken } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (accessToken) {
+      profileRequest().then((data) => setProfile(data));
+    }
+  }, [accessToken]);
 
   const fetchProfile = async () => {
     setLoading(true);

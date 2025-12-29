@@ -14,24 +14,33 @@ import {
   signUpRequest,
   googleLoginRequest,
 } from "../auth/authService";
-
+import { useNavigate } from "react-router-dom";
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const refreshTimeoutRef = useRef(null);
+  const navigate = useNavigate();
+  const [authLoading, setAuthLoading] = useState(true);
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("user");
     return saved ? JSON.parse(saved) : null;
   });
-  const [isAuthenticated, setIsAuthenticated] = useState(() =>
-    Boolean(localStorage.getItem("accessToken"))
-  );
-
   const [accessToken, setAccessToken] = useState(() =>
     localStorage.getItem("accessToken")
   );
 
+  const isAuthenticated = Boolean(accessToken);
+
   const scheduleRefresh = (token) => {
+    if (!token || typeof token !== "string") {
+      console.warn("scheduleRefresh called with invalid token:", token);
+      return;
+    }
+
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+    }
+
     try {
       const { exp } = jwtDecode(token);
       const expiresAt = exp * 1000;
@@ -43,89 +52,119 @@ export const AuthProvider = ({ children }) => {
       }
 
       refreshTimeoutRef.current = setTimeout(refreshAccessToken, delay);
-    } catch {
+    } catch (err) {
+      console.error("Failed to schedule refresh:", err);
       logOut();
     }
   };
-  const signUp = async (data) => {
-    const { user, accessToken } = await signUpRequest(data);
-    setUser(user);
-    setAccessToken(accessToken);
-    setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("accessToken", accessToken);
-    scheduleRefresh(accessToken);
-    return { user, accessToken };
-  };
-  const googleLogin = async (idToken) => {
-    const { user, accessToken } = await googleLoginRequest(idToken);
-    setUser(user);
-    setAccessToken(accessToken);
-    setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("accessToken", accessToken);
-    scheduleRefresh(accessToken);
-    return { user, accessToken };
-  };
+
+  // -------------------
+  // Auth actions
+  // -------------------
   const login = async (credentials) => {
     const { user, accessToken } = await loginRequest(credentials);
     setUser(user);
     setAccessToken(accessToken);
-    setIsAuthenticated(true);
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("accessToken", accessToken);
-    scheduleRefresh(accessToken);
   };
+
+  const signUp = async (data) => {
+    const { user, accessToken } = await signUpRequest(data);
+    setUser(user);
+    setAccessToken(accessToken);
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("accessToken", accessToken);
+    return { user, accessToken };
+  };
+
+  const googleLogin = async (idToken) => {
+    const { user, accessToken } = await googleLoginRequest(idToken);
+    setUser(user);
+    setAccessToken(accessToken);
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("accessToken", accessToken);
+    return { user, accessToken };
+  };
+
   const refreshAccessToken = async () => {
     try {
       const newToken = await refreshTokenRequest();
       setAccessToken(newToken);
       localStorage.setItem("accessToken", newToken);
-      scheduleRefresh(newToken);
       return newToken;
-    } catch {
+    } catch (err) {
+      console.error("Refresh token failed:", err);
       logOut();
-      throw new Error("Session expired");
+      throw err;
     }
   };
-  const logOut = async () => {
+
+  const logOut = async (goHome) => {
     try {
       await logoutRequest();
-      setIsAuthenticated(false);
+      if (goHome) navigate("/");
     } catch {
       // ignore
     }
-    clearTimeout(refreshTimeoutRef.current);
+
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+    }
+
     setUser(null);
     setAccessToken(null);
     localStorage.removeItem("user");
     localStorage.removeItem("accessToken");
   };
 
+  // -------------------
+  // Bootstrap auth ONCE
+  // -------------------
+  useEffect(() => {
+    const bootstrapAuth = async () => {
+      try {
+        await refreshAccessToken();
+      } catch {
+        // not logged in, ignore
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+    bootstrapAuth();
+  }, []);
+
+  // -------------------
+  // Setup Axios interceptors
+  // -------------------
   useEffect(() => {
     setupInterceptors({
       getAccessToken: () => accessToken,
       refreshAccessToken,
       onLogout: logOut,
     });
-  }, []);
+  }, [accessToken]);
 
+  // -------------------
+  // Schedule refresh when token changes
+  // -------------------
   useEffect(() => {
     if (accessToken) {
       scheduleRefresh(accessToken);
     }
-  }, []);
+  }, [accessToken]);
 
   return (
     <AuthContext.Provider
       value={{
         user,
         accessToken,
+        isAuthenticated,
+        authLoading,
         login,
-        logOut,
         signUp,
         googleLogin,
-        isAuthenticated,
+        logOut,
         refreshAccessToken,
       }}
     >
