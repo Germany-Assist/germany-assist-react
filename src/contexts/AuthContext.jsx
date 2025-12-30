@@ -1,3 +1,4 @@
+//auth context
 import React, {
   createContext,
   useContext,
@@ -6,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import { jwtDecode } from "jwt-decode";
-import { setupInterceptors } from "../api/client";
+import { setupInterceptors, api } from "../api/client";
 import {
   loginRequest,
   refreshTokenRequest,
@@ -15,66 +16,50 @@ import {
   googleLoginRequest,
 } from "../auth/authService";
 import { useNavigate } from "react-router-dom";
+
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const refreshTimeoutRef = useRef(null);
   const navigate = useNavigate();
+
   const [authLoading, setAuthLoading] = useState(true);
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("user");
-    return saved ? JSON.parse(saved) : null;
-  });
-  const [accessToken, setAccessToken] = useState(() =>
-    localStorage.getItem("accessToken")
-  );
+  const [user, setUser] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
 
   const isAuthenticated = Boolean(accessToken);
 
   const scheduleRefresh = (token) => {
-    if (!token || typeof token !== "string") {
-      console.warn("scheduleRefresh called with invalid token:", token);
-      return;
-    }
-
-    if (refreshTimeoutRef.current) {
-      clearTimeout(refreshTimeoutRef.current);
-    }
+    if (!token) return;
+    if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
 
     try {
       const { exp } = jwtDecode(token);
-      const expiresAt = exp * 1000;
-      const delay = expiresAt - Date.now() - 5000;
-
-      if (delay <= 0) {
-        refreshAccessToken();
-        return;
-      }
+      const delay = exp * 1000 - Date.now() - 5000; // refresh 5s before expiry
+      if (delay <= 0) return refreshAccessToken();
 
       refreshTimeoutRef.current = setTimeout(refreshAccessToken, delay);
-    } catch (err) {
-      console.error("Failed to schedule refresh:", err);
+    } catch {
       logOut();
     }
   };
 
-  // -------------------
+  // ------------------------
   // Auth actions
-  // -------------------
+  // ------------------------
   const login = async (credentials) => {
     const { user, accessToken } = await loginRequest(credentials);
     setUser(user);
     setAccessToken(accessToken);
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("accessToken", accessToken);
+    scheduleRefresh(accessToken);
+    return { user, accessToken };
   };
 
   const signUp = async (data) => {
     const { user, accessToken } = await signUpRequest(data);
     setUser(user);
     setAccessToken(accessToken);
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("accessToken", accessToken);
+    scheduleRefresh(accessToken);
     return { user, accessToken };
   };
 
@@ -82,8 +67,7 @@ export const AuthProvider = ({ children }) => {
     const { user, accessToken } = await googleLoginRequest(idToken);
     setUser(user);
     setAccessToken(accessToken);
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("accessToken", accessToken);
+    scheduleRefresh(accessToken);
     return { user, accessToken };
   };
 
@@ -91,68 +75,49 @@ export const AuthProvider = ({ children }) => {
     try {
       const newToken = await refreshTokenRequest();
       setAccessToken(newToken);
-      localStorage.setItem("accessToken", newToken);
+      scheduleRefresh(newToken);
       return newToken;
-    } catch (err) {
-      console.error("Refresh token failed:", err);
+    } catch {
       logOut();
-      throw err;
+      throw new Error("Refresh token failed");
     }
   };
 
   const logOut = async (goHome) => {
     try {
       await logoutRequest();
-      if (goHome) navigate("/");
-    } catch {
-      // ignore
-    }
-
-    if (refreshTimeoutRef.current) {
-      clearTimeout(refreshTimeoutRef.current);
-    }
-
+    } catch {}
+    if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
     setUser(null);
     setAccessToken(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("accessToken");
+    if (goHome) navigate("/");
   };
 
-  // -------------------
-  // Bootstrap auth ONCE
-  // -------------------
-  useEffect(() => {
-    const bootstrapAuth = async () => {
-      try {
-        await refreshAccessToken();
-      } catch {
-        // not logged in, ignore
-      } finally {
-        setAuthLoading(false);
-      }
-    };
-    bootstrapAuth();
-  }, []);
-
-  // -------------------
-  // Setup Axios interceptors
-  // -------------------
+  // ------------------------
+  // Bootstrap auth
+  // ------------------------
   useEffect(() => {
     setupInterceptors({
       getAccessToken: () => accessToken,
       refreshAccessToken,
       onLogout: logOut,
     });
-  }, [accessToken]);
 
-  // -------------------
-  // Schedule refresh when token changes
-  // -------------------
-  useEffect(() => {
-    if (accessToken) {
-      scheduleRefresh(accessToken);
-    }
-  }, [accessToken]);
+    const bootstrap = async () => {
+      try {
+        const token = await refreshAccessToken();
+        if (token) {
+          // profile can be fetched here if needed
+        }
+      } catch {
+        // not logged in
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+
+    bootstrap();
+  }, []);
 
   return (
     <AuthContext.Provider

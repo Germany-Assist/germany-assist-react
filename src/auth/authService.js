@@ -1,12 +1,10 @@
 import { api } from "../api/client";
 
 export const loginRequest = async (credentials) => {
-  console.log(credentials);
   const res = await api.post("/auth/login", credentials, {
     headers: { "Content-Type": "application/json" },
     skipAuthRefresh: true,
   });
-  console.log(res.data);
   return res.data; // { user, accessToken }
 };
 export const refreshTokenRequest = async () => {

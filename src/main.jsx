@@ -6,21 +6,30 @@ import App from "./App.jsx";
 import { AuthProvider, useAuth } from "./contexts/AuthContext.jsx";
 import { ProfileProvider, useProfile } from "./contexts/profileContext.jsx";
 
-function BootstrapGate({ children }) {
+export const BootstrapGate = ({ children }) => {
   const { refreshAccessToken } = useAuth();
   const { fetchProfile } = useProfile();
+  const [bootstrapped, setBootstrapped] = useState(false);
+
   useEffect(() => {
     const bootstrap = async () => {
-      const ok = await refreshAccessToken();
-      if (ok) {
-        await fetchProfile();
+      try {
+        const token = await refreshAccessToken();
+        if (token) {
+          await fetchProfile(); // fetch profile safely
+        }
+      } catch {
+        // user is not logged in, ignore
+      } finally {
+        setBootstrapped(true);
       }
     };
+
     bootstrap();
   }, []);
+  if (!bootstrapped) return <div>Loading...</div>; // or a splash screen
   return children;
-}
-
+};
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>

@@ -1,3 +1,4 @@
+//profile context
 import { useState, useContext, createContext, useEffect } from "react";
 import { profileRequest } from "../api/profile";
 import { useAuth } from "./AuthContext";
@@ -9,17 +10,18 @@ export const ProfileProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     if (accessToken) {
-      profileRequest().then((data) => setProfile(data));
+      (async () => {
+        const data = await profileRequest();
+        setProfile(data);
+      })();
     }
   }, [accessToken]);
 
   const fetchProfile = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const data = await profileRequest();
       setProfile(data);

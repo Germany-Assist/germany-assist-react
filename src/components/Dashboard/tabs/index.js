@@ -13,6 +13,7 @@ import ServiceProviderGeneral from "./serviceProvider/ServiceProviderGeneral";
 import ServiceProviderServices from "./serviceProvider/ServiceProviderServices";
 import ServiceProviderOrders from "./serviceProvider/ServiceProviderOrders";
 import ServiceProviderPage from "./serviceProvider/ServiceProviderPage";
+import AdminProfile from "./admin/AdminProfile";
 
 export default {
   admin: {
@@ -21,6 +22,7 @@ export default {
     Users: AdminUsers,
     Orders: AdminOrders,
     ServiceProvider: AdminServiceProviders,
+    Profile: AdminProfile,
   },
   client: {
     General: ClientGeneral,

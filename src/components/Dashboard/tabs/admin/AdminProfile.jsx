@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useProfile } from "../../../../contexts/profileContext";
 import { uploadProfileImage } from "../../../../api/profile";
 
-const UserProfile = () => {
+const AdminProfile = () => {
   const { profile: userProfile } = useProfile();
   const [profile, setProfile] = useState(userProfile);
   const handleImageChange = async (e) => {
@@ -99,4 +99,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default AdminProfile;
