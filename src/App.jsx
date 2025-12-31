@@ -6,17 +6,17 @@ import Jobs from "./pages/jobs";
 import OnboardingPage from "./pages/onboarding";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import UserProfile from "./components/Candidate/userProfile.jsx";
-import { ServiceList } from "./components/Services/serviceList.jsx";
 import Homepage from "./components/Homepage/Homepage.jsx";
-import ServiceDetails from "./components/Services/ServiceDetails.jsx";
 import { StripeContainer } from "./components/Payment/StripeContainer.jsx";
 import { TimelinePage } from "./components/ServiceTimeLine/TimelinePage.jsx";
 import BusinessProvider from "./components/Buisnesses/BusinessProvider.jsx";
 import { TimelineForm } from "./components/ServiceTimeLine/TimelineForm.jsx";
 import { CreatePostForm } from "./components/ServiceTimeLine/CreatePostForm.jsx";
 import { ServiceTimelineClient } from "./components/ServiceTimeLine/ServiceTimelineClient.jsx";
+
 import MainNav from "./components/Homepage/MainNav.jsx";
 import DashboardPanel from "./pages/dashboards/DashboardPanel.jsx";
+import ServicePage from "./pages/service/ServicePage.jsx";
 //TODO temp disable for unification to be updated and moved and refactored
 // import AdminDashboard from "./components/Dashboard/AdminDashboard.jsx";
 function App() {
@@ -49,27 +49,9 @@ function App() {
           </>
         }
       ></Route>
-      <Route
-        path="/serviceDetails/:id"
-        element={
-          <>
-            <MainNav />
-            <ServiceDetails />
-          </>
-        }
-      ></Route>
       <Route path="/onboarding" element={<OnboardingPage />}></Route>
       <Route path="/login" element={<Login />}></Route>
       <Route path="/signup" element={<Signup />}></Route>
-      <Route
-        path="/services"
-        element={
-          <>
-            <MainNav />
-            <ServiceList />
-          </>
-        }
-      ></Route>
       <Route
         path="/userProfile"
         element={
@@ -135,14 +117,17 @@ function App() {
           </>
         }
       />
+      {/* confirmed */}
       <Route
-        path="/dashboard"
+        path="/service/:serviceId"
         element={
           <>
-            <DashboardPanel />
+            <MainNav />
+            <ServicePage />
           </>
         }
-      />{" "}
+      />
+      <Route path="/dashboard" element={<DashboardPanel />} />
     </Routes>
   );
 }

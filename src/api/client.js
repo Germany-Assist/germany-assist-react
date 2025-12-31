@@ -22,14 +22,17 @@ export const setupInterceptors = ({
     queue = [];
   };
 
-  // Request interceptor: attach token
+  api.interceptors.request.clear();
+  api.interceptors.response.clear();
+
   api.interceptors.request.use((config) => {
     const token = getAccessToken();
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   });
 
-  // Response interceptor: handle 401
   api.interceptors.response.use(
     (res) => res,
     async (err) => {
@@ -40,7 +43,6 @@ export const setupInterceptors = ({
         original._retry = true;
 
         if (isRefreshing) {
-          // wait until refresh finishes
           return new Promise((resolve, reject) => {
             queue.push({
               resolve: (token) => {
@@ -56,6 +58,8 @@ export const setupInterceptors = ({
         try {
           const newToken = await refreshAccessToken();
           processQueue(null, newToken);
+
+          // Ensure the new token is in the headers for the retry
           original.headers.Authorization = `Bearer ${newToken}`;
           return api(original);
         } catch (refreshErr) {
@@ -66,7 +70,6 @@ export const setupInterceptors = ({
           isRefreshing = false;
         }
       }
-
       return Promise.reject(err);
     }
   );

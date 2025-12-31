@@ -41,6 +41,7 @@ export default function AdminServices() {
       updateRow(id, (row) => ({ ...row, rejected: true, approved: false }));
     }
   };
+
   useEffect(() => {
     (async () => {
       const res = (await adminApis.getAllServices()).data;

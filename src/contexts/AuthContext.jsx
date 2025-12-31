@@ -1,13 +1,13 @@
-//auth context
 import React, {
   createContext,
   useContext,
   useEffect,
   useRef,
   useState,
+  useCallback,
 } from "react";
 import { jwtDecode } from "jwt-decode";
-import { setupInterceptors, api } from "../api/client";
+import { setupInterceptors } from "../api/client";
 import {
   loginRequest,
   refreshTokenRequest,
@@ -29,24 +29,74 @@ export const AuthProvider = ({ children }) => {
 
   const isAuthenticated = Boolean(accessToken);
 
+  // 1. Helper to clear everything
+  const clearAuthState = useCallback(() => {
+    if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+    setUser(null);
+    setAccessToken(null);
+    setAuthLoading(false);
+  }, []);
+
+  // 2. Token Refresh Logic
+  const refreshAccessToken = useCallback(async () => {
+    try {
+      const newToken = await refreshTokenRequest();
+      setAccessToken(newToken);
+      scheduleRefresh(newToken);
+      return newToken;
+    } catch (err) {
+      clearAuthState();
+      throw err;
+    }
+  }, [clearAuthState]);
+
+  // 3. Logout Logic
+  const logOut = useCallback(
+    async (goHome) => {
+      try {
+        await logoutRequest();
+      } catch (err) {
+        console.warn("Server logout failed, clearing local state.");
+      } finally {
+        clearAuthState();
+        if (goHome) navigate("/");
+      }
+    },
+    [clearAuthState, navigate]
+  );
+
+  // 4. JWT Schedule Logic
   const scheduleRefresh = (token) => {
     if (!token) return;
     if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
 
     try {
       const { exp } = jwtDecode(token);
-      const delay = exp * 1000 - Date.now() - 5000; // refresh 5s before expiry
-      if (delay <= 0) return refreshAccessToken();
+      // Refresh 5 seconds before expiry
+      const delay = exp * 1000 - Date.now() - 5000;
 
-      refreshTimeoutRef.current = setTimeout(refreshAccessToken, delay);
-    } catch {
+      if (delay <= 0) {
+        refreshAccessToken();
+      } else {
+        refreshTimeoutRef.current = setTimeout(refreshAccessToken, delay);
+      }
+    } catch (error) {
+      console.error("Invalid token during scheduling", error);
       logOut();
     }
   };
 
-  // ------------------------
-  // Auth actions
-  // ------------------------
+  // 5. Setup Interceptors
+  // We use a useEffect that reacts to changes but cleans up after itself
+  useEffect(() => {
+    setupInterceptors({
+      getAccessToken: () => accessToken,
+      refreshAccessToken,
+      onLogout: logOut,
+    });
+  }, [accessToken, refreshAccessToken, logOut]);
+
+  // 6. Auth Actions
   const login = async (credentials) => {
     const { user, accessToken } = await loginRequest(credentials);
     setUser(user);
@@ -71,54 +121,6 @@ export const AuthProvider = ({ children }) => {
     return { user, accessToken };
   };
 
-  const refreshAccessToken = async () => {
-    try {
-      const newToken = await refreshTokenRequest();
-      setAccessToken(newToken);
-      scheduleRefresh(newToken);
-      return newToken;
-    } catch {
-      logOut();
-      throw new Error("Refresh token failed");
-    }
-  };
-
-  const logOut = async (goHome) => {
-    try {
-      await logoutRequest();
-    } catch {}
-    if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
-    setUser(null);
-    setAccessToken(null);
-    if (goHome) navigate("/");
-  };
-
-  // ------------------------
-  // Bootstrap auth
-  // ------------------------
-  useEffect(() => {
-    setupInterceptors({
-      getAccessToken: () => accessToken,
-      refreshAccessToken,
-      onLogout: logOut,
-    });
-
-    const bootstrap = async () => {
-      try {
-        const token = await refreshAccessToken();
-        if (token) {
-          // profile can be fetched here if needed
-        }
-      } catch {
-        // not logged in
-      } finally {
-        setAuthLoading(false);
-      }
-    };
-
-    bootstrap();
-  }, []);
-
   return (
     <AuthContext.Provider
       value={{
@@ -126,6 +128,7 @@ export const AuthProvider = ({ children }) => {
         accessToken,
         isAuthenticated,
         authLoading,
+        setAuthLoading, // Exported so BootstrapGate can toggle it
         login,
         signUp,
         googleLogin,
@@ -138,4 +141,8 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
+};

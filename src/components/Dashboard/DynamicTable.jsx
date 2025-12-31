@@ -27,6 +27,27 @@ const DynamicTable = ({ columns, data }) => {
     }));
   };
 
+  const levelCalculator = (row) => {
+    let bgStyle;
+    switch (row.level) {
+      case "pending":
+        bgStyle = "bg-yellow-100";
+        break;
+      case "ready":
+        bgStyle = "bg-green-100";
+        break;
+      case "accepted":
+        bgStyle = "bg-blue-100";
+        break;
+      case "alert":
+        bgStyle = "bg-red-100";
+        break;
+      default:
+        bgStyle = "";
+        break;
+    }
+    return `hover:bg-gray-400 transition-colors ${bgStyle}`;
+  };
   return (
     <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
       <table className="min-w-full border-collapse text-sm">
@@ -55,10 +76,7 @@ const DynamicTable = ({ columns, data }) => {
 
         <tbody className="divide-y divide-gray-100">
           {sortedData.map((row, rowIndex) => (
-            <tr
-              key={row.id ?? rowIndex}
-              className="hover:bg-gray-50 transition-colors"
-            >
+            <tr key={row.id ?? rowIndex} className={levelCalculator(row)}>
               {columns.map((col) => (
                 <td
                   key={col.key}

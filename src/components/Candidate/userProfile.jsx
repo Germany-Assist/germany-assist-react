@@ -10,14 +10,12 @@ const UserProfile = () => {
   const { userId, accessToken } = useAuth();
   const [user, setUser] = useState({});
   const [loading, setLoading] = useState(true);
-  const [favoriteServices, setFavoriteServices] = useState([]);
   const [services, setServices] = useState([]);
   const [reviews, setReviews] = useState([]);
 
   //Pagination uses
   const servicePagination = usePagination(services, 4);
   const reviewPagination = usePagination(reviews, 4);
-  const favoritePagination = usePagination(favoriteServices.favorite, 3);
 
   useEffect(() => {
     if (userId && accessToken) {
@@ -49,7 +47,6 @@ const UserProfile = () => {
         isVerified: userData.isVerified,
         createdAt: userData.createdAt,
       });
-      setFavoriteServices(userData);
 
       console.log("User  Rs API response:", userRes.data);
 

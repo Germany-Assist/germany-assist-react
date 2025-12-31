@@ -1,12 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";
 import { useProfile } from "../../contexts/profileContext";
 import ProfileAvatar from "../profile/profileAvatar";
 const MainNav = () => {
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
   const { profile } = useProfile();
-  const isLoggedIn = !!profile && !!isAuthenticated;
 
   // Helper function to determine if a link is active
   const isActivePath = (path) => {
@@ -79,7 +76,7 @@ const MainNav = () => {
               </span>
             </Link>
             {/* Only show Profile link when user is logged in */}
-            {isLoggedIn && (
+            {profile && (
               <Link to="/userProfile" className={getLinkStyles("/userProfile")}>
                 Profile
               </Link>
@@ -90,14 +87,12 @@ const MainNav = () => {
           <div className="flex items-center space-x-4">
             {/* Auth Buttons - Conditional based on login status */}
             <div className="flex items-center space-x-3">
-              {isLoggedIn ? (
+              {profile ? (
                 // Logged in: Show user info and logout
                 <>
                   <div className="hidden lg:flex items-center space-x-3">
                     <div className="text-sm text-gray-600">
-                      {isAuthenticated && (
-                        <ProfileAvatar navDir={"/dashboard"} />
-                      )}
+                      {profile && <ProfileAvatar navDir={"/dashboard"} />}
                     </div>
                   </div>
                 </>

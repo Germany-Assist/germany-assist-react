@@ -22,6 +22,7 @@ export default function AdminUsers() {
     const res = await adminApis.verifyUser(id);
     if (res) updateRow(id, (row) => ({ ...row, isVerified: true }));
   };
+
   const [data, setData] = useState(null);
   useEffect(() => {
     (async () => {

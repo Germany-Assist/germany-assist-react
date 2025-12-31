@@ -12,8 +12,6 @@ import {
   ArcElement,
 } from "chart.js";
 import { SideBarBusiness } from "./SideBarBusiness";
-import { ServiceList } from "../Services/serviceList";
-import ServiceCard from "../Services/serviceCard";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../../config/api.js";
@@ -199,18 +197,7 @@ export default function BusinessProvider() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.isArray(services) &&
-              services.map((service) => (
-                <ServiceCard
-                  key={service.id}
-                  service={service}
-                  onEdit={(s) => console.log("Edit:", s)}
-                  onDelete={(id) => console.log("Delete:", id)}
-                  isProvider={true}
-                />
-              ))}
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </div>
         {/* Charts */}
 

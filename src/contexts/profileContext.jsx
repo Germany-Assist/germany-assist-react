@@ -1,5 +1,10 @@
-//profile context
-import { useState, useContext, createContext, useEffect } from "react";
+import {
+  useState,
+  useContext,
+  createContext,
+  useEffect,
+  useCallback,
+} from "react";
 import { profileRequest } from "../api/profile";
 import { useAuth } from "./AuthContext";
 
@@ -10,16 +15,8 @@ export const ProfileProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  useEffect(() => {
-    if (accessToken) {
-      (async () => {
-        const data = await profileRequest();
-        setProfile(data);
-      })();
-    }
-  }, [accessToken]);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -31,33 +28,24 @@ export const ProfileProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const clearProfile = () => {
-    setProfile(null);
-    setError(null);
-    setLoading(false);
-  };
+  useEffect(() => {
+    if (accessToken) {
+      if (!profile) {
+        fetchProfile();
+      }
+    } else {
+      setProfile(null);
+      setError(null);
+    }
+  }, [accessToken, fetchProfile]);
 
   return (
-    <ProfileContext.Provider
-      value={{
-        profile,
-        loading,
-        error,
-        fetchProfile,
-        clearProfile,
-      }}
-    >
+    <ProfileContext.Provider value={{ profile, loading, error, fetchProfile }}>
       {children}
     </ProfileContext.Provider>
   );
 };
 
-export const useProfile = () => {
-  const ctx = useContext(ProfileContext);
-  if (!ctx) {
-    throw new Error("useProfile must be used inside ProfileProvider");
-  }
-  return ctx;
-};
+export const useProfile = () => useContext(ProfileContext);
