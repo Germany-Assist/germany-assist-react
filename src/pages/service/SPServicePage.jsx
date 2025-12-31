@@ -11,22 +11,25 @@ import {
   Eye,
 } from "lucide-react";
 import { useParams } from "react-router-dom";
-import { fetchServiceProfile } from "../../api/publicApis";
 import ImageGallery from "../../components/imageGallery/ImageGallery";
 import BookingSidebar from "../../components/services/serviceProfile/BookingSidebar";
 import ReviewsSection from "../../components/services/serviceProfile/ReviewComponent";
+import { serviceProfilePageSP } from "../../api/serviceProviderApis";
+import { useAuth } from "../../contexts/AuthContext";
 
-const ServicePage = () => {
+const SPServicePage = () => {
   const { serviceId } = useParams();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const { isAuthenticated } = useAuth();
   useEffect(() => {
     const loadData = async () => {
       try {
-        const res = await fetchServiceProfile(serviceId);
-        console.log(res);
-        setData(res);
+        if (isAuthenticated) {
+          const res = await serviceProfilePageSP(serviceId);
+          console.log(res);
+          setData(res);
+        }
       } catch (err) {
         //TODO Error message should be here but i need error component first
         console.error("Failed to load service", err);
@@ -35,7 +38,7 @@ const ServicePage = () => {
       }
     };
     loadData();
-  }, [serviceId]);
+  }, [serviceId, isAuthenticated]);
 
   // --- 1. Sub-component: Reviews Section ---
 
@@ -48,7 +51,6 @@ const ServicePage = () => {
         </span>
       </div>
     );
-
   if (!data) return <div className="text-center py-20">Service not found.</div>;
 
   return (
@@ -159,11 +161,6 @@ const ServicePage = () => {
               category={data.category}
               providerEmail={data.ServiceProvider?.email}
             />
-            <ReviewsSection
-              reviews={data.reviews}
-              totalReviews={data.totalReviews || data.reviews.length}
-              rating={data.rating}
-            />
           </div>
         </div>
       </main>
@@ -171,4 +168,20 @@ const ServicePage = () => {
   );
 };
 
-export default ServicePage;
+export default SPServicePage;
+// TODO those are the extra fields that i will address
+// "approved": true,
+// "rejected": false,
+// "published": true,
+// "User": {
+//     "firstName": "root",
+//     "lastName": "serviceProvider",
+//     "email": "amr_imad@hotmail.com"
+// },
+// "timelines": [
+//     {
+//         "id": "8dHE",
+//         "isArchived": false,
+//         "label": null
+//     }
+// ],

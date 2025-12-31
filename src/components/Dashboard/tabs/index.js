@@ -15,27 +15,76 @@ import ServiceProviderOrders from "./serviceProvider/ServiceProviderOrders";
 import ServiceProviderPage from "./serviceProvider/ServiceProviderPage";
 import AdminProfile from "./admin/AdminProfile";
 import SPCreateService from "./serviceProvider/SPCreateService";
+import CreateNewSP from "./serviceProvider/components/CreateNewSP";
 
 export default {
+  //example
   admin: {
-    General: AdminGeneral,
-    Services: AdminServices,
-    Users: AdminUsers,
-    Orders: AdminOrders,
-    ServiceProvider: AdminServiceProviders,
-    Profile: AdminProfile,
+    General: {
+      label: "General",
+      component: AdminGeneral,
+    },
+    Users: {
+      label: "Users",
+      component: AdminUsers,
+      children: [{ label: "Create New Admin", component: AdminGeneral }],
+    },
+    Services: {
+      label: "Service",
+      component: AdminServices,
+    },
+    Orders: {
+      label: "Orders",
+      component: AdminOrders,
+    },
+    ServiceProvider: {
+      label: "Service Providers",
+      component: AdminServiceProviders,
+      children: [
+        { label: "Create New Service Provider", component: CreateNewSP },
+      ],
+    },
+    Profile: {
+      label: "Profile",
+      component: AdminProfile,
+    },
   },
+
   client: {
-    General: ClientGeneral,
-    Services: ClientServices,
-    Profile: ClientProfile,
-    Orders: ClientOrders,
+    General: {
+      label: "General",
+      component: ClientGeneral,
+    },
+    Services: {
+      label: "General",
+      component: ClientServices,
+    },
+    Profile: {
+      label: "General",
+      component: ClientProfile,
+    },
+    Orders: {
+      label: "General",
+      component: ClientOrders,
+    },
   },
   service_provider_root: {
-    General: ServiceProviderGeneral,
-    Services: ServiceProviderServices,
-    CreateService: SPCreateService,
-    Orders: ServiceProviderOrders,
-    Page: ServiceProviderPage,
+    General: {
+      label: "General",
+      component: ServiceProviderGeneral,
+    },
+    Services: {
+      label: "Services",
+      component: ServiceProviderServices,
+      children: [{ label: "Create New Service", component: SPCreateService }],
+    },
+    Orders: {
+      label: "Orders",
+      component: ServiceProviderOrders,
+    },
+    Page: {
+      label: "Page",
+      component: ServiceProviderPage,
+    },
   },
 };

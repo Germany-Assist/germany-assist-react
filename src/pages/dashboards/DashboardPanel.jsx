@@ -5,23 +5,32 @@ import DashboardSideBar from "../../components/Dashboard/DashboardSideBar";
 
 export default function DashboardPanel() {
   const { profile } = useProfile();
+  // We initialize with null or the default 'General' object
   const [activeSection, setActiveSection] = useState(null);
   const [Component, setComponent] = useState(null);
+
   useEffect(() => {
-    if (activeSection) {
-      setComponent(() => DashboardMap[profile.role][activeSection]);
-    } else if (profile?.role && !activeSection) {
-      setComponent(() => DashboardMap[profile.role].General);
+    const roleData = DashboardMap[profile?.role];
+
+    if (activeSection?.component) {
+      // If user clicked a specific item/sub-item
+      setComponent(() => activeSection.component);
+    } else if (roleData?.General) {
+      // Default fallback to General component
+      setComponent(() => roleData.General.component);
     }
   }, [activeSection, profile]);
 
   if (!profile?.role) return <div>Loading...</div>;
+
   return (
     <div className="flex h-screen bg-gray-100">
       <DashboardSideBar
-        navElements={Object.keys(DashboardMap[profile?.role])}
+        // Pass the array of objects: [{label: "Users", component:..., children: [...]}, ...]
+        navElements={Object.values(DashboardMap[profile.role])}
         setActiveSection={setActiveSection}
-        activeSection={activeSection}
+        // Pass the string label for CSS highlighting logic
+        activeSection={activeSection?.label || "General"}
       />
       <div className="flex-1 p-6 overflow-auto">
         {Component ? <Component /> : "nothing yet"}

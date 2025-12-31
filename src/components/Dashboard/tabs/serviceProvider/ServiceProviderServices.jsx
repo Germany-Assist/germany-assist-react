@@ -24,24 +24,24 @@ export default function ServiceProviderServices() {
   const openNewTab = (id) => {
     window.open(`/service/${id}`, "_blank");
   };
-  const approveService = async (id) => {
-    const payload = {
-      id: id,
-      status: "approve",
-    };
-    const res = await adminApis.updateServiceStatus(payload);
+
+  const publishService = async (serviceId) => {
+    const res = await serviceProviderApis.publishService(serviceId);
     if (res) {
-      updateRow(id, (row) => ({ ...row, approved: true, rejected: false }));
+      updateRow(serviceId, (row) => ({
+        ...row,
+        published: true,
+      }));
     }
   };
-  const rejectService = async (id) => {
-    const payload = {
-      id: id,
-      status: "reject",
-    };
-    const res = await adminApis.updateServiceStatus(payload);
+
+  const unpublishService = async (serviceId) => {
+    const res = await serviceProviderApis.unpublishService(serviceId);
     if (res) {
-      updateRow(id, (row) => ({ ...row, rejected: true, approved: false }));
+      updateRow(serviceId, (row) => ({
+        ...row,
+        published: false,
+      }));
     }
   };
 
@@ -81,20 +81,15 @@ export default function ServiceProviderServices() {
                 label: "View",
                 onClick: () => openNewTab(row.id),
               },
-              row.approved
+              row.published
                 ? {
-                    label: "Reject",
-                    onClick: async () => await rejectService(row.id),
+                    label: "Unpublish",
+                    onClick: async () => await unpublishService(row.id),
                   }
                 : {
-                    label: "Approve",
-                    onClick: async () => await approveService(row.id),
+                    label: "Publish",
+                    onClick: async () => await publishService(row.id),
                   },
-              {
-                label: "Delete",
-                danger: true,
-                onClick: () => console.log("Delete", row.id),
-              },
             ]}
           />
         ),
@@ -107,7 +102,6 @@ export default function ServiceProviderServices() {
   return (
     <div>
       <h1 className="text-3xl antialiased mb-4">Services</h1>
-      <button className="bg-red-100 mb-4 p-2">Create service</button>
       {data ? (
         <DynamicTable columns={data.columns} data={data.data} />
       ) : (
