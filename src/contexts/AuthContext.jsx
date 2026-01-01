@@ -14,7 +14,7 @@ import {
   logoutRequest,
   signUpRequest,
   googleLoginRequest,
-} from "../auth/authService";
+} from "../api/authService";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext(null);

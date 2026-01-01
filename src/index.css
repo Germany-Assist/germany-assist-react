@@ -2,3 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  /* This creates the 'floating' glass look across all components */
+  .glass-card {
+    @apply bg-[#141414]/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)];
+  }
+
+  /* Custom glow for active elements */
+  .accent-glow {
+    @apply shadow-[0_0_20px_rgba(34,211,238,0.2)] border-accent/30;
+  }
+}
+
+/* Global body style to ensure the dark theme looks right */
+body {
+  @apply bg-[#050505] text-white;
+}

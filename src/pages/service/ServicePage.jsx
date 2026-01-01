@@ -13,8 +13,8 @@ import {
 import { useParams } from "react-router-dom";
 import { fetchServiceProfile } from "../../api/publicApis";
 import ImageGallery from "../../components/imageGallery/ImageGallery";
-import BookingSidebar from "../../components/services/serviceProfile/BookingSidebar";
-import ReviewsSection from "../../components/services/serviceProfile/ReviewComponent";
+import BookingSidebar from "../../features/service/serviceProfile/BookingSidebar";
+import ReviewsSection from "../../features/service/serviceProfile/ReviewComponent";
 
 const ServicePage = () => {
   const { serviceId } = useParams();
@@ -25,7 +25,6 @@ const ServicePage = () => {
     const loadData = async () => {
       try {
         const res = await fetchServiceProfile(serviceId);
-        console.log(res);
         setData(res);
       } catch (err) {
         //TODO Error message should be here but i need error component first

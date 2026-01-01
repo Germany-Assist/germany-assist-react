@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 import { useState, useEffect } from "react";
-import PLACEHOLDER from "../../assets/placeholder.png";
+import PLACEHOLDER from "../../assets/placeholders/placeholder.png";
 
 const ImageGallery = ({ assets = [] }) => {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
