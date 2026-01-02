@@ -1,4 +1,4 @@
-import GoogleLoginButton from "../../components/buttons/googleLoginButton";
+import GoogleLoginButton from "../../components/ui/googleLoginButton";
 
 const SocialAuth = ({ mode }) => (
   <div className="mt-8">

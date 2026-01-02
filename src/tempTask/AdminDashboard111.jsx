@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { API_URL } from "../../config/api";
+import { useAuth } from "../contexts/AuthContext";
+import { API_URL } from "../config/api";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,7 +14,7 @@ import {
   Legend,
 } from "chart.js";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
-import { api } from "../../api/client";
+import { api } from "../api/client";
 
 ChartJS.register(
   CategoryScale,

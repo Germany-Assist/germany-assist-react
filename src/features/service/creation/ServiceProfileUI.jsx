@@ -9,7 +9,7 @@ import {
   Globe,
   ChevronRight,
 } from "lucide-react";
-import ImageGallery from "../../../components/imageGallery/ImageGallery";
+import ImageGallery from "../../../components/ui/ImageGallery";
 import BookingSidebar from "../serviceProfile/BookingSidebar";
 import ReviewsSection from "../serviceProfile/ReviewComponent";
 

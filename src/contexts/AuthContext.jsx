@@ -87,7 +87,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   // 5. Setup Interceptors
-  // We use a useEffect that reacts to changes but cleans up after itself
   useEffect(() => {
     setupInterceptors({
       getAccessToken: () => accessToken,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useProfile } from "../../contexts/profileContext";
+import { useProfile } from "../../contexts/ProfileContext";
 import { useNavigate } from "react-router-dom";
 
 export default function ProfileAvatar({ navDir, name = false, className }) {

@@ -9,3 +9,8 @@ export const fetchCategories = async () => {
   const data = await api.get("/category");
   return data.data;
 };
+
+export const fetchServicesApi = async (query) => {
+  const data = await api.get(`/service?${query.toString()}`);
+  return data.data;
+};

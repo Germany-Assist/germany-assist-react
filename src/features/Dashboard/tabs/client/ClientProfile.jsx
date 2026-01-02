@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useProfile } from "../../../../contexts/profileContext";
+import { useProfile } from "../../../../contexts/ProfileContext";
 import { uploadProfileImage } from "../../../../api/profile";
 
 const UserProfile = () => {

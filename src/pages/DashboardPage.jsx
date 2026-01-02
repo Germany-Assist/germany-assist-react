@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useProfile } from "../contexts/profileContext";
+import { useProfile } from "../contexts/ProfileContext";
 import DashboardSideBar from "../features/Dashboard/DashboardSideBar";
 import DashboardMap from "../features/Dashboard/tabs/index";
 export default function DashboardPage() {

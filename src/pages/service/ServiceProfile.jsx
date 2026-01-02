@@ -12,9 +12,10 @@ import {
 } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { fetchServiceProfile } from "../../api/publicApis";
-import ImageGallery from "../../components/imageGallery/ImageGallery";
+import ImageGallery from "../../components/ui/ImageGallery";
 import BookingSidebar from "../../features/service/serviceProfile/BookingSidebar";
 import ReviewsSection from "../../features/service/serviceProfile/ReviewComponent";
+import NavigationBar from "../../components/ui/NavigationBar";
 
 const ServicePage = () => {
   const { serviceId } = useParams();
@@ -52,6 +53,7 @@ const ServicePage = () => {
 
   return (
     <div className="min-h-screen bg-white font-sans text-gray-900 pb-20">
+      <NavigationBar />
       <nav className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2 text-sm text-gray-500">
@@ -71,7 +73,6 @@ const ServicePage = () => {
           </div>
         </div>
       </nav>
-
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold capitalize mb-4">

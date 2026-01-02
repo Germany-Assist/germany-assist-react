@@ -1,8 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
-import { useProfile } from "../../contexts/profileContext";
-import ProfileAvatar from "../ui/ProfileAvatar";
+import { useProfile } from "../../contexts/ProfileContext";
+import ProfileAvatar from "./ProfileAvatar";
 import logo from "../../assets/brand/logo.png";
-const MainNav = () => {
+const NavigationBar = () => {
   const location = useLocation();
   const { profile } = useProfile();
 
@@ -94,4 +94,4 @@ const MainNav = () => {
   );
 };
 
-export default MainNav;
+export default NavigationBar;
