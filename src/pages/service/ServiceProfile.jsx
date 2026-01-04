@@ -22,6 +22,7 @@ import NavigationBar from "../../components/ui/NavigationBar";
 import ShareSheet from "../../components/ui/ShareSheet";
 import PaymentModal from "../../components/ui/PaymentModal";
 import { useProfile } from "../../contexts/ProfileContext";
+import { fetchUserReviewForServiceApi } from "../../api/profile";
 
 const ServiceProfile = ({ previewData = null }) => {
   const { serviceId } = useParams();
@@ -40,7 +41,7 @@ const ServiceProfile = ({ previewData = null }) => {
   const [hasPurchasedService, setHasPurchasedService] = useState(null);
   const [hasPurchasedTimeline, setHasPurchasedTimeline] = useState(false);
   const [purchasedTimelines, setPurchasedTimelines] = useState([]);
-
+  const [hasReview, setHasReview] = useState(false);
   // Modals & Payment State
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
@@ -69,14 +70,19 @@ const ServiceProfile = ({ previewData = null }) => {
     loadData();
   }, [serviceId, previewData]);
 
-  // 2. Sync Purchase States from Hooks
   useEffect(() => {
     setIsFavorite(isInFavorite(serviceId));
     if (data) {
       const ps = isAlreadyPurchasedService(data);
       setHasPurchasedService(ps);
       setHasPurchasedTimeline(Boolean(isAlreadyPurchasedTimeline(data)));
-      if (ps) setPurchasedTimelines(isAlreadyPurchasedService(data));
+      if (ps) {
+        setPurchasedTimelines(isAlreadyPurchasedService(data));
+        (async () => {
+          const review = await fetchUserReviewForServiceApi(serviceId);
+          setHasReview(review);
+        })();
+      }
     }
   }, [profile, data]);
 
@@ -97,8 +103,7 @@ const ServiceProfile = ({ previewData = null }) => {
     }
   };
 
-  const handleNavigateToTimeline = (tid) =>
-    navigate(`/experience/${serviceId}/${tid}`);
+  const handleNavigateToTimeline = (tid) => navigate(`/timeline/${tid}`);
 
   if (loading || !data)
     return (
@@ -135,7 +140,10 @@ const ServiceProfile = ({ previewData = null }) => {
               Services
             </span>
             <ChevronRight size={14} className="opacity-50" />
-            <span className="text-slate-900 dark:text-white font-medium capitalize">
+            <span
+              className="text-slate-900 hover:text-accent light:text-black dark:text-white font-medium capitalize  cursor-pointer"
+              onClick={() => navigate(`/services?category=${data.category}`)}
+            >
               {data.category?.replace("-", " ")}
             </span>
           </div>
@@ -185,6 +193,9 @@ const ServiceProfile = ({ previewData = null }) => {
               reviews={data.reviews || []}
               totalReviews={data.totalReviews}
               rating={data.rating}
+              serviceId={serviceId}
+              existingReview={hasReview}
+              canReview={hasPurchasedService}
             />
           </div>
 

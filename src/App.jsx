@@ -6,6 +6,7 @@ import DashboardPage from "./pages/DashboardPage.jsx";
 import ServiceProfile from "./pages/service/ServiceProfile.jsx";
 import AuthPortal from "./features/auth/AuthPortal.jsx";
 import ServicesPage from "./pages/ServicesPage.jsx";
+import TimelinePage from "./pages/TimelinePage.jsx";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/services" element={<ServicesPage />} />
       <Route path="/service/:serviceId" element={<ServiceProfile />} />
+      <Route path="/timeline/:timelineId" element={<TimelinePage />} />
     </Routes>
   );
 }

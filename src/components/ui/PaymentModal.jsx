@@ -72,8 +72,8 @@ const CheckoutForm = ({ clientSecret, onPaymentSuccess, amount }) => {
                   fontFamily: "Inter, sans-serif",
                   color: window.matchMedia("(prefers-color-scheme: dark)")
                     .matches
-                    ? "#ffffff"
-                    : "#0f172a",
+                    ? "#000000"
+                    : "#000000",
                   "::placeholder": { color: "#94a3b8" },
                 },
               },
