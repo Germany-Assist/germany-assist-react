@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Star,
-  Mail,
   Globe,
   ShieldCheck,
   ChevronRight,
@@ -9,147 +8,184 @@ import {
   Heart,
   CheckCircle,
   Eye,
+  Loader2,
 } from "lucide-react";
-import { useParams } from "react-router-dom";
-import { fetchServiceProfile } from "../../api/publicApis";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  fetchServiceProfile,
+  fetchPaymentIntentApi,
+} from "../../api/publicApis";
 import ImageGallery from "../../components/ui/ImageGallery";
 import BookingSidebar from "../../features/service/serviceProfile/BookingSidebar";
 import ReviewsSection from "../../features/service/serviceProfile/ReviewComponent";
 import NavigationBar from "../../components/ui/NavigationBar";
+import ShareSheet from "../../components/ui/ShareSheet";
+import PaymentModal from "../../components/ui/PaymentModal";
+import { useProfile } from "../../contexts/ProfileContext";
 
-const ServicePage = () => {
+const ServiceProfile = ({ previewData = null }) => {
   const { serviceId } = useParams();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [data, setData] = useState(previewData);
+  const [loading, setLoading] = useState(!previewData);
+  const {
+    toggleFavorite,
+    isInFavorite,
+    profile,
+    isAlreadyPurchasedService,
+    isAlreadyPurchasedTimeline,
+  } = useProfile();
 
+  const [isFavorite, setIsFavorite] = useState(null);
+  const [hasPurchasedService, setHasPurchasedService] = useState(null);
+  const [hasPurchasedTimeline, setHasPurchasedTimeline] = useState(false);
+  const [purchasedTimelines, setPurchasedTimelines] = useState([]);
+
+  // Modals & Payment State
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isPreparingPayment, setIsPreparingPayment] = useState(false);
+  const [paymentConfig, setPaymentConfig] = useState({
+    isOpen: false,
+    clientSecret: "",
+  });
+
+  // 1. Fetch Service Data
   useEffect(() => {
+    if (previewData) {
+      setData(previewData);
+      setLoading(false);
+      return;
+    }
     const loadData = async () => {
       try {
         const res = await fetchServiceProfile(serviceId);
         setData(res);
       } catch (err) {
-        //TODO Error message should be here but i need error component first
         console.error("Failed to load service", err);
       } finally {
         setLoading(false);
       }
     };
     loadData();
-  }, [serviceId]);
+  }, [serviceId, previewData]);
 
-  // --- 1. Sub-component: Reviews Section ---
+  // 2. Sync Purchase States from Hooks
+  useEffect(() => {
+    setIsFavorite(isInFavorite(serviceId));
+    if (data) {
+      const ps = isAlreadyPurchasedService(data);
+      setHasPurchasedService(ps);
+      setHasPurchasedTimeline(Boolean(isAlreadyPurchasedTimeline(data)));
+      if (ps) setPurchasedTimelines(isAlreadyPurchasedService(data));
+    }
+  }, [profile, data]);
 
-  if (loading)
+  const handleInitiatePayment = async () => {
+    setIsPreparingPayment(true);
+    try {
+      const res = await fetchPaymentIntentApi(data.id || serviceId);
+      if (res) {
+        setPaymentConfig({
+          isOpen: true,
+          clientSecret: res.message.clientSecret,
+        });
+      }
+    } catch (err) {
+      console.error("Payment initialization failed", err);
+    } finally {
+      setIsPreparingPayment(false);
+    }
+  };
+
+  const handleNavigateToTimeline = (tid) =>
+    navigate(`/experience/${serviceId}/${tid}`);
+
+  if (loading || !data)
     return (
-      <div className="min-h-screen flex items-center justify-center flex-col gap-4">
-        <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
-        <span className="text-gray-500 font-medium tracking-wide">
-          Fetching Details...
-        </span>
+      <div className="min-h-screen bg-light-950 dark:bg-dark-950 flex items-center justify-center">
+        <Loader2 className="animate-spin text-accent" />
       </div>
     );
 
-  if (!data) return <div className="text-center py-20">Service not found.</div>;
-
   return (
-    <div className="min-h-screen bg-white font-sans text-gray-900 pb-20">
+    <div className="min-h-screen bg-light-950 dark:bg-dark-950 text-slate-900 dark:text-slate-100 transition-colors duration-700 pb-20 relative">
       <NavigationBar />
-      <nav className="border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <span>Services</span> <ChevronRight size={14} />
-            <span className="text-indigo-600 font-medium capitalize">
+      <ShareSheet
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        url={window.location.href}
+        title={data.title}
+      />
+
+      <PaymentModal
+        isOpen={paymentConfig.isOpen}
+        onClose={() => setPaymentConfig((p) => ({ ...p, isOpen: false }))}
+        clientSecret={paymentConfig.clientSecret}
+        amount={data.price}
+      />
+
+      {/* Nav Bar */}
+      <nav className="border-b border-light-700 dark:border-white/5 bg-light-900/50 dark:bg-black/10 backdrop-blur-md sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-3 text-sm text-slate-500 dark:text-slate-400">
+            <span
+              className="hover:text-accent cursor-pointer"
+              onClick={() => navigate("/services")}
+            >
+              Services
+            </span>
+            <ChevronRight size={14} className="opacity-50" />
+            <span className="text-slate-900 dark:text-white font-medium capitalize">
               {data.category?.replace("-", " ")}
             </span>
           </div>
-          <div className="flex items-center space-x-4">
-            <button className="flex items-center text-sm font-medium hover:underline">
+          <div className="flex items-center space-x-6">
+            <button
+              onClick={() => setIsShareOpen(true)}
+              className="flex items-center text-xs font-bold uppercase tracking-widest hover:text-accent transition-all active:scale-95"
+            >
               <Share2 size={16} className="mr-2" /> Share
             </button>
-            <button className="flex items-center text-sm font-medium hover:underline">
-              {/* TODO add to favorite */}
-              <Heart size={16} className="mr-2" /> Favorite
+            <button
+              onClick={() => toggleFavorite(data)}
+              className="flex items-center text-xs font-bold uppercase tracking-widest hover:text-red-500 transition-all active:scale-95"
+            >
+              <Heart
+                size={16}
+                className={`mr-2 ${
+                  isFavorite ? "fill-red-500 text-red-500" : ""
+                }`}
+              />{" "}
+              Favorite
             </button>
           </div>
         </div>
       </nav>
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold capitalize mb-4">
-            {data.title}
-          </h1>
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-            <div className="flex items-center font-bold text-gray-900">
-              <Star size={16} className="text-black fill-current mr-1" />
-              <span>{data.rating > 0 ? data.rating : "New"}</span>
-              <span className="mx-1 font-normal text-gray-500 underline">
-                ({data.totalReviews} reviews)
-              </span>
-            </div>
-            <div className="flex items-center font-medium">
-              {data?.ServiceProvider?.isVerified ? (
-                <>
-                  <CheckCircle size={16} className="text-green-600 mr-1" />
-                  "Identity Verified"
-                </>
-              ) : (
-                ""
-              )}
-            </div>
-            <div className="flex items-center italic">
-              <Eye size={16} className="mr-1" /> {data.views} recent views
-            </div>
-          </div>
+
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white capitalize mb-6">
+          {data.title}
+        </h1>
+
+        <div className="rounded-[2.5rem] overflow-hidden shadow-2xl border border-light-700 dark:border-white/5 mb-16">
+          <ImageGallery assets={data.assets || []} />
         </div>
 
-        <ImageGallery assets={data.assets} />
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-12">
-          <div className="lg:col-span-2">
-            <div className="flex items-center justify-between pb-8 border-b border-gray-100 mb-8">
-              <div>
-                <h2 className="text-2xl font-semibold mb-1">
-                  Service by{" "}
-                  {data.ServiceProvider?.name || "Authorized Provider"}
-                </h2>
-                <p className="text-gray-500 capitalize">
-                  {data.type} session • {data.category?.replace("-", " ")}
-                </p>
-              </div>
-              <div className="h-14 w-14 bg-gray-900 rounded-full flex items-center justify-center text-white text-xl font-bold">
-                {(data.ServiceProvider?.name || "S").charAt(0).toUpperCase()}
-              </div>
-            </div>
-
-            <div className="space-y-6 mb-8">
-              <div className="flex items-start space-x-4">
-                <ShieldCheck size={24} className="mt-1 text-indigo-600" />
-                <div>
-                  <h4 className="font-semibold text-lg">Secure Process</h4>
-                  <p className="text-gray-500 text-sm">
-                    Encrypted handling of your documents.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-4">
-                <Globe size={24} className="mt-1 text-indigo-600" />
-                <div>
-                  <h4 className="font-semibold text-lg">100% Online</h4>
-                  <p className="text-gray-500 text-sm">
-                    Managed digitally for global access.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-100 pt-8">
-              <h3 className="text-2xl font-semibold mb-4 text-gray-900">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+          <div className="lg:col-span-2 space-y-12">
+            <div className="pt-4">
+              <h3 className="text-2xl font-bold mb-6 italic">
                 About this service
               </h3>
-              <p className="text-gray-600 leading-loose text-lg whitespace-pre-line">
-                {data.description || "No description provided."}
+              <p className="text-slate-600 dark:text-slate-400 leading-[2.2rem] text-lg whitespace-pre-line font-light">
+                {data.description}
               </p>
             </div>
+            <ReviewsSection
+              reviews={data.reviews || []}
+              totalReviews={data.totalReviews}
+              rating={data.rating}
+            />
           </div>
 
           <div className="lg:col-span-1">
@@ -158,11 +194,11 @@ const ServicePage = () => {
               rating={data.rating}
               category={data.category}
               providerEmail={data.ServiceProvider?.email}
-            />
-            <ReviewsSection
-              reviews={data.reviews}
-              totalReviews={data.totalReviews || data.reviews.length}
-              rating={data.rating}
+              onBuy={handleInitiatePayment}
+              isProcessing={isPreparingPayment}
+              hasPurchasedTimeline={hasPurchasedTimeline}
+              purchasedTimelines={purchasedTimelines}
+              onNavigate={handleNavigateToTimeline}
             />
           </div>
         </div>
@@ -171,4 +207,4 @@ const ServicePage = () => {
   );
 };
 
-export default ServicePage;
+export default ServiceProfile;

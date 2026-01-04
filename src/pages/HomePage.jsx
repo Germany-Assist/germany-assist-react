@@ -3,17 +3,31 @@ import Hero from "../features/home/Hero";
 import ServiceGrid from "../features/home/ServiceGrid";
 import PartnerMarquee from "../components/ui/PartnerMarquee";
 import NavigationBar from "../components/ui/NavigationBar";
+
 const HomePage = () => {
   return (
-    <div className="min-h-screen bg-[#141414] selection:bg-accent selection:text-black">
+    <div className="min-h-screen bg-light-950 dark:bg-dark-950 transition-colors duration-700 ease-elegant selection:bg-accent/20">
       <NavigationBar />
       <main>
+        {/* Ensure Hero doesn't have its own bg-[#fff] or bg-white inside */}
         <Hero />
-        <PartnerMarquee />
-        <ServiceGrid />
+
+        {/* Marquee should be transparent or bg-light-900 */}
+        <div className="bg-light-900/50 dark:bg-white/5 border-y border-light-700 dark:border-white/5">
+          <PartnerMarquee />
+        </div>
+
+        <section className="py-20 px-6 max-w-7xl mx-auto">
+          <ServiceGrid />
+        </section>
       </main>
+
+      <footer className="py-12 border-t border-light-700 dark:border-white/5 text-center bg-light-900/30 dark:bg-transparent">
+        <p className="text-sm text-slate-500 dark:text-slate-400 font-light tracking-widest uppercase">
+          © 2026 Germany Assist
+        </p>
+      </footer>
     </div>
   );
 };
-
 export default HomePage;

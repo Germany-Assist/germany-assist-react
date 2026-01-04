@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import LOCAL_FALLBACK from "../../assets/placeholders/placeholder.png";
 import { useNavigate } from "react-router-dom";
 
 const ServiceCard = ({ data = {}, favorite, onFavoriteClick }) => {
   const [isFavorite, setIsFavorite] = useState(favorite);
   const navigation = useNavigate();
+  useEffect(() => {
+    setIsFavorite(favorite);
+  }, [favorite]);
   const {
     id = "---",
     serviceProvider = "Provider",
@@ -16,26 +19,27 @@ const ServiceCard = ({ data = {}, favorite, onFavoriteClick }) => {
     price = 0,
   } = data;
 
-  const handleFav = (e) => {
+  const handleFav = async (e) => {
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
-    if (onFavoriteClick) onFavoriteClick(id, !isFavorite);
+    if (onFavoriteClick) {
+      const resp = await onFavoriteClick();
+      if (resp) setIsFavorite(!isFavorite);
+    }
   };
 
   return (
     <div
       onClick={() => navigation(`/service/${id}`)}
       className="group relative w-full max-w-[340px] mx-auto h-full cursor-pointer isolate"
-      style={{ isolation: "isolate" }} // Prevents background bleed
     >
-      {/* GLOW LAYER: Positioned slightly behind to prevent corner overlap */}
-      <div className="absolute -inset-[1px] bg-gradient-to-r from-cyan-500/40 to-blue-500/40 rounded-[2.2rem] blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-[-1]" />
+      {/* GLOW LAYER: Subtle cyan glow that feels "expensive" */}
+      <div className="absolute -inset-[1px] bg-gradient-to-r from-accent/40 to-blue-500/20 rounded-[2.2rem] blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-[-1]" />
 
-      {/* MAIN CONTAINER */}
+      {/* MAIN CONTAINER: Swapped to light-800 / dark-800 */}
       <div
-        className="relative bg-[#161920] border border-white/10 rounded-[2.2rem] flex flex-col h-full shadow-xl transition-all duration-500 group-hover:-translate-y-2 overflow-hidden"
+        className="relative bg-light-800 dark:bg-dark-800 border border-light-700 dark:border-white/10 rounded-[2.2rem] flex flex-col h-full shadow-lg transition-all duration-500 ease-elegant group-hover:-translate-y-2 overflow-hidden"
         style={{
-          WebkitMaskImage: "-webkit-radial-gradient(white, black)", // Forces Safari to respect border radius
+          WebkitMaskImage: "-webkit-radial-gradient(white, black)",
           backfaceVisibility: "hidden",
           transform: "translateZ(0)",
         }}
@@ -53,7 +57,8 @@ const ServiceCard = ({ data = {}, favorite, onFavoriteClick }) => {
           />
 
           <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-            <span className="bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-lg border border-white/10 uppercase tracking-widest">
+            {/* Badge: Adapts transparency for mode */}
+            <span className="bg-black/40 dark:bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-lg border border-white/10 uppercase tracking-widest">
               {serviceProvider}
             </span>
 
@@ -62,7 +67,7 @@ const ServiceCard = ({ data = {}, favorite, onFavoriteClick }) => {
               className={`p-2 rounded-full backdrop-blur-md border transition-all duration-300 ${
                 isFavorite
                   ? "bg-red-500 border-red-500 text-white shadow-[0_0_15px_rgba(239,68,68,0.5)]"
-                  : "bg-black/40 border-white/10 text-white hover:bg-white hover:text-black"
+                  : "bg-black/20 dark:bg-black/40 border-white/20 text-white hover:bg-white hover:text-black"
               }`}
             >
               <svg
@@ -86,39 +91,41 @@ const ServiceCard = ({ data = {}, favorite, onFavoriteClick }) => {
         <div className="p-6 flex flex-col flex-grow">
           <div className="flex-grow">
             <div className="flex justify-between items-start mb-2">
-              <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors capitalize leading-tight">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-accent transition-colors capitalize leading-tight">
                 {title}
               </h3>
-              <span className="text-cyan-400 text-[10px] font-bold uppercase tracking-tighter">
+              <span className="text-accent text-[10px] font-bold uppercase tracking-tighter">
                 {level}
               </span>
             </div>
 
-            <p className="text-slate-400 text-sm leading-relaxed font-light line-clamp-4 break-words">
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed font-light line-clamp-4 break-words">
               {description}
             </p>
 
             <div className="flex gap-4 mt-4">
-              <span className="text-[10px] text-slate-500 font-mono">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono italic">
                 ID: {id}
               </span>
-              <span className="text-[10px] text-slate-500 font-mono">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
                 ⭐ {rating.toFixed(1)}
               </span>
             </div>
           </div>
 
-          <div className="mt-6 pt-5 border-t border-white/5 flex justify-between items-center">
+          {/* FOOTER AREA */}
+          <div className="mt-6 pt-5 border-t border-light-700 dark:border-white/5 flex justify-between items-center">
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
+              <p className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">
                 Price
               </p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-2xl font-black text-slate-900 dark:text-white">
                 €{(price || 0).toFixed(2)}
               </p>
             </div>
 
-            <button className="h-10 w-10 rounded-full bg-cyan-500 text-black flex items-center justify-center hover:bg-white transition-all">
+            {/* CTA Button: Darker in light mode, lighter in dark mode */}
+            <button className="h-10 w-10 rounded-full bg-slate-900 dark:bg-accent text-white dark:text-black flex items-center justify-center hover:scale-110 active:scale-90 transition-all shadow-lg shadow-accent/10">
               <svg
                 className="w-5 h-5"
                 fill="none"

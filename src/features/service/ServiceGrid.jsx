@@ -1,7 +1,10 @@
 import React from "react";
 import ServiceCard from "./ServiceCard";
+import { useProfile } from "../../contexts/ProfileContext";
 
-const ServiceGrid = ({ services, isSearching, favorites, toggleFavorite }) => {
+const ServiceGrid = ({ services, isSearching }) => {
+  const { isInFavorite, toggleFavorite, profile } = useProfile();
+
   if (services.length === 0) {
     return (
       <div className="text-center py-40 bg-white/5 rounded-[3rem] border border-white/5">
@@ -20,8 +23,14 @@ const ServiceGrid = ({ services, isSearching, favorites, toggleFavorite }) => {
         <ServiceCard
           key={service.id}
           data={service}
-          isFavorite={favorites?.includes(service.id)}
-          onFavoriteClick={() => toggleFavorite(service.id)}
+          favorite={isInFavorite(service.id)}
+          onFavoriteClick={() =>
+            toggleFavorite({
+              id: service.id,
+              title: service.title,
+              description: service.description,
+            })
+          }
         />
       ))}
     </div>

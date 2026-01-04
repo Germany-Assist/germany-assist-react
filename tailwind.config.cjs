@@ -1,19 +1,34 @@
 module.exports = {
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+  darkMode: "class", // Crucial for manual light/dark switching
   theme: {
     extend: {
       colors: {
+        // --- Dark Scheme (Midnight/Obsidian) ---
         dark: {
-          950: "#030303", // Deepest background
-          900: "#0a0a0a", // Section background
-          800: "#141414", // Card background
+          950: "#111111ff", // Deepest background
+          900: "#666666ff", // Section background
+          800: "#313131ff", // Card background
+          700: "#1f1f1f", // Borders / Hover states
         },
-        accent: "#22d3ee", // Electric Cyan
+        light: {
+          950: "#efeee5", // The Page Background (Matches across all pages)
+          900: "#e5e4da", // HUD/Section backgrounds
+          800: "#f5f4f0", // Card surfaces
+          700: "#d6d3c4", // Borders
+          text: "#1e293b", // Slate 800 for elegant readability
+        },
+        // --- Common Accents ---
+        accent: {
+          DEFAULT: "#22d3ee", // Electric Cyan (Dark Mode)
+          soft: "#0a8eccff", // Azure/Sky (Light Mode)
+        },
       },
       animation: {
         float: "floating 6s ease-in-out infinite",
         shimmer: "shimmer 2.5s linear infinite",
         marquee: "marquee 20s linear infinite",
+        "loading-bar": "loading-bar 1.5s infinite ease-in-out", // Added for HUD
       },
       keyframes: {
         marquee: {
@@ -28,6 +43,15 @@ module.exports = {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        "loading-bar": {
+          // Added for HUD
+          "0%": { width: "0%", left: "0%" },
+          "50%": { width: "100%", left: "0%" },
+          "100%": { width: "0%", left: "100%" },
+        },
+      },
+      transitionTimingFunction: {
+        elegant: "cubic-bezier(0.23, 1, 0.32, 1)", // For smooth HUD interactions
       },
     },
   },
