@@ -16,6 +16,8 @@ import {
 } from "react-icons/fi";
 import { PiUsersFourFill, PiUserSoundDuotone } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
+import { useProfile } from "../../contexts/ProfileContext";
+import ThemeSwitch from "../../components/ui/ThemeSwitch";
 
 export default function DashboardSideBar({
   navElements,
@@ -25,6 +27,7 @@ export default function DashboardSideBar({
   const { logOut } = useAuth();
   const navigate = useNavigate();
   const [expandedMenus, setExpandedMenus] = useState({});
+  const { profile } = useProfile();
 
   const toggleMenu = (label) => {
     setExpandedMenus((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -45,67 +48,88 @@ export default function DashboardSideBar({
   };
 
   return (
-    <div className="w-64 min-h-screen bg-gradient-to-b from-white to-gray-100 shadow-lg flex flex-col border-r">
-      <div className="p-6 flex flex-col items-center border-b border-gray-200">
-        <ProfileAvatar name={true} />
-        <span className="mt-3 text-[10px] uppercase tracking-wider font-bold text-gray-400">
-          Dashboard
+    <div className="w-72 min-h-screen bg-white dark:bg-dark-900 border-r border-light-700 dark:border-white/5 flex flex-col transition-colors duration-700 shadow-xl shadow-black/5">
+      {/* Sidebar Header */}
+      <div className="p-4 flex flex-col items-center border-b border-light-100 dark:border-white/5 bg-light-50/50 dark:bg-white/5">
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-accent rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+          <ProfileAvatar
+            navDir={"/"}
+            className={
+              "relative w-24 h-24 ring-4 ring-white dark:ring-dark-900 rounded-full"
+            }
+          />
+        </div>
+        <span className="mt-6 text-[10px] uppercase tracking-[0.3em] font-black text-blue-600 dark:text-accent">
+          {profile.role}
         </span>
+        <div className="mt-4 scale-90">
+          <ThemeSwitch />
+        </div>
       </div>
 
-      <nav className="flex-1 p-4 mt-4 space-y-1 overflow-y-auto">
+      {/* Navigation */}
+      <nav className="flex-1 p-6 space-y-2 overflow-y-auto custom-scrollbar">
         {navElements.map((item, index) => {
           const label = item.label;
           const hasChildren = item.children && item.children.length > 0;
           const isExpanded = expandedMenus[label];
+          const isActive = activeSection === label;
 
           return (
             <div key={index} className="space-y-1">
               <button
                 onClick={() => {
                   if (hasChildren) toggleMenu(label);
-                  setActiveSection(item); // Update the component in the main panel
+                  setActiveSection(item);
                 }}
-                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200
+                className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-300 group
                   ${
-                    activeSection === label
-                      ? "bg-blue-600 text-white shadow-md font-medium"
-                      : "text-gray-600 hover:bg-gray-200 hover:text-gray-900"
+                    isActive
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20 font-bold translate-x-1"
+                      : "text-slate-500 dark:text-slate-400 hover:bg-light-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
                   }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">{icons[label] || <FiGrid />}</span>
-                  <span className="text-sm">{label}</span>{" "}
-                  {/* FIX: item.label instead of item */}
+                  <span
+                    className={`text-xl transition-transform duration-300 ${
+                      isActive ? "scale-110" : "group-hover:scale-110"
+                    }`}
+                  >
+                    {icons[label] || <FiGrid />}
+                  </span>
+                  <span className="text-sm tracking-wide">{label}</span>
                 </div>
                 {hasChildren && (
-                  <span>
-                    {isExpanded ? (
-                      <FiChevronDown size={14} />
-                    ) : (
-                      <FiChevronRight size={14} />
-                    )}
+                  <span
+                    className={`${
+                      isExpanded ? "rotate-180" : ""
+                    } transition-transform duration-300`}
+                  >
+                    <FiChevronDown size={14} />
                   </span>
                 )}
               </button>
 
               {hasChildren && isExpanded && (
-                <div className="ml-6 pl-4 border-l-2 border-gray-200 space-y-1 mt-1">
+                <div className="ml-6 pl-4 border-l border-light-200 dark:border-white/10 space-y-1 mt-2 animate-in slide-in-from-left-2">
                   {item.children.map((child, childIdx) => (
                     <button
                       key={childIdx}
-                      onClick={() => setActiveSection(child)} // Sets the sub-component
-                      className={`w-full flex items-center gap-3 px-4 py-2 text-sm rounded-md transition-colors
+                      onClick={() => setActiveSection(child)}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-xs rounded-xl transition-all
                         ${
                           activeSection === child.label
-                            ? "text-blue-600 font-bold bg-blue-50"
-                            : "text-gray-500 hover:bg-gray-100"
+                            ? "text-blue-600 dark:text-accent font-black bg-blue-50 dark:bg-accent/5"
+                            : "text-slate-400 hover:text-slate-900 dark:hover:text-white"
                         }`}
                     >
-                      <span className="text-base">
-                        {icons[child.label] || null}
+                      <span>
+                        {icons[child.label] || (
+                          <div className="w-1 h-1 rounded-full bg-current" />
+                        )}
                       </span>
-                      {child.label} {/* FIX: child.label instead of child */}
+                      {child.label}
                     </button>
                   ))}
                 </div>
@@ -113,23 +137,27 @@ export default function DashboardSideBar({
             </div>
           );
         })}
-        <hr className="my-6 border-gray-200" />
 
-        <button
-          onClick={() => navigate("/")}
-          className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
-        >
-          <FiHome size={18} />
-          Main Home
-        </button>
+        <div className="pt-8 mt-4 border-t border-light-100 dark:border-white/5 space-y-2">
+          <button
+            onClick={() => navigate("/")}
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 hover:bg-light-100 dark:hover:bg-white/5 rounded-2xl transition-all"
+          >
+            <FiHome size={18} />
+            <span>Main Home</span>
+          </button>
 
-        <button
-          onClick={() => logOut(true)}
-          className="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-        >
-          <FiLogOut size={18} />
-          Log out
-        </button>
+          <button
+            onClick={() => logOut(true)}
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-500/10 rounded-2xl transition-all group"
+          >
+            <FiLogOut
+              size={18}
+              className="group-hover:translate-x-1 transition-transform"
+            />
+            <span>Log out</span>
+          </button>
+        </div>
       </nav>
     </div>
   );

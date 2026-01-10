@@ -14,15 +14,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   fetchServiceProfile,
   fetchPaymentIntentApi,
-} from "../../api/publicApis";
-import ImageGallery from "../../components/ui/ImageGallery";
-import BookingSidebar from "../../features/service/serviceProfile/BookingSidebar";
-import ReviewsSection from "../../features/service/serviceProfile/ReviewComponent";
-import NavigationBar from "../../components/ui/NavigationBar";
-import ShareSheet from "../../components/ui/ShareSheet";
-import PaymentModal from "../../components/ui/PaymentModal";
-import { useProfile } from "../../contexts/ProfileContext";
-import { fetchUserReviewForServiceApi } from "../../api/profile";
+} from "../../../api/publicApis";
+import ImageGallery from "../../../components/ui/ImageGallery";
+import BookingSidebar from "./BookingSidebar";
+import ReviewsSection from "./ReviewComponent";
+import NavigationBar from "../../../components/ui/NavigationBar";
+import ShareSheet from "../../../components/ui/ShareSheet";
+import PaymentModal from "../../../components/ui/PaymentModal";
+import { useProfile } from "../../../contexts/ProfileContext";
+import { fetchUserReviewForServiceApi } from "../../../api/profile";
 
 const ServiceProfile = ({ previewData = null }) => {
   const { serviceId } = useParams();
@@ -36,7 +36,7 @@ const ServiceProfile = ({ previewData = null }) => {
     isAlreadyPurchasedService,
     isAlreadyPurchasedTimeline,
   } = useProfile();
-
+  console.log(data);
   const [isFavorite, setIsFavorite] = useState(null);
   const [hasPurchasedService, setHasPurchasedService] = useState(null);
   const [hasPurchasedTimeline, setHasPurchasedTimeline] = useState(false);

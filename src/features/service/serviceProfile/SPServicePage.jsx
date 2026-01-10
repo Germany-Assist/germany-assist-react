@@ -14,8 +14,8 @@ import { useParams } from "react-router-dom";
 import ImageGallery from "../../components/imageGallery/ImageGallery";
 import BookingSidebar from "../../components/services/serviceProfile/BookingSidebar";
 import ReviewsSection from "../../components/services/serviceProfile/ReviewComponent";
-import { serviceProfilePageSP } from "../../api/serviceProviderApis";
-import { useAuth } from "../../contexts/AuthContext";
+import { serviceProfilePageSP } from "../../../api/serviceProviderApis";
+import { useAuth } from "../../../contexts/AuthContext";
 
 const SPServicePage = () => {
   const { serviceId } = useParams();

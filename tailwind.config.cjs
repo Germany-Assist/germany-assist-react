@@ -1,10 +1,9 @@
 module.exports = {
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
-  darkMode: "class", // Crucial for manual light/dark switching
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        // --- Dark Scheme (Midnight/Obsidian) ---
         dark: {
           950: "#111111ff", // Deepest background
           900: "#666666ff", // Section background

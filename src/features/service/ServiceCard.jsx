@@ -18,7 +18,6 @@ const ServiceCard = ({ data = {}, favorite, onFavoriteClick }) => {
     rating = 0,
     price = 0,
   } = data;
-
   const handleFav = async (e) => {
     e.stopPropagation();
     if (onFavoriteClick) {

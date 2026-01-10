@@ -2,27 +2,27 @@ import { Link, useLocation } from "react-router-dom";
 import { useProfile } from "../../contexts/ProfileContext";
 import ProfileAvatar from "./ProfileAvatar";
 import logo from "../../assets/brand/logo.png";
-import { useEffect, useState } from "react";
+import ThemeSwitch from "./ThemeSwitch";
 
 const NavigationBar = () => {
-  const location = useLocation();
   const { profile } = useProfile();
+  const location = useLocation();
 
-  const [isDark, setIsDark] = useState(() => {
-    return (
-      localStorage.getItem("theme") === "dark" || !("theme" in localStorage)
-    );
-  });
+  // const [isDark, setIsDark] = useState(() => {
+  //   return (
+  //     localStorage.getItem("theme") === "dark" || !("theme" in localStorage)
+  //   );
+  // });
 
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [isDark]);
+  // useEffect(() => {
+  //   if (isDark) {
+  //     document.documentElement.classList.add("dark");
+  //     localStorage.setItem("theme", "dark");
+  //   } else {
+  //     document.documentElement.classList.remove("dark");
+  //     localStorage.setItem("theme", "light");
+  //   }
+  // }, [isDark]);
 
   const isActivePath = (path) => {
     if (path === "/") return location.pathname === "/";
@@ -74,19 +74,15 @@ const NavigationBar = () => {
             {/* Right Side Actions */}
             <div className="flex items-center gap-3">
               {/* Elegant Integrated Theme Toggle */}
-              <button
-                onClick={() => setIsDark(!isDark)}
-                className="p-2.5 rounded-xl bg-light-900 dark:bg-white/5 border border-light-700 dark:border-white/10 text-lg hover:scale-105 active:scale-95 transition-all duration-300"
-                aria-label="Toggle Theme"
-              >
-                {isDark ? "🌙" : "☀️"}
-              </button>
-
+              <ThemeSwitch />
               <div className="h-6 w-[1px] bg-light-700 dark:bg-white/10 mx-1" />
 
               {/* Auth Section */}
               {profile ? (
-                <ProfileAvatar navDir={"/dashboard"} className={"max-w-10"} />
+                <ProfileAvatar
+                  navDir={"/dashboard"}
+                  className={"relative w-14 h-14 max-w-14"}
+                />
               ) : (
                 <Link to="/auth">
                   <button className="bg-accent text-black text-sm font-bold px-6 py-2 rounded-full transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-95">

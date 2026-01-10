@@ -16,6 +16,7 @@ import ServiceProviderPage from "./serviceProvider/ServiceProviderPage";
 import AdminProfile from "./admin/AdminProfile";
 import SPCreateService from "./serviceProvider/SPCreateService";
 import CreateNewSP from "./serviceProvider/components/CreateNewSP";
+import { FiMessageCircle } from "react-icons/fi";
 
 export default {
   //example
@@ -55,16 +56,20 @@ export default {
       label: "General",
       component: ClientGeneral,
     },
-    Services: {
-      label: "General",
+    Favorite: {
+      label: "Services",
       component: ClientServices,
     },
     Profile: {
-      label: "General",
+      label: "Profile",
       component: ClientProfile,
     },
     Orders: {
-      label: "General",
+      label: "Orders",
+      component: ClientOrders,
+    },
+    Messages: {
+      label: "Messages",
       component: ClientOrders,
     },
   },
