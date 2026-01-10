@@ -5,7 +5,7 @@ import adminApis from "../../../../api/adminApis";
 import { FcCheckmark } from "react-icons/fc";
 import { ImCross } from "react-icons/im";
 import serviceProviderApis from "../../../../api/serviceProviderApis";
-import ElegantButton from "../../../buttons/PremiumGlassButton";
+import ElegantButton from "../../../ui/PremiumGlassButton";
 import ServiceWizard from "../../../services/creation/ServiceWizard";
 
 export default function ServiceProviderServices() {

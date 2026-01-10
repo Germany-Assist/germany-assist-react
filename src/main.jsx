@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import { AuthProvider, useAuth } from "./contexts/AuthContext.jsx";
-import { ProfileProvider } from "./contexts/profileContext.jsx";
+import { ProfileProvider } from "./contexts/ProfileContext.jsx";
+import { MetaContextProvider } from "./contexts/MetadataContext.jsx";
 
 export const BootstrapGate = ({ children }) => {
   const { refreshAccessToken } = useAuth();
@@ -29,14 +30,16 @@ export const BootstrapGate = ({ children }) => {
 };
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <ProfileProvider>
-          <BootstrapGate>
-            <App />
-          </BootstrapGate>
-        </ProfileProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <MetaContextProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <ProfileProvider>
+            <BootstrapGate>
+              <App />
+            </BootstrapGate>
+          </ProfileProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </MetaContextProvider>
   </React.StrictMode>
 );
