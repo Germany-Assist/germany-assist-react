@@ -3,79 +3,69 @@ import WizardProgress from "./WizardProgress";
 import StepBasics from "./steps/StepBasics";
 import LivePreview from "./steps/LivePreview";
 import StepMedia from "./steps/StepMedia";
-import StepPricing from "./steps/StepPricing";
-import { ServiceProfileUI } from "./ServiceProfileUI";
+import StepTypeAndPricing from "./steps/StepTypeAndPricing";
 import { createNewService } from "../../../api/serviceProviderApis";
-import { fetchCategories } from "../../../api/publicApis";
 import CreationSuccess from "./CreationSuccess";
+import ServiceProfile from "../serviceProfile/ServiceProfile";
+import { useMeta } from "../../../contexts/MetadataContext";
 
 const ServiceWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [categories, setCategories] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false); // New: track loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [successServiceId, setSuccessServiceId] = useState(null);
-
-  useEffect(() => {
-    (async () => {
-      const cats = await fetchCategories();
-      setCategories(cats);
-    })();
-  }, []);
-
+  const { categories } = useMeta();
   const [formData, setFormData] = useState({
     title: "",
     category: "",
     price: 0,
     description: "",
     assets: [],
+    variants: [],
+    timelines: [],
   });
-
   const updateFormData = (newData) => {
     setFormData((prev) => ({ ...prev, ...newData }));
   };
-
   const nextStep = () => setCurrentStep((prev) => prev + 1);
   const prevStep = () => setCurrentStep((prev) => prev - 1);
-
   const handleSubmit = async () => {
     setIsSubmitting(true);
     const sendData = new FormData();
-
     sendData.append("title", formData.title);
-    sendData.append("category", formData.categoryTitle);
+    sendData.append("category", formData.category);
     sendData.append("description", formData.description);
-    sendData.append("price", formData.price);
     sendData.append("type", formData.type);
-
+    sendData.append("variants", JSON.stringify(formData.variants));
+    sendData.append("timelines", JSON.stringify(formData.timelines));
     formData.assets.forEach((asset) => {
       if (asset.file) {
         asset.file.key = asset.key;
         sendData.append("image", asset.file);
       }
     });
-
     try {
       const response = await createNewService(sendData);
       if (response.status == 201) {
-        // Handle success
-        setIsSubmitting(false); // Stop loading
+        setIsSubmitting(false);
         setSuccessServiceId(response.data.data.id);
         nextStep();
       }
     } catch (error) {
       console.error("Upload failed", error);
-      setIsSubmitting(false); // Stop loading
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-sans relative">
-      {/* Simple Loading Overlay - Only shows when submitting */}
+    // FIXED: Background colors to match ServiceProfile theme
+    <div className="min-h-screen bg-light-950 dark:bg-dark-950 flex flex-col font-sans relative transition-colors duration-700">
+      {/* FIXED: Loading Overlay colors */}
       {isSubmitting && (
-        <div className="fixed inset-0 bg-white/60 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-light-950/60 dark:bg-dark-950/60 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="flex flex-col items-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="mt-4 font-medium text-gray-700">
+            {/* Using accent color for loader */}
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+            <p className="mt-4 font-bold uppercase tracking-widest text-xs text-slate-600 dark:text-slate-400">
               Uploading your service...
             </p>
           </div>
@@ -83,7 +73,9 @@ const ServiceWizard = () => {
       )}
 
       <WizardProgress currentStep={currentStep} />
+
       <main className="flex-1 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 p-8 md:p-12">
+        {/* Left column: Step Forms */}
         <div className="flex flex-col justify-center">
           {currentStep === 1 && (
             <StepBasics
@@ -94,7 +86,7 @@ const ServiceWizard = () => {
             />
           )}
           {currentStep === 2 && (
-            <StepPricing
+            <StepTypeAndPricing
               data={formData}
               onUpdate={updateFormData}
               onNext={nextStep}
@@ -114,12 +106,15 @@ const ServiceWizard = () => {
           )}
         </div>
 
+        {/* Right column: Original Preview Component */}
         <div className="hidden lg:block">
           <LivePreview data={formData} categories={categories} />
         </div>
       </main>
-      <div className="hidden lg:block ">
-        <ServiceProfileUI data={formData} categories={categories} />
+
+      {/* Full Width Preview at Bottom (Kept as requested) */}
+      <div className="hidden lg:block border-t border-light-700 dark:border-white/5">
+        <ServiceProfile previewData={formData} />
       </div>
     </div>
   );

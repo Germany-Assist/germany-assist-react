@@ -68,7 +68,6 @@ export default function AdminServiceProvider() {
               {
                 label: "Delete",
                 danger: true,
-                onClick: () => console.log("Delete", row.id),
               },
             ]}
           />

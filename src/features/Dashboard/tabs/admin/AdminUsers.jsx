@@ -69,7 +69,6 @@ export default function AdminUsers() {
               {
                 label: "Delete",
                 danger: true,
-                onClick: () => console.log("Delete", row.id),
               },
             ]}
           />
