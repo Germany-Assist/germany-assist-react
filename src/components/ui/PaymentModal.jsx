@@ -11,7 +11,6 @@ import { STRIPE_KEY } from "../../config/api";
 
 const stripePromise = loadStripe(STRIPE_KEY);
 
-// 1. The Success View Component
 const SuccessScreen = ({ onClose }) => (
   <div className="flex flex-col items-center justify-center text-center py-10 animate-in zoom-in-95">
     <div className="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-6">

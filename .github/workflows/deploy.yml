@@ -27,7 +27,9 @@ jobs:
           VITE_NODE_ENV: ${{vars.VITE_NODE_ENV}}
           VITE_DROPLET_BACKEND_URL: ${{ vars.VITE_DROPLET_BACKEND_URL }}
           VITE_LOCAL_BACKEND_URL: ${{ vars.VITE_LOCAL_BACKEND_URL }}
-          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
+          VITE_STRIPE_SK: ${{ secrets.VITE_STRIPE_SK }}
+
         run: npm run build
 
       - name: Upload frontend to server
