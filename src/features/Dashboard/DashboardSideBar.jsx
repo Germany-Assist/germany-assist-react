@@ -28,7 +28,6 @@ export default function DashboardSideBar({
   const navigate = useNavigate();
   const [expandedMenus, setExpandedMenus] = useState({});
   const { profile } = useProfile();
-
   const toggleMenu = (label) => {
     setExpandedMenus((prev) => ({ ...prev, [label]: !prev[label] }));
   };

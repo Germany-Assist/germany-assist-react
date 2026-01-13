@@ -106,9 +106,11 @@ export const ProfileProvider = ({ children }) => {
   const isAlreadyPurchasedTimeline = (service) => {
     if (profile) {
       const exist = profile.orders?.filter((i) => {
-        return (
-          i.serviceId == service.id && i.timelineId == service.activeTimeline.id
-        );
+        if (i.type === "timeline")
+          return (
+            i.serviceId == service.id &&
+            i.timelineId == service.activeTimeline.id
+          );
       });
       if (exist) return exist.length > 0;
     } else {

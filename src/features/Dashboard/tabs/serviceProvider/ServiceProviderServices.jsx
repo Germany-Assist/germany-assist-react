@@ -95,7 +95,6 @@ export default function ServiceProviderServices() {
       setData({ columns, data: res });
     })();
   }, []);
-
   return (
     <div>
       <h1 className="text-3xl antialiased mb-4">Services</h1>

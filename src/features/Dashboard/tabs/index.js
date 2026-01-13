@@ -17,9 +17,11 @@ import AdminProfile from "./admin/AdminProfile";
 import SPCreateService from "./serviceProvider/SPCreateService";
 import CreateNewSP from "./serviceProvider/components/CreateNewSP";
 import { FiMessageCircle } from "react-icons/fi";
+import SPManageTimelines from "./serviceProvider/SPManageTimelines";
 
 export default {
   //example
+
   admin: {
     General: {
       label: "General",
@@ -50,7 +52,36 @@ export default {
       component: AdminProfile,
     },
   },
-
+  super_admin: {
+    General: {
+      label: "General",
+      component: AdminGeneral,
+    },
+    Users: {
+      label: "Users",
+      component: AdminUsers,
+      children: [{ label: "Create New Admin", component: AdminGeneral }],
+    },
+    Services: {
+      label: "Service",
+      component: AdminServices,
+    },
+    Orders: {
+      label: "Orders",
+      component: AdminOrders,
+    },
+    ServiceProvider: {
+      label: "Service Providers",
+      component: AdminServiceProviders,
+      children: [
+        { label: "Create New Service Provider", component: CreateNewSP },
+      ],
+    },
+    Profile: {
+      label: "Profile",
+      component: AdminProfile,
+    },
+  },
   client: {
     General: {
       label: "General",
@@ -81,7 +112,10 @@ export default {
     Services: {
       label: "Services",
       component: ServiceProviderServices,
-      children: [{ label: "Create New Service", component: SPCreateService }],
+      children: [
+        { label: "Create New Service", component: SPCreateService },
+        { label: "Manage Timelines", component: SPManageTimelines },
+      ],
     },
     Orders: {
       label: "Orders",

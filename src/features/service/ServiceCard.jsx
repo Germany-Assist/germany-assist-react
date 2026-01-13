@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import LOCAL_FALLBACK from "../../assets/placeholders/placeholder.png";
 import { useNavigate } from "react-router-dom";
 
-const ServiceCard = ({ data = {}, favorite, onFavoriteClick }) => {
+const ServiceCard = ({
+  data = {},
+  isDummy,
+  dummyProfileImage,
+  favorite,
+  onFavoriteClick,
+}) => {
   const [isFavorite, setIsFavorite] = useState(favorite);
   const navigation = useNavigate();
   useEffect(() => {
@@ -18,7 +24,9 @@ const ServiceCard = ({ data = {}, favorite, onFavoriteClick }) => {
     rating = 0,
     price = 0,
   } = data;
+
   const handleFav = async (e) => {
+    if (isDummy) return;
     e.stopPropagation();
     if (onFavoriteClick) {
       const resp = await onFavoriteClick();
@@ -28,7 +36,10 @@ const ServiceCard = ({ data = {}, favorite, onFavoriteClick }) => {
 
   return (
     <div
-      onClick={() => navigation(`/service/${id}`)}
+      onClick={() => {
+        if (isDummy) return;
+        navigation(`/service/${id}`);
+      }}
       className="group relative w-full max-w-[340px] mx-auto h-full cursor-pointer isolate"
     >
       {/* GLOW LAYER: Subtle cyan glow that feels "expensive" */}
@@ -46,7 +57,9 @@ const ServiceCard = ({ data = {}, favorite, onFavoriteClick }) => {
         {/* IMAGE SECTION */}
         <div className="h-48 w-full relative overflow-hidden">
           <img
-            src={image || LOCAL_FALLBACK}
+            src={
+              dummyProfileImage ? dummyProfileImage : image || LOCAL_FALLBACK
+            }
             alt={title}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             onError={(e) => {

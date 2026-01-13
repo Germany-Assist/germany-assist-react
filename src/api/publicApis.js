@@ -14,7 +14,9 @@ export const fetchServicesApi = async (query) => {
   const data = await api.get(`/service?${query.toString()}`);
   return data.data;
 };
-export const fetchPaymentIntentApi = async (id) => {
-  const data = await api.get(`/order/pay/${id.toString()}`);
+export const fetchPaymentIntentApi = async ({ serviceId, optionId, type }) => {
+  const data = await api.get(
+    `/order/pay?serviceId=${serviceId}&optionId=${optionId}&type=${type}`
+  );
   return data.data;
 };

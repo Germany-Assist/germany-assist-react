@@ -25,7 +25,6 @@ const TimelinePage = () => {
         ],
       };
       const data = await fetchTimelineApi(timelineId);
-      console.log(timelineId);
       setData(data ?? mockData);
       setLoading(false);
     };

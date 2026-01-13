@@ -90,7 +90,6 @@ export default function AdminServices() {
               {
                 label: "Delete",
                 danger: true,
-                onClick: () => console.log("Delete", row.id),
               },
             ]}
           />

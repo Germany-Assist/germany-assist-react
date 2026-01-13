@@ -56,8 +56,6 @@ function ReviewSidePanel({ isSidePanelOpen, setIsSidePanelOpen, serviceId }) {
                 key={review.id || idx}
                 className="border-b border-light-700 dark:border-white/5 pb-8 last:border-0"
               >
-                {console.log(review)}
-
                 <ReviewCard review={review} />
               </div>
             ))}

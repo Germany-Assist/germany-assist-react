@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     // Step 1: Basic Professional Info
-    profession: '',
-    degree: '',
-    yearsOfExperience: '',
-    currentSalary: '',
-    
+    profession: "",
+    degree: "",
+    yearsOfExperience: "",
+    currentSalary: "",
+
     // Step 2: German & Location
-    germanLevel: '',
-    currentLocation: '',
-    preferredGermanLocation: '',
-    arrivalTimeframe: '',
-    
+    germanLevel: "",
+    currentLocation: "",
+    preferredGermanLocation: "",
+    arrivalTimeframe: "",
+
     // Step 3: Support Areas
     supportAreas: [],
-    priorityArea: '',
-    
+    priorityArea: "",
+
     // Step 4: Additional Info
-    hasJobOffer: '',
-    companySize: '',
-    workType: '',
-    familyStatus: '',
-    additionalNotes: ''
+    hasJobOffer: "",
+    companySize: "",
+    workType: "",
+    familyStatus: "",
+    additionalNotes: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -35,43 +35,55 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
 
   // German proficiency levels
   const germanLevels = [
-    { value: 'none', label: 'No German (A0)' },
-    { value: 'a1', label: 'Basic (A1)' },
-    { value: 'a2', label: 'Elementary (A2)' },
-    { value: 'b1', label: 'Intermediate (B1)' },
-    { value: 'b2', label: 'Upper Intermediate (B2)' },
-    { value: 'c1', label: 'Advanced (C1)' },
-    { value: 'c2', label: 'Proficient (C2)' },
-    { value: 'native', label: 'Native Speaker' }
+    { value: "none", label: "No German (A0)" },
+    { value: "a1", label: "Basic (A1)" },
+    { value: "a2", label: "Elementary (A2)" },
+    { value: "b1", label: "Intermediate (B1)" },
+    { value: "b2", label: "Upper Intermediate (B2)" },
+    { value: "c1", label: "Advanced (C1)" },
+    { value: "c2", label: "Proficient (C2)" },
+    { value: "native", label: "Native Speaker" },
   ];
 
   // Support areas based on existing services
   const supportAreas = [
-    { value: 'visa-paperwork', label: 'Visa & Work Permits', icon: '📋' },
-    { value: 'translation', label: 'Document Translation', icon: '📝' },
-    { value: 'language-learning', label: 'German Language Learning', icon: '🗣️' },
-    { value: 'career-coaching', label: 'Career Coaching', icon: '💼' },
-    { value: 'housing', label: 'Housing & Accommodation', icon: '🏠' },
-    { value: 'banking-finance', label: 'Banking & Financial Setup', icon: '💰' },
-    { value: 'legal-advice', label: 'Legal Consultation', icon: '⚖️' },
-    { value: 'tax-setup', label: 'Tax Registration', icon: '📊' },
-    { value: 'networking', label: 'Professional Networking', icon: '🤝' },
-    { value: 'cultural-integration', label: 'Cultural Integration', icon: '🌍' }
+    { value: "visa-paperwork", label: "Visa & Work Permits", icon: "📋" },
+    { value: "translation", label: "Document Translation", icon: "📝" },
+    {
+      value: "language-learning",
+      label: "German Language Learning",
+      icon: "🗣️",
+    },
+    { value: "career-coaching", label: "Career Coaching", icon: "💼" },
+    { value: "housing", label: "Housing & Accommodation", icon: "🏠" },
+    {
+      value: "banking-finance",
+      label: "Banking & Financial Setup",
+      icon: "💰",
+    },
+    { value: "legal-advice", label: "Legal Consultation", icon: "⚖️" },
+    { value: "tax-setup", label: "Tax Registration", icon: "📊" },
+    { value: "networking", label: "Professional Networking", icon: "🤝" },
+    {
+      value: "cultural-integration",
+      label: "Cultural Integration",
+      icon: "🌍",
+    },
   ];
 
   const updateFormData = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
   const handleSupportAreaToggle = (area) => {
     const updatedAreas = formData.supportAreas.includes(area)
-      ? formData.supportAreas.filter(a => a !== area)
+      ? formData.supportAreas.filter((a) => a !== area)
       : [...formData.supportAreas, area];
-    updateFormData('supportAreas', updatedAreas);
+    updateFormData("supportAreas", updatedAreas);
   };
 
   const validateStep = (step) => {
@@ -79,22 +91,31 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
 
     switch (step) {
       case 1:
-        if (!formData.profession) newErrors.profession = 'Profession is required';
-        if (!formData.degree) newErrors.degree = 'Education level is required';
-        if (!formData.yearsOfExperience) newErrors.yearsOfExperience = 'Experience is required';
+        if (!formData.profession)
+          newErrors.profession = "Profession is required";
+        if (!formData.degree) newErrors.degree = "Education level is required";
+        if (!formData.yearsOfExperience)
+          newErrors.yearsOfExperience = "Experience is required";
         break;
       case 2:
-        if (!formData.germanLevel) newErrors.germanLevel = 'German level is required';
-        if (!formData.currentLocation) newErrors.currentLocation = 'Current location is required';
-        if (!formData.arrivalTimeframe) newErrors.arrivalTimeframe = 'Arrival timeframe is required';
+        if (!formData.germanLevel)
+          newErrors.germanLevel = "German level is required";
+        if (!formData.currentLocation)
+          newErrors.currentLocation = "Current location is required";
+        if (!formData.arrivalTimeframe)
+          newErrors.arrivalTimeframe = "Arrival timeframe is required";
         break;
       case 3:
-        if (formData.supportAreas.length === 0) newErrors.supportAreas = 'Select at least one support area';
-        if (!formData.priorityArea) newErrors.priorityArea = 'Priority area is required';
+        if (formData.supportAreas.length === 0)
+          newErrors.supportAreas = "Select at least one support area";
+        if (!formData.priorityArea)
+          newErrors.priorityArea = "Priority area is required";
         break;
       case 4:
-        if (!formData.hasJobOffer) newErrors.hasJobOffer = 'Job offer status is required';
-        if (!formData.workType) newErrors.workType = 'Work type preference is required';
+        if (!formData.hasJobOffer)
+          newErrors.hasJobOffer = "Job offer status is required";
+        if (!formData.workType)
+          newErrors.workType = "Work type preference is required";
         break;
       default:
         break;
@@ -106,19 +127,19 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, totalSteps));
+      setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
     }
   };
 
   const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
   const handleSubmit = async () => {
     if (!validateStep(currentStep)) return;
 
     setIsSubmitting(true);
-    
+
     try {
       // TODO: Replace with actual API call
       // const response = await fetch('/api/candidates/onboarding', {
@@ -128,16 +149,15 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
       // });
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      console.log('Onboarding data:', formData);
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       if (onComplete) {
         onComplete(formData);
       }
     } catch (error) {
-      console.error('Onboarding submission error:', error);
-      setErrors({ submit: 'Failed to save your information. Please try again.' });
+      console.error("Onboarding submission error:", error);
+      setErrors({
+        submit: "Failed to save your information. Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -146,27 +166,37 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Professional Background</h2>
-        <p className="text-gray-600">Tell us about your professional experience</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Professional Background
+        </h2>
+        <p className="text-gray-600">
+          Tell us about your professional experience
+        </p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">What is your profession?</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          What is your profession?
+        </label>
         <input
           type="text"
           value={formData.profession}
-          onChange={(e) => updateFormData('profession', e.target.value)}
+          onChange={(e) => updateFormData("profession", e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="e.g., Software Engineer, Marketing Manager, Data Scientist"
         />
-        {errors.profession && <p className="text-red-500 text-sm mt-1">{errors.profession}</p>}
+        {errors.profession && (
+          <p className="text-red-500 text-sm mt-1">{errors.profession}</p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Highest Education Level</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Highest Education Level
+        </label>
         <select
           value={formData.degree}
-          onChange={(e) => updateFormData('degree', e.target.value)}
+          onChange={(e) => updateFormData("degree", e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select your education level</option>
@@ -177,14 +207,18 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
           <option value="phd">PhD/Doctorate</option>
           <option value="other">Other/Professional Certification</option>
         </select>
-        {errors.degree && <p className="text-red-500 text-sm mt-1">{errors.degree}</p>}
+        {errors.degree && (
+          <p className="text-red-500 text-sm mt-1">{errors.degree}</p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Years of Professional Experience</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Years of Professional Experience
+        </label>
         <select
           value={formData.yearsOfExperience}
-          onChange={(e) => updateFormData('yearsOfExperience', e.target.value)}
+          onChange={(e) => updateFormData("yearsOfExperience", e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select experience level</option>
@@ -195,14 +229,20 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
           <option value="11-15">11-15 years</option>
           <option value="15+">15+ years (Senior)</option>
         </select>
-        {errors.yearsOfExperience && <p className="text-red-500 text-sm mt-1">{errors.yearsOfExperience}</p>}
+        {errors.yearsOfExperience && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.yearsOfExperience}
+          </p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Current Salary Range (Optional)</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Current Salary Range (Optional)
+        </label>
         <select
           value={formData.currentSalary}
-          onChange={(e) => updateFormData('currentSalary', e.target.value)}
+          onChange={(e) => updateFormData("currentSalary", e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Prefer not to say</option>
@@ -221,42 +261,60 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
   const renderStep2 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Location & Language</h2>
-        <p className="text-gray-600">Help us understand your location preferences and German skills</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Location & Language
+        </h2>
+        <p className="text-gray-600">
+          Help us understand your location preferences and German skills
+        </p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">German Language Level</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          German Language Level
+        </label>
         <select
           value={formData.germanLevel}
-          onChange={(e) => updateFormData('germanLevel', e.target.value)}
+          onChange={(e) => updateFormData("germanLevel", e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select your German level</option>
-          {germanLevels.map(level => (
-            <option key={level.value} value={level.value}>{level.label}</option>
+          {germanLevels.map((level) => (
+            <option key={level.value} value={level.value}>
+              {level.label}
+            </option>
           ))}
         </select>
-        {errors.germanLevel && <p className="text-red-500 text-sm mt-1">{errors.germanLevel}</p>}
+        {errors.germanLevel && (
+          <p className="text-red-500 text-sm mt-1">{errors.germanLevel}</p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Current Location</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Current Location
+        </label>
         <input
           type="text"
           value={formData.currentLocation}
-          onChange={(e) => updateFormData('currentLocation', e.target.value)}
+          onChange={(e) => updateFormData("currentLocation", e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="e.g., London, UK or São Paulo, Brazil"
         />
-        {errors.currentLocation && <p className="text-red-500 text-sm mt-1">{errors.currentLocation}</p>}
+        {errors.currentLocation && (
+          <p className="text-red-500 text-sm mt-1">{errors.currentLocation}</p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Preferred German Location (Optional)</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Preferred German Location (Optional)
+        </label>
         <select
           value={formData.preferredGermanLocation}
-          onChange={(e) => updateFormData('preferredGermanLocation', e.target.value)}
+          onChange={(e) =>
+            updateFormData("preferredGermanLocation", e.target.value)
+          }
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">No preference</option>
@@ -272,10 +330,12 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">When could you arrive in Germany if you get a job opportunity?</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          When could you arrive in Germany if you get a job opportunity?
+        </label>
         <select
           value={formData.arrivalTimeframe}
-          onChange={(e) => updateFormData('arrivalTimeframe', e.target.value)}
+          onChange={(e) => updateFormData("arrivalTimeframe", e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select timeframe</option>
@@ -286,7 +346,9 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
           <option value="6-12-months">6-12 months</option>
           <option value="flexible">Flexible / depends on visa process</option>
         </select>
-        {errors.arrivalTimeframe && <p className="text-red-500 text-sm mt-1">{errors.arrivalTimeframe}</p>}
+        {errors.arrivalTimeframe && (
+          <p className="text-red-500 text-sm mt-1">{errors.arrivalTimeframe}</p>
+        )}
       </div>
     </div>
   );
@@ -295,21 +357,25 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Support Areas</h2>
-        <p className="text-gray-600">What areas do you need the most help with?</p>
+        <p className="text-gray-600">
+          What areas do you need the most help with?
+        </p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-4">Select all areas where you need support:</label>
+        <label className="block text-sm font-medium text-gray-700 mb-4">
+          Select all areas where you need support:
+        </label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {supportAreas.map(area => (
+          {supportAreas.map((area) => (
             <button
               key={area.value}
               type="button"
               onClick={() => handleSupportAreaToggle(area.value)}
               className={`p-4 border rounded-lg text-left transition-all duration-200 ${
                 formData.supportAreas.includes(area.value)
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-300 hover:border-gray-400'
+                  ? "border-blue-500 bg-blue-50 text-blue-700"
+                  : "border-gray-300 hover:border-gray-400"
               }`}
             >
               <div className="flex items-center">
@@ -319,22 +385,30 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
             </button>
           ))}
         </div>
-        {errors.supportAreas && <p className="text-red-500 text-sm mt-1">{errors.supportAreas}</p>}
+        {errors.supportAreas && (
+          <p className="text-red-500 text-sm mt-1">{errors.supportAreas}</p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">What is your top priority?</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          What is your top priority?
+        </label>
         <select
           value={formData.priorityArea}
-          onChange={(e) => updateFormData('priorityArea', e.target.value)}
+          onChange={(e) => updateFormData("priorityArea", e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select your top priority</option>
-          {supportAreas.map(area => (
-            <option key={area.value} value={area.value}>{area.label}</option>
+          {supportAreas.map((area) => (
+            <option key={area.value} value={area.value}>
+              {area.label}
+            </option>
           ))}
         </select>
-        {errors.priorityArea && <p className="text-red-500 text-sm mt-1">{errors.priorityArea}</p>}
+        {errors.priorityArea && (
+          <p className="text-red-500 text-sm mt-1">{errors.priorityArea}</p>
+        )}
       </div>
     </div>
   );
@@ -342,40 +416,50 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
   const renderStep4 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Additional Information</h2>
-        <p className="text-gray-600">A few more details to help us serve you better</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Additional Information
+        </h2>
+        <p className="text-gray-600">
+          A few more details to help us serve you better
+        </p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Do you currently have a job offer from a German company?</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Do you currently have a job offer from a German company?
+        </label>
         <div className="space-y-2">
           {[
-            { value: 'yes', label: 'Yes, I have a confirmed offer' },
-            { value: 'pending', label: 'I have offers under consideration' },
-            { value: 'applying', label: 'I am actively applying' },
-            { value: 'no', label: 'No, I am just exploring' }
-          ].map(option => (
+            { value: "yes", label: "Yes, I have a confirmed offer" },
+            { value: "pending", label: "I have offers under consideration" },
+            { value: "applying", label: "I am actively applying" },
+            { value: "no", label: "No, I am just exploring" },
+          ].map((option) => (
             <label key={option.value} className="flex items-center">
               <input
                 type="radio"
                 name="hasJobOffer"
                 value={option.value}
                 checked={formData.hasJobOffer === option.value}
-                onChange={(e) => updateFormData('hasJobOffer', e.target.value)}
+                onChange={(e) => updateFormData("hasJobOffer", e.target.value)}
                 className="mr-3"
               />
               <span>{option.label}</span>
             </label>
           ))}
         </div>
-        {errors.hasJobOffer && <p className="text-red-500 text-sm mt-1">{errors.hasJobOffer}</p>}
+        {errors.hasJobOffer && (
+          <p className="text-red-500 text-sm mt-1">{errors.hasJobOffer}</p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Company Size</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Preferred Company Size
+        </label>
         <select
           value={formData.companySize}
-          onChange={(e) => updateFormData('companySize', e.target.value)}
+          onChange={(e) => updateFormData("companySize", e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">No preference</option>
@@ -387,10 +471,12 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Work Type Preference</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Work Type Preference
+        </label>
         <select
           value={formData.workType}
-          onChange={(e) => updateFormData('workType', e.target.value)}
+          onChange={(e) => updateFormData("workType", e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Select work type</option>
@@ -399,14 +485,18 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
           <option value="hybrid">Hybrid</option>
           <option value="flexible">Flexible</option>
         </select>
-        {errors.workType && <p className="text-red-500 text-sm mt-1">{errors.workType}</p>}
+        {errors.workType && (
+          <p className="text-red-500 text-sm mt-1">{errors.workType}</p>
+        )}
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Family Status</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Family Status
+        </label>
         <select
           value={formData.familyStatus}
-          onChange={(e) => updateFormData('familyStatus', e.target.value)}
+          onChange={(e) => updateFormData("familyStatus", e.target.value)}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">Prefer not to say</option>
@@ -417,10 +507,12 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Additional Notes (Optional)</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Additional Notes (Optional)
+        </label>
         <textarea
           value={formData.additionalNotes}
-          onChange={(e) => updateFormData('additionalNotes', e.target.value)}
+          onChange={(e) => updateFormData("additionalNotes", e.target.value)}
           rows={4}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Any additional information you'd like to share..."
@@ -431,11 +523,16 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case 1: return renderStep1();
-      case 2: return renderStep2();
-      case 3: return renderStep3();
-      case 4: return renderStep4();
-      default: return null;
+      case 1:
+        return renderStep1();
+      case 2:
+        return renderStep2();
+      case 3:
+        return renderStep3();
+      case 4:
+        return renderStep4();
+      default:
+        return null;
     }
   };
 
@@ -447,28 +544,51 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
           <div className="text-center mb-8">
             <Link to="/" className="flex items-center justify-center mb-6">
               <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl mr-3">
-                <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg
+                  className="h-8 w-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
               </div>
               <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Germany-Assist
               </div>
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Candidate Profile Setup</h1>
-            <p className="text-gray-600">Help us understand your background and goals</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Candidate Profile Setup
+            </h1>
+            <p className="text-gray-600">
+              Help us understand your background and goals
+            </p>
           </div>
         )}
 
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Step {currentStep} of {totalSteps}</span>
-            <span className="text-sm text-gray-500">{Math.round((currentStep / totalSteps) * 100)}% Complete</span>
+            <span className="text-sm font-medium text-gray-700">
+              Step {currentStep} of {totalSteps}
+            </span>
+            <span className="text-sm text-gray-500">
+              {Math.round((currentStep / totalSteps) * 100)}% Complete
+            </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
+            <div
               className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${(currentStep / totalSteps) * 100}%` }}
             />
@@ -514,7 +634,7 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
                     Saving Profile...
                   </div>
                 ) : (
-                  'Complete Profile'
+                  "Complete Profile"
                 )}
               </button>
             )}
@@ -524,10 +644,7 @@ const CandidateOnboarding = ({ onComplete, isStandalone = false }) => {
         {/* Skip Option for Testing */}
         {isStandalone && (
           <div className="text-center mt-6">
-            <Link 
-              to="/"
-              className="text-gray-500 hover:text-gray-700 text-sm"
-            >
+            <Link to="/" className="text-gray-500 hover:text-gray-700 text-sm">
               Skip for now and explore the platform
             </Link>
           </div>

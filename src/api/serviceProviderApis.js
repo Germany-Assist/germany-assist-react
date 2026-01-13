@@ -22,6 +22,18 @@ export const serviceProfilePageSP = async (serviceId) => {
   const res = await api.get(`/service/provider/services/${serviceId}`);
   return res.data;
 };
+export const serviceProviderCheckout = async (orderId) => {
+  const res = await api.get(`/order/serviceProvider/checkout/${orderId}`);
+  return res.data;
+};
+export const serviceProviderCloseOrder = async (orderId) => {
+  const res = await api.get(`/order/serviceProvider/close/${orderId}`);
+  return res.data;
+};
+export const serviceProviderGetAllOrders = async () => {
+  const res = await api.get(`/order/serviceProvider/getAll`);
+  return res.data;
+};
 const serviceProviderApis = {
   publishService,
   unpublishService,
