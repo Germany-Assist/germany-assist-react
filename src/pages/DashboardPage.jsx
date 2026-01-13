@@ -36,7 +36,7 @@ export default function DashboardPage() {
         {/* Decorative background element for premium feel */}
         <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-blue-600/5 blur-[120px] rounded-full pointer-events-none" />
 
-        <main className="p-8 relative z-10 max-w-[1600px] mx-auto">
+        <main className=" relative z-10  mx-auto">
           {Component ? (
             <div className="animate-in fade-in zoom-in-95 duration-500">
               <Component />

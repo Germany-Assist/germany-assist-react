@@ -13,13 +13,11 @@ import ShareSheet from "../../../components/ui/ShareSheet";
 import PaymentModal from "../../../components/ui/PaymentModal";
 import { useProfile } from "../../../contexts/ProfileContext";
 import { fetchUserReviewForServiceApi } from "../../../api/profile";
-import { useMeta } from "../../../contexts/MetadataContext";
 
 const ServiceProfile = ({ previewData = null }) => {
   const { serviceId } = useParams();
   const navigate = useNavigate();
-  const { categories } = useMeta();
-  // 1. Initialize data with previewData or null
+
   const [data, setData] = useState(previewData);
   const [loading, setLoading] = useState(!previewData);
 
@@ -34,16 +32,17 @@ const ServiceProfile = ({ previewData = null }) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [hasPurchasedService, setHasPurchasedService] = useState(false);
   const [hasPurchasedTimeline, setHasPurchasedTimeline] = useState(false);
-  const [purchasedTimelines, setPurchasedTimelines] = useState([]);
+  const [purchasedItems, setPurchasedItems] = useState([]);
   const [hasReview, setHasReview] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
   const [paymentConfig, setPaymentConfig] = useState({
     isOpen: false,
     clientSecret: "",
+    amount: 0,
   });
 
-  // 2. Load Data Effect: Bypassed if previewData exists
+  /* -------------------- Load Service -------------------- */
   useEffect(() => {
     if (previewData) {
       setData(previewData);
@@ -61,45 +60,50 @@ const ServiceProfile = ({ previewData = null }) => {
         setLoading(false);
       }
     };
+
     loadData();
   }, [serviceId, previewData]);
 
-  // 3. Status Check Effect: Bypassed if previewData exists
+  /* -------------------- Status Checks -------------------- */
   useEffect(() => {
-    if (previewData || !data) {
-      // Set default visual states for preview mode
-      setIsFavorite(false);
-      setHasPurchasedService(false);
-      return;
-    }
+    if (previewData || !data) return;
 
-    setIsFavorite(isInFavorite(serviceId));
+    setIsFavorite(isInFavorite(data.id));
+
+    // Check purchase status from context
     const ps = isAlreadyPurchasedService(data);
     setHasPurchasedService(ps);
     setHasPurchasedTimeline(Boolean(isAlreadyPurchasedTimeline(data)));
 
     if (ps) {
-      setPurchasedTimelines(ps);
+      setPurchasedItems(ps);
       (async () => {
-        const review = await fetchUserReviewForServiceApi(serviceId);
+        const review = await fetchUserReviewForServiceApi(data.id);
         setHasReview(review);
       })();
     }
-  }, [profile, data, previewData, serviceId]);
+  }, [profile, data, previewData]);
 
-  const handleInitiatePayment = async () => {
-    if (previewData) return; // Disable actual payments in preview
+  /* -------------------- Payments -------------------- */
+  const handleInitiatePayment = async (selectedOption) => {
+    if (previewData || !selectedOption) return;
     setIsPreparingPayment(true);
     try {
-      const res = await fetchPaymentIntentApi(data.id || serviceId);
+      const res = await fetchPaymentIntentApi({
+        serviceId: data.id,
+        optionId: selectedOption.id,
+        type: data.type,
+      });
+
       if (res) {
         setPaymentConfig({
           isOpen: true,
           clientSecret: res.message.clientSecret,
+          amount: selectedOption.price,
         });
       }
     } catch (err) {
-      console.error("Payment initialization failed", err);
+      console.error("Payment failed to initialize", err);
     } finally {
       setIsPreparingPayment(false);
     }
@@ -110,22 +114,37 @@ const ServiceProfile = ({ previewData = null }) => {
     navigate(`/timeline/${tid}`);
   };
 
-  if (loading || !data)
+  if (loading || !data) {
     return (
       <div className="min-h-screen bg-light-950 dark:bg-dark-950 flex items-center justify-center">
-        <Loader2 className="animate-spin text-accent" />
+        <Loader2 className="animate-spin text-accent" size={32} />
       </div>
     );
+  }
+
+  /* -------------------- Asset & Option Normalization -------------------- */
+  const galleryAssets =
+    data.assets?.length > 0
+      ? data.assets
+      : [
+          {
+            url: "https://via.placeholder.com/1200x600?text=No+Media",
+            mediaType: "image",
+          },
+        ];
+
+  // Pick the correct options array based on the service type
+  const options =
+    data.type === "oneTime" ? data.variants || [] : data.timelines || [];
 
   return (
-    <div className="min-h-screen bg-light-950 dark:bg-dark-950 text-slate-900 dark:text-slate-100 transition-colors duration-700 pb-20 relative">
-      {/* Hide Global Nav in Preview */}
+    <div className="min-h-screen bg-light-950 dark:bg-dark-950 text-slate-900 dark:text-slate-100 pb-20 relative transition-colors duration-500">
       {!previewData && <NavigationBar />}
 
       <ShareSheet
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
-        url={previewData ? "#" : window.location.href}
+        url={window.location.href}
         title={data.title}
       />
 
@@ -133,36 +152,35 @@ const ServiceProfile = ({ previewData = null }) => {
         isOpen={paymentConfig.isOpen}
         onClose={() => setPaymentConfig((p) => ({ ...p, isOpen: false }))}
         clientSecret={paymentConfig.clientSecret}
-        amount={data.price}
+        amount={paymentConfig.amount}
       />
 
-      {/* Sub-Nav Bar */}
-      <nav className="border-b border-light-700 dark:border-white/5 bg-light-900/50 dark:bg-black/10 backdrop-blur-md sticky top-0 ">
-        <div className="  max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className=" flex items-center space-x-3 text-sm text-slate-500 dark:text-slate-400">
+      {/* Breadcrumb Header */}
+      <nav className="border-b border-light-700 dark:border-white/5 bg-light-900/50 dark:bg-black/20 backdrop-blur-md sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-3 text-sm">
             <span
-              className="hover:text-accent cursor-pointer"
-              onClick={() => !previewData && navigate("/services")}
+              className="text-slate-400 hover:text-accent cursor-pointer transition-colors"
+              onClick={() => navigate("/services")}
             >
               Services
             </span>
-            <ChevronRight size={14} className="opacity-50" />
-            <span className="text-slate-900 hover:text-accent dark:text-white font-medium capitalize cursor-pointer">
-              {data.category
-                ? categories.find((i) => i.id === data.category).title
-                : "Category"}
+            <ChevronRight size={14} className="text-slate-600" />
+            <span className="text-slate-900 dark:text-white font-bold tracking-tight">
+              {data.category?.label || "General"}
             </span>
           </div>
+
           <div className="flex items-center space-x-6">
             <button
               onClick={() => setIsShareOpen(true)}
-              className="flex items-center text-xs font-bold uppercase tracking-widest hover:text-accent transition-all active:scale-95"
+              className="flex items-center text-[10px] font-black uppercase tracking-widest hover:text-accent transition-all"
             >
               <Share2 size={16} className="mr-2" /> Share
             </button>
             <button
               onClick={() => !previewData && toggleFavorite(data)}
-              className="flex items-center text-xs font-bold uppercase tracking-widest hover:text-red-500 transition-all active:scale-95"
+              className="flex items-center text-[10px] font-black uppercase tracking-widest hover:text-red-500 transition-all"
             >
               <Heart
                 size={16}
@@ -177,60 +195,67 @@ const ServiceProfile = ({ previewData = null }) => {
       </nav>
 
       <main className="max-w-7xl mx-auto px-6 py-12">
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white capitalize mb-6">
-          {data.title || "Untitled Service"}
-        </h1>
-
-        <div className="rounded-[2.5rem] overflow-hidden shadow-2xl border border-light-700 dark:border-white/5 mb-16">
-          {/* Ensure ImageGallery doesn't crash on empty assets */}
-          <ImageGallery
-            assets={
-              data.assets?.length > 0
-                ? data.assets
-                : [
-                    "https://via.placeholder.com/1200x600?text=No+Image+Provided",
-                  ]
-            }
-          />
+        {/* Title & Provider */}
+        <div className="mb-10">
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter capitalize mb-4">
+            {data.title}
+          </h1>
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center text-accent font-bold text-xs">
+              {data.serviceProvider?.name?.charAt(0)}
+            </div>
+            <span className="text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-[0.2em]">
+              By{" "}
+              <span className="text-slate-900 dark:text-white">
+                {data.serviceProvider?.name}
+              </span>
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
-          <div className="lg:col-span-2 space-y-12">
-            <div className="pt-4">
-              <h3 className="text-2xl font-bold mb-6 italic">
-                About this service
-              </h3>
-              <p className="text-slate-600 dark:text-slate-400 leading-[2.2rem] text-lg whitespace-pre-line font-light break-words">
-                {data.description || "No description provided yet."}
-              </p>
-            </div>
+        {/* Media Section */}
+        <div className="rounded-[3rem] overflow-hidden shadow-2xl border border-light-700 dark:border-white/5 mb-16 aspect-video lg:aspect-auto">
+          <ImageGallery assets={galleryAssets} />
+        </div>
 
-            {/* Reviews disabled in preview or uses dummy list */}
-            <ReviewsSection
-              reviews={data.reviews || []}
-              totalReviews={data.totalReviews || 0}
-              rating={data.rating || 0}
-              serviceId={serviceId}
-              existingReview={hasReview}
-              canReview={hasPurchasedService}
-            />
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+          <div className="lg:col-span-2 space-y-16">
+            <section>
+              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-accent mb-8">
+                The Experience
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 text-xl md:text-2xl font-light leading-relaxed whitespace-pre-line break-words">
+                {data.description}
+              </p>
+            </section>
+
+            <section className="pt-10 border-t border-light-700 dark:border-white/5">
+              <ReviewsSection
+                reviews={data.reviews || []}
+                totalReviews={data.totalReviews || 0}
+                rating={data.rating || 0}
+                serviceId={data.id}
+                existingReview={hasReview}
+                canReview={hasPurchasedService}
+              />
+            </section>
           </div>
 
-          <div className="lg:col-span-1">
+          {/* Sticky Sidebar */}
+          <aside className="lg:col-span-1">
             <BookingSidebar
-              price={data.price || 0}
-              rating={data.rating || 0}
+              serviceType={data.type}
+              options={options}
+              purchasedItems={purchasedItems}
               category={data.category}
-              providerEmail={
-                data.ServiceProvider?.email || "provider@example.com"
-              }
+              rating={data.rating}
+              providerEmail={data.serviceProvider?.name}
               onBuy={handleInitiatePayment}
               isProcessing={isPreparingPayment}
-              hasPurchasedTimeline={hasPurchasedTimeline}
-              purchasedTimelines={purchasedTimelines}
               onNavigate={handleNavigateToTimeline}
             />
-          </div>
+          </aside>
         </div>
       </main>
     </div>

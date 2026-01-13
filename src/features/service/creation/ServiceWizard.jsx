@@ -37,10 +37,10 @@ const ServiceWizard = () => {
     sendData.append("type", formData.type);
     sendData.append("variants", JSON.stringify(formData.variants));
     sendData.append("timelines", JSON.stringify(formData.timelines));
-    formData.assets.forEach((asset) => {
+    formData.assets.forEach((asset, index) => {
       if (asset.file) {
-        asset.file.key = asset.key;
-        sendData.append("image", asset.file);
+        sendData.append("images", asset.file);
+        sendData.append(`imageKeys[${index}]`, asset.key);
       }
     });
     try {
@@ -48,7 +48,7 @@ const ServiceWizard = () => {
       if (response.status == 201) {
         setIsSubmitting(false);
         setSuccessServiceId(response.data.data.id);
-        nextStep();
+        // nextStep();
       }
     } catch (error) {
       console.error("Upload failed", error);
