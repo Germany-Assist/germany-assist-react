@@ -16,9 +16,9 @@
 
 /* Global body style to ensure the dark theme looks right */
 body {
-  @apply bg-[#050505] text-white;
+  @apply bg-light-950 dark:bg-dark-950 text-light-text dark:text-white custom-scrollbar;
+  overflow-x: hidden;
 }
-
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

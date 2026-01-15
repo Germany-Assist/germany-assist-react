@@ -6,30 +6,11 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { ShieldCheck, Lock, X, CheckCircle2, ArrowRight } from "lucide-react";
-import { STRIPE_KEY } from "../../config/api";
+import { ShieldCheck, Lock, X } from "lucide-react";
+import { STRIPE_KEY } from "../../../config/api";
+import StatusModal from "../StatusModal";
 
 const stripePromise = loadStripe(STRIPE_KEY);
-
-const SuccessScreen = ({ onClose }) => (
-  <div className="flex flex-col items-center justify-center text-center py-10 animate-in zoom-in-95">
-    <div className="w-20 h-20 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center mb-6">
-      <CheckCircle2 size={48} className="animate-bounce" />
-    </div>
-    <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-2">
-      Payment Received!
-    </h3>
-    <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-[240px]">
-      Your booking is confirmed. You can now access your session details.
-    </p>
-    <button
-      onClick={onClose}
-      className="flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-black px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:opacity-90 transition-all active:scale-95"
-    >
-      Go to Dashboard <ArrowRight size={16} />
-    </button>
-  </div>
-);
 
 // 2. The Checkout Form logic
 const CheckoutForm = ({ clientSecret, onPaymentSuccess, amount }) => {
@@ -102,7 +83,6 @@ const CheckoutForm = ({ clientSecret, onPaymentSuccess, amount }) => {
 const PaymentModal = ({ isOpen, onClose, clientSecret, amount }) => {
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Reset success state when modal closes
   const handleClose = () => {
     onClose();
     setTimeout(() => setIsSuccess(false), 500);
@@ -150,7 +130,12 @@ const PaymentModal = ({ isOpen, onClose, clientSecret, amount }) => {
           </>
         ) : (
           <div className="p-10">
-            <SuccessScreen onClose={handleClose} />
+            <StatusModal
+              isOpen={isSuccess}
+              onClose={handleClose}
+              type={"success"}
+              message="Congratulations Your Payment was received and your booking is confirmed."
+            />
           </div>
         )}
       </div>

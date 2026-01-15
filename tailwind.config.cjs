@@ -30,6 +30,10 @@ module.exports = {
         "loading-bar": "loading-bar 1.5s infinite ease-in-out", // Added for HUD
       },
       keyframes: {
+        scan: {
+          "0%": { transform: "translateY(-100%)" },
+          "100%": { transform: "translateY(200%)" },
+        },
         marquee: {
           "0%": { transform: "translateX(0%)" },
           "100%": { transform: "translateX(-100%)" },

@@ -9,10 +9,8 @@ const HomePage = () => {
     <div className="min-h-screen bg-light-950 dark:bg-dark-950 transition-colors duration-700 ease-elegant selection:bg-accent/20">
       <NavigationBar />
       <main>
-        {/* Ensure Hero doesn't have its own bg-[#fff] or bg-white inside */}
         <Hero />
 
-        {/* Marquee should be transparent or bg-light-900 */}
         <div className="bg-light-900/50 dark:bg-white/5 border-y border-light-700 dark:border-white/5">
           <PartnerMarquee />
         </div>
