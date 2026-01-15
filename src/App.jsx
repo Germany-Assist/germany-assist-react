@@ -9,6 +9,7 @@ import ServicesPage from "./pages/ServicesPage.jsx";
 import TimelinePage from "./pages/TimelinePage.jsx";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
+import JobsPage from "./pages/JobsPage.jsx";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/jobs" element={<JobsPage />} />
         <Route path="/auth" element={<AuthPortal />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/services" element={<ServicesPage />} />

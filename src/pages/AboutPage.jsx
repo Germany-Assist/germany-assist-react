@@ -4,12 +4,7 @@ import NavigationBar from "../components/ui/NavigationBar";
 import MaintenancePage from "./MaintenancePage";
 
 const AboutPage = () => {
-  return (
-    <>
-      <MaintenancePage />
-      {/* Hero Section */}
-    </>
-  );
+  return <MaintenancePage />;
 };
 
 export default AboutPage;
