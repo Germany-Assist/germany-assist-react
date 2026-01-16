@@ -117,6 +117,7 @@ export const AuthProvider = ({ children }) => {
     setUser(user);
     setAccessToken(accessToken);
     scheduleRefresh(accessToken);
+    navigate("/");
     return { user, accessToken };
   };
 

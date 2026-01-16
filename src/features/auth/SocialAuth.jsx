@@ -11,7 +11,7 @@ const SocialAuth = ({ mode }) => (
       </div>
     </div>
     <div className="grid grid-cols-2 gap-3">
-      <GoogleLoginButton />
+      <GoogleLoginButton nav={"/"} />
       <button
         type="button"
         className="flex items-center justify-center gap-2 py-3 border border-white/10 rounded-xl hover:bg-white/5 transition-all"

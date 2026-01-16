@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { GOOGLE_CLIENT_ID } from "../../config/api";
 
-export default function GoogleLoginButton() {
+export default function GoogleLoginButton({ nav }) {
   const { googleLogin } = useAuth();
 
   // Called when Google returns the ID token
