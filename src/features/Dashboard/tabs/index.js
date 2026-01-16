@@ -20,8 +20,6 @@ import { FiMessageCircle } from "react-icons/fi";
 import SPManageTimelines from "./serviceProvider/SPManageTimelines";
 
 export default {
-  //example
-
   admin: {
     General: {
       label: "General",
@@ -117,8 +115,8 @@ export default {
         { label: "Manage Timelines", component: SPManageTimelines },
       ],
     },
-    Orders: {
-      label: "Orders",
+    Finance: {
+      label: "Finance",
       component: ServiceProviderOrders,
     },
     Page: {
