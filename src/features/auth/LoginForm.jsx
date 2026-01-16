@@ -77,7 +77,7 @@ const LoginForm = ({ onSwitch }) => {
         {isLoading ? "Signing in..." : "Sign In"}
       </button>
 
-      <SocialAuth mode="log in" />
+      <SocialAuth />
 
       <p className="text-center text-sm text-gray-500 mt-6">
         Don't have an account?{" "}

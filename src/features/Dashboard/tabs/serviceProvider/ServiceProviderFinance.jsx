@@ -20,7 +20,7 @@ import {
   serviceProviderFinanceInit,
 } from "../../../../api/serviceProviderApis";
 
-const ServiceProviderDashboard = () => {
+const ServiceProviderFinance = () => {
   const [orders, setOrders] = useState([]);
   const [metrics, setMetrics] = useState({
     grossTotal: 0,
@@ -438,4 +438,4 @@ const PaginationButton = ({ onClick, disabled, icon: Icon }) => (
   </button>
 );
 
-export default ServiceProviderDashboard;
+export default ServiceProviderFinance;

@@ -11,7 +11,7 @@ import AdminServiceProviders from "./admin/AdminServiceProviders";
 
 import ServiceProviderGeneral from "./serviceProvider/ServiceProviderGeneral";
 import ServiceProviderServices from "./serviceProvider/ServiceProviderServices";
-import ServiceProviderOrders from "./serviceProvider/ServiceProviderOrders";
+import ServiceProviderFinance from "./serviceProvider/ServiceProviderFinance";
 import ServiceProviderPage from "./serviceProvider/ServiceProviderPage";
 import AdminProfile from "./admin/AdminProfile";
 import SPCreateService from "./serviceProvider/SPCreateService";
@@ -111,13 +111,15 @@ export default {
       label: "Services",
       component: ServiceProviderServices,
       children: [
-        { label: "Create New Service", component: SPCreateService },
+        { label: "Manage One Time Orders", component: SPManageTimelines },
         { label: "Manage Timelines", component: SPManageTimelines },
+        { label: "Manage Service", component: SPCreateService },
+        { label: "Create New Service", component: SPCreateService },
       ],
     },
     Finance: {
       label: "Finance",
-      component: ServiceProviderOrders,
+      component: ServiceProviderFinance,
     },
     Page: {
       label: "Page",
