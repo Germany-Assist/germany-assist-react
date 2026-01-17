@@ -1,14 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import {
-  History,
-  LayoutGrid,
-  Calendar,
-  Plus,
-  Search,
-  Edit3,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { LayoutGrid, Plus, Search, Edit3, Tag, Package } from "lucide-react";
 
 // UI Components
 import MultiUseTable from "../../../../components/ui/MultiUseTable";
@@ -20,7 +11,7 @@ import FilterContainer from "../../../../components/ui/FilterContainer";
 // API
 import serviceProviderApis from "../../../../api/serviceProviderApis";
 
-export default function ServiceProviderTimelines() {
+export default function ServiceProviderVariants() {
   // --- 1. STATE MANAGEMENT ---
   const [services, setServices] = useState([]);
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 });
@@ -29,14 +20,14 @@ export default function ServiceProviderTimelines() {
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
-    type: "timeline", // Keep filter for timeline-type services
+    type: "oneTime", // Lock this view to oneTime services which have variants
     title: "",
     category: "",
     published: undefined,
   });
 
   // --- 2. API LOGIC ---
-  const fetchGroupedData = useCallback(async () => {
+  const fetchVariantsData = useCallback(async () => {
     setLoading(true);
     try {
       const cleanParams = Object.fromEntries(
@@ -52,66 +43,62 @@ export default function ServiceProviderTimelines() {
         });
       }
     } catch (err) {
-      console.error("Failed to fetch:", err);
+      console.error("Failed to fetch variants:", err);
     } finally {
       setLoading(false);
     }
   }, [filters]);
 
   useEffect(() => {
-    fetchGroupedData();
-  }, [fetchGroupedData]);
+    fetchVariantsData();
+  }, [fetchVariantsData]);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
   };
 
-  // --- 3. COLUMNS WITH NESTED GROUPING ---
-  const groupedColumns = [
+  // --- 3. COLUMNS WITH NESTED VARIANTS ---
+  const variantColumns = [
     {
-      header: "Service Group",
+      header: "Service",
       render: (service) => (
         <TransactionCell
           id={service.title}
-          subtext={`${service.category} • ${service.timelines?.length || 0} Sessions`}
-          icon={LayoutGrid}
+          subtext={`${service.category} • ${service.variants?.length || 0} Variants`}
+          icon={Package}
           variant="default"
         />
       ),
     },
     {
-      header: "Timelines & Sessions",
+      header: "Available Variants",
       render: (service) => (
-        <div className="flex flex-col gap-2 py-2 min-w-[300px]">
-          {service.timelines?.map((timeline) => (
+        <div className="flex flex-col gap-2 py-2 min-w-[280px]">
+          {service.variants?.map((variant) => (
             <div
-              key={timeline.id}
-              className="group flex items-center justify-between p-3 rounded-2xl border border-zinc-100 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.02] hover:border-blue-500/30 transition-colors"
+              key={variant.id}
+              className="group flex items-center justify-between p-3 rounded-2xl border border-zinc-100 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.02] hover:border-blue-500/30 transition-all"
             >
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase text-zinc-800 dark:text-zinc-200">
-                    {timeline.label}
-                  </span>
-                  {timeline.isArchived && (
-                    <span className="text-[7px] font-bold text-red-500 uppercase px-1.5 py-0.5 bg-red-500/5 border border-red-500/20 rounded">
-                      Archived
-                    </span>
-                  )}
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-100 dark:border-white/5">
+                  <Tag size={12} className="text-zinc-400" />
                 </div>
-                <span className="text-[9px] font-bold text-zinc-400 flex items-center gap-1 mt-0.5">
-                  <Calendar size={10} />
-                  {new Date(timeline.startDate).toLocaleDateString()} —{" "}
-                  {new Date(timeline.endDate).toLocaleDateString()}
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black uppercase text-zinc-800 dark:text-zinc-200">
+                    {variant.label}
+                  </span>
+                  <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-tighter">
+                    Ref ID: {variant.id}
+                  </span>
+                </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-sm font-black italic tracking-tighter text-blue-600 dark:text-blue-400">
-                  ${timeline.price}
+                <span className="text-sm font-black italic tracking-tighter text-emerald-600 dark:text-emerald-400">
+                  ${variant.price}
                 </span>
                 <button
-                  onClick={() => console.log("Edit timeline", timeline.id)}
+                  onClick={() => console.log("Edit variant", variant.id)}
                   className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-lg transition-all"
                 >
                   <Edit3 size={12} className="text-zinc-400" />
@@ -119,9 +106,9 @@ export default function ServiceProviderTimelines() {
               </div>
             </div>
           ))}
-          {(!service.timelines || service.timelines.length === 0) && (
-            <span className="text-[10px] italic text-zinc-400">
-              No sessions found for this service.
+          {(!service.variants || service.variants.length === 0) && (
+            <span className="text-[10px] italic text-zinc-400 p-2">
+              No variants defined.
             </span>
           )}
         </div>
@@ -148,13 +135,13 @@ export default function ServiceProviderTimelines() {
         <ActionGroup
           actions={[
             {
-              label: "Add Session",
+              label: "Add Variant",
               show: true,
-              onClick: () => console.log("Add to", service.id),
+              onClick: () => console.log("Add variant to", service.id),
               variant: "primary",
             },
             {
-              label: "Service Settings",
+              label: "Settings",
               show: true,
               onClick: () => console.log("Edit Service", service.id),
               variant: "outline",
@@ -171,22 +158,19 @@ export default function ServiceProviderTimelines() {
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-4xl font-black italic tracking-tighter uppercase">
-            Timeline Ledger
+            Variant Ledger
           </h1>
           <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-            Grouped session management by service
+            Manage pricing tiers for one-time services
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-zinc-900 dark:bg-white dark:text-black text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-transform hover:scale-[1.02]">
-          <Plus size={14} /> Create Service
-        </button>
       </div>
 
       {/* FILTERS */}
       <FilterContainer
         searchValue={filters.title}
         onSearchChange={(val) => handleFilterChange("title", val)}
-        placeholder="Search Service Title..."
+        placeholder="Search Service..."
       >
         <select
           value={filters.category || ""}
@@ -204,7 +188,7 @@ export default function ServiceProviderTimelines() {
 
         <div className="flex gap-2 col-span-full pt-2">
           <FilterToggle
-            label="Live Only"
+            label="Published Only"
             active={filters.published === true}
             color="emerald"
             onClick={() =>
@@ -220,8 +204,8 @@ export default function ServiceProviderTimelines() {
       {/* TABLE */}
       <div className="relative">
         <MultiUseTable
-          columns={groupedColumns}
-          data={services} // Passing the raw nested services array
+          columns={variantColumns}
+          data={services}
           loading={loading}
           pagination={meta}
           onPageChange={(newPage) => handleFilterChange("page", newPage)}
@@ -231,7 +215,7 @@ export default function ServiceProviderTimelines() {
   );
 }
 
-// Helper FilterToggle
+// Reusable FilterToggle (Can be moved to its own file later)
 const FilterToggle = ({ label, active, onClick, color }) => {
   const colorClasses = {
     emerald: active

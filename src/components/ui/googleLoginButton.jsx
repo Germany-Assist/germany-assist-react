@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { GOOGLE_CLIENT_ID } from "../../config/api";
 
-export default function GoogleLoginButton({ nav }) {
+export default function GoogleLoginButton() {
   const { googleLogin } = useAuth();
 
   // Called when Google returns the ID token
@@ -31,7 +31,7 @@ export default function GoogleLoginButton({ nav }) {
         theme: "outline",
         size: "large",
         width: "100%",
-      }
+      },
     );
 
     // Optional: prevent auto One Tap

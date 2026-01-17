@@ -18,6 +18,7 @@ import SPCreateService from "./serviceProvider/SPCreateService";
 import CreateNewSP from "./serviceProvider/components/CreateNewSP";
 import { FiMessageCircle } from "react-icons/fi";
 import SPManageTimelines from "./serviceProvider/SPManageTimelines";
+import ServiceProviderVariants from "./serviceProvider/ServiceProviderVariants";
 
 export default {
   admin: {
@@ -111,9 +112,9 @@ export default {
       label: "Services",
       component: ServiceProviderServices,
       children: [
-        { label: "Manage One Time Orders", component: SPManageTimelines },
+        { label: "Manage Variants", component: ServiceProviderVariants },
         { label: "Manage Timelines", component: SPManageTimelines },
-        { label: "Manage Service", component: SPCreateService },
+        { label: "Manage Service", component: ServiceProviderServices },
         { label: "Create New Service", component: SPCreateService },
       ],
     },
