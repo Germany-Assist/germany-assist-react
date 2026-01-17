@@ -11,17 +11,16 @@ import AdminServiceProviders from "./admin/AdminServiceProviders";
 
 import ServiceProviderGeneral from "./serviceProvider/ServiceProviderGeneral";
 import ServiceProviderServices from "./serviceProvider/ServiceProviderServices";
-import ServiceProviderOrders from "./serviceProvider/ServiceProviderOrders";
+import ServiceProviderFinance from "./serviceProvider/ServiceProviderFinance";
 import ServiceProviderPage from "./serviceProvider/ServiceProviderPage";
 import AdminProfile from "./admin/AdminProfile";
 import SPCreateService from "./serviceProvider/SPCreateService";
 import CreateNewSP from "./serviceProvider/components/CreateNewSP";
 import { FiMessageCircle } from "react-icons/fi";
 import SPManageTimelines from "./serviceProvider/SPManageTimelines";
+import ServiceProviderVariants from "./serviceProvider/ServiceProviderVariants";
 
 export default {
-  //example
-
   admin: {
     General: {
       label: "General",
@@ -113,13 +112,15 @@ export default {
       label: "Services",
       component: ServiceProviderServices,
       children: [
-        { label: "Create New Service", component: SPCreateService },
+        { label: "Manage Variants", component: ServiceProviderVariants },
         { label: "Manage Timelines", component: SPManageTimelines },
+        { label: "Manage Service", component: ServiceProviderServices },
+        { label: "Create New Service", component: SPCreateService },
       ],
     },
-    Orders: {
-      label: "Orders",
-      component: ServiceProviderOrders,
+    Finance: {
+      label: "Finance",
+      component: ServiceProviderFinance,
     },
     Page: {
       label: "Page",

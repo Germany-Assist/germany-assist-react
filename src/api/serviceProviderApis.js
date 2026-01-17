@@ -1,7 +1,10 @@
 import { api } from "./client";
 
-export const getAllServices = async () => {
-  const res = await api.get("/service/provider/services");
+export const getAllServices = async (params) => {
+  const queryString = params
+    ? `?${new URLSearchParams(params).toString()}`
+    : "";
+  const res = await api.get(`/service/provider/services${queryString}`);
   return res.data;
 };
 export const createNewService = async (payload) => {
@@ -14,7 +17,7 @@ export const publishService = async (serviceId) => {
 };
 export const unpublishService = async (serviceId) => {
   const res = await api.get(
-    `/service/provider/services/unpublish/${serviceId}`
+    `/service/provider/services/unpublish/${serviceId}`,
   );
   return res;
 };
@@ -30,10 +33,18 @@ export const serviceProviderCloseOrder = async (orderId) => {
   const res = await api.get(`/order/serviceProvider/close/${orderId}`);
   return res.data;
 };
-export const serviceProviderGetAllOrders = async () => {
-  const res = await api.get(`/order/serviceProvider/getAll`);
+export const serviceProviderGetAllOrders = async (params) => {
+  const queryString = params
+    ? `?${new URLSearchParams(params).toString()}`
+    : "";
+  const res = await api.get(`/order/serviceProvider/getAll${queryString}`);
   return res.data;
 };
+export const serviceProviderFinanceInit = async () => {
+  const res = await api.get(`/dashboard/provider/finance`);
+  return res.data;
+};
+
 const serviceProviderApis = {
   publishService,
   unpublishService,

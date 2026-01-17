@@ -10,17 +10,17 @@ import BookingSidebar from "./BookingSidebar";
 import ReviewsSection from "./ReviewComponent";
 import NavigationBar from "../../../components/ui/NavigationBar";
 import ShareSheet from "../../../components/ui/ShareSheet";
-import PaymentModal from "../../../components/ui/PaymentModal";
+import PaymentModal from "../../../components/ui/payments/PaymentModal";
 import { useProfile } from "../../../contexts/ProfileContext";
 import { fetchUserReviewForServiceApi } from "../../../api/profile";
+import StatusModal from "../../../components/ui/StatusModal";
 
 const ServiceProfile = ({ previewData = null }) => {
   const { serviceId } = useParams();
   const navigate = useNavigate();
-
   const [data, setData] = useState(previewData);
   const [loading, setLoading] = useState(!previewData);
-
+  const [error, setError] = useState(false);
   const {
     toggleFavorite,
     isInFavorite,
@@ -30,19 +30,22 @@ const ServiceProfile = ({ previewData = null }) => {
   } = useProfile();
 
   const [isFavorite, setIsFavorite] = useState(false);
-  const [hasPurchasedService, setHasPurchasedService] = useState(false);
-  const [hasPurchasedTimeline, setHasPurchasedTimeline] = useState(false);
-  const [purchasedItems, setPurchasedItems] = useState([]);
-  const [hasReview, setHasReview] = useState(false);
+  const [successScreen, setSuccessScreen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
+
+  const [hasPurchasedService, setHasPurchasedService] = useState(false);
+  const [hasPurchasedTimeline, setHasPurchasedTimeline] = useState(false);
+  const [hasReview, setHasReview] = useState(false);
+
+  const [purchasedItems, setPurchasedItems] = useState([]);
+
   const [paymentConfig, setPaymentConfig] = useState({
     isOpen: false,
     clientSecret: "",
     amount: 0,
   });
 
-  /* -------------------- Load Service -------------------- */
   useEffect(() => {
     if (previewData) {
       setData(previewData);
@@ -55,7 +58,9 @@ const ServiceProfile = ({ previewData = null }) => {
         const res = await fetchServiceProfile(serviceId);
         setData(res);
       } catch (err) {
-        console.error("Failed to load service", err);
+        // setError(err.response?.data?.message);
+        console.log(err.response?.data?.message);
+        setError(err.response?.data?.message || "ops something went wrong");
       } finally {
         setLoading(false);
       }
@@ -67,14 +72,11 @@ const ServiceProfile = ({ previewData = null }) => {
   /* -------------------- Status Checks -------------------- */
   useEffect(() => {
     if (previewData || !data) return;
-
     setIsFavorite(isInFavorite(data.id));
-
     // Check purchase status from context
     const ps = isAlreadyPurchasedService(data);
     setHasPurchasedService(ps);
     setHasPurchasedTimeline(Boolean(isAlreadyPurchasedTimeline(data)));
-
     if (ps) {
       setPurchasedItems(ps);
       (async () => {
@@ -94,13 +96,14 @@ const ServiceProfile = ({ previewData = null }) => {
         optionId: selectedOption.id,
         type: data.type,
       });
-
-      if (res) {
+      if (res && selectedOption.price !== 0) {
         setPaymentConfig({
           isOpen: true,
           clientSecret: res.message.clientSecret,
           amount: selectedOption.price,
         });
+      } else if (res && selectedOption.price == 0) {
+        setSuccessScreen(true);
       }
     } catch (err) {
       console.error("Payment failed to initialize", err);
@@ -114,11 +117,21 @@ const ServiceProfile = ({ previewData = null }) => {
     navigate(`/timeline/${tid}`);
   };
 
-  if (loading || !data) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-light-950 dark:bg-dark-950 flex items-center justify-center">
         <Loader2 className="animate-spin text-accent" size={32} />
       </div>
+    );
+  }
+  if (error) {
+    return (
+      <StatusModal
+        isOpen={true}
+        onClose={() => navigate("/")}
+        type={"error"}
+        message={error}
+      />
     );
   }
 
@@ -140,21 +153,24 @@ const ServiceProfile = ({ previewData = null }) => {
   return (
     <div className="min-h-screen bg-light-950 dark:bg-dark-950 text-slate-900 dark:text-slate-100 pb-20 relative transition-colors duration-500">
       {!previewData && <NavigationBar />}
-
       <ShareSheet
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
         url={window.location.href}
         title={data.title}
       />
-
       <PaymentModal
         isOpen={paymentConfig.isOpen}
         onClose={() => setPaymentConfig((p) => ({ ...p, isOpen: false }))}
         clientSecret={paymentConfig.clientSecret}
         amount={paymentConfig.amount}
       />
-
+      <StatusModal
+        isOpen={successScreen}
+        onClose={() => setSuccessScreen(false)}
+        type={"success"}
+        message="Congratulations Your booking is confirmed."
+      />
       {/* Breadcrumb Header */}
       <nav className="border-b border-light-700 dark:border-white/5 bg-light-900/50 dark:bg-black/20 backdrop-blur-md sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -212,12 +228,10 @@ const ServiceProfile = ({ previewData = null }) => {
             </span>
           </div>
         </div>
-
         {/* Media Section */}
         <div className="rounded-[3rem] overflow-hidden shadow-2xl border border-light-700 dark:border-white/5 mb-16 aspect-video lg:aspect-auto">
           <ImageGallery assets={galleryAssets} />
         </div>
-
         {/* Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           <div className="lg:col-span-2 space-y-16">
