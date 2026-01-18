@@ -44,7 +44,11 @@ export const serviceProviderFinanceInit = async () => {
   const res = await api.get(`/dashboard/provider/finance`);
   return res.data;
 };
+export const createNewPost = async (payload)=>{
+  const res = await api.post(`/post/createNewPost`,payload);
+  return res.data;
 
+}
 const serviceProviderApis = {
   publishService,
   unpublishService,
