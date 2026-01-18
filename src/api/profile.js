@@ -19,10 +19,14 @@ export const removeFromFavoriteApi = async (id) => {
   const res = await api.delete(`/service/client/favorite/${id}`);
   return res.status == 200;
 };
-export const fetchTimelineApi = async (id) => {
+export const fetchTimelineApi = async (id, page) => {
   const res = await api.get(
-    `/service/timeline/client/readTimeline/:timelineId${id}`,
+    `/service/timeline/client/readTimeline/${id}?page=${page}`,
   );
+  return res.data;
+};
+export const fetchAllPostsApi = async (timelineId, page) => {
+  const res = await api.get(`/post/getPosts/${timelineId}/${page}`);
   return res.data;
 };
 // review

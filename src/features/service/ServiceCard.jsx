@@ -24,7 +24,6 @@ const ServiceCard = ({
     rating = 0,
     price = 0,
   } = data;
-
   const handleFav = async (e) => {
     if (isDummy) return;
     e.stopPropagation();

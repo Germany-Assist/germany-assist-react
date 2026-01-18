@@ -44,7 +44,11 @@ export default function ServiceProviderTimelines() {
     } catch (error) {
       const errorMessage =
         error?.response?.data?.message || "Something Went Wrong";
-      setStatusModalCon({ isOpen: true, message: errorMessage, type: "error" });
+      setStatusModalCon({
+        isOpen: true,
+        message: errorMessage,
+        type: "error",
+      });
     }
   }
   const [filters, setFilters] = useState({
