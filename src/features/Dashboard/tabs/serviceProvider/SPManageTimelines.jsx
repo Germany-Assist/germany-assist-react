@@ -18,18 +18,39 @@ import ActionGroup from "../../../../components/ui/ActionGroup";
 import FilterContainer from "../../../../components/ui/FilterContainer";
 
 // API
-import serviceProviderApis from "../../../../api/serviceProviderApis";
-
+import serviceProviderApis, {
+  createNewPost,
+} from "../../../../api/serviceProviderApis";
+import StatusModal from "../../../../components/ui/StatusModal";
+import PostCreationModal from "../../../../components/ui/PostCreationModal";
 export default function ServiceProviderTimelines() {
   // --- 1. STATE MANAGEMENT ---
   const [services, setServices] = useState([]);
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 });
   const [loading, setLoading] = useState(false);
+  const [statusModalCon, setStatusModalCon] = useState(null);
+  const [selectedTimelineId, setSelectedTimelineId] = useState(null);
 
+  async function handlePostCreation({ description, isPinned }) {
+    const body = {
+      timelineId: selectedTimelineId,
+      description,
+      isPinned,
+    };
+    try {
+      await createNewPost(body);
+      setSelectedTimelineId(null);
+      setStatusModalCon({ isOpen: true, message: "Post Created Successfully" });
+    } catch (error) {
+      const errorMessage =
+        error?.response?.data?.message || "Something Went Wrong";
+      setStatusModalCon({ isOpen: true, message: errorMessage, type: "error" });
+    }
+  }
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
-    type: "timeline", // Keep filter for timeline-type services
+    type: "timeline",
     title: "",
     category: "",
     published: undefined,
@@ -73,14 +94,14 @@ export default function ServiceProviderTimelines() {
       render: (service) => (
         <TransactionCell
           id={service.title}
-          subtext={`${service.category} • ${service.timelines?.length || 0} Sessions`}
+          subtext={`${service.category} • ${service.timelines?.length || 0} timelines`}
           icon={LayoutGrid}
           variant="default"
         />
       ),
     },
     {
-      header: "Timelines & Sessions",
+      header: "Timelines ",
       render: (service) => (
         <div className="flex flex-col gap-2 py-2 min-w-[300px]">
           {service.timelines?.map((timeline) => (
@@ -99,7 +120,7 @@ export default function ServiceProviderTimelines() {
                     </span>
                   )}
                 </div>
-                <span className="text-[9px] font-bold text-zinc-400 flex items-center gap-1 mt-0.5">
+                <span className="text-[12px] font-bold text-zinc-400 flex items-center gap-1 mt-0.5">
                   <Calendar size={10} />
                   {new Date(timeline.startDate).toLocaleDateString()} —{" "}
                   {new Date(timeline.endDate).toLocaleDateString()}
@@ -111,7 +132,7 @@ export default function ServiceProviderTimelines() {
                   ${timeline.price}
                 </span>
                 <button
-                  onClick={() => console.log("Edit timeline", timeline.id)}
+                  onClick={() => setSelectedTimelineId(timeline.id)}
                   className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-lg transition-all"
                 >
                   <Edit3 size={12} className="text-zinc-400" />
@@ -121,7 +142,7 @@ export default function ServiceProviderTimelines() {
           ))}
           {(!service.timelines || service.timelines.length === 0) && (
             <span className="text-[10px] italic text-zinc-400">
-              No sessions found for this service.
+              No Timelines found for this service.
             </span>
           )}
         </div>
@@ -148,7 +169,7 @@ export default function ServiceProviderTimelines() {
         <ActionGroup
           actions={[
             {
-              label: "Add Session",
+              label: "Add Timeline",
               show: true,
               onClick: () => console.log("Add to", service.id),
               variant: "primary",
@@ -174,7 +195,7 @@ export default function ServiceProviderTimelines() {
             Timeline Ledger
           </h1>
           <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-            Grouped session management by service
+            Grouped Timelines management by service
           </p>
         </div>
         <button className="flex items-center gap-2 bg-zinc-900 dark:bg-white dark:text-black text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-transform hover:scale-[1.02]">
@@ -216,7 +237,6 @@ export default function ServiceProviderTimelines() {
           />
         </div>
       </FilterContainer>
-
       {/* TABLE */}
       <div className="relative">
         <MultiUseTable
@@ -227,6 +247,21 @@ export default function ServiceProviderTimelines() {
           onPageChange={(newPage) => handleFilterChange("page", newPage)}
         />
       </div>
+      <StatusModal
+        isOpen={statusModalCon?.isOpen}
+        type={statusModalCon?.type}
+        message={statusModalCon?.message}
+        onClose={() => {
+          setStatusModalCon(null);
+        }}
+      />
+      <PostCreationModal
+        isOpen={selectedTimelineId}
+        onSubmit={handlePostCreation}
+        onClose={() => {
+          setSelectedTimelineId(null);
+        }}
+      />
     </div>
   );
 }

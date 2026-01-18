@@ -29,8 +29,10 @@ const ServiceCard = ({
     if (isDummy) return;
     e.stopPropagation();
     if (onFavoriteClick) {
-      const resp = await onFavoriteClick();
-      if (resp) setIsFavorite(!isFavorite);
+      try {
+        const resp = await onFavoriteClick();
+        if (resp) setIsFavorite(!isFavorite);
+      } catch (error) {}
     }
   };
 
@@ -120,7 +122,7 @@ const ServiceCard = ({
                 ID: {id}
               </span>
               <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-                ⭐ {rating.toFixed(1)}
+                ⭐ {rating?.toFixed(1)}
               </span>
             </div>
           </div>

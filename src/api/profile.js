@@ -7,7 +7,7 @@ export const profileRequest = async () => {
 export const uploadProfileImage = async (payload) => {
   const res = await api.post(
     "/asset/upload/users/post/image/profileImage",
-    payload
+    payload,
   );
   return res.data; // { user }
 };
@@ -20,7 +20,9 @@ export const removeFromFavoriteApi = async (id) => {
   return res.status == 200;
 };
 export const fetchTimelineApi = async (id) => {
-  const res = await api.get(`/service/timeline/client/${id}`);
+  const res = await api.get(
+    `/service/timeline/client/readTimeline/:timelineId${id}`,
+  );
   return res.data;
 };
 // review
