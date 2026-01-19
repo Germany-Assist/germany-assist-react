@@ -3,7 +3,7 @@ import ServiceCard from "./ServiceCard";
 import { useProfile } from "../../contexts/ProfileContext";
 
 const ServiceGrid = ({ services, isSearching }) => {
-  const { isInFavorite, toggleFavorite, profile } = useProfile();
+  const { isInFavorite, toggleFavorite } = useProfile();
 
   if (services.length === 0) {
     return (

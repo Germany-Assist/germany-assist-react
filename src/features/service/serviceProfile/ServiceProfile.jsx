@@ -21,25 +21,16 @@ const ServiceProfile = ({ previewData = null }) => {
   const [data, setData] = useState(previewData);
   const [loading, setLoading] = useState(!previewData);
   const [error, setError] = useState(false);
-  const {
-    toggleFavorite,
-    isInFavorite,
-    profile,
-    isAlreadyPurchasedService,
-    isAlreadyPurchasedTimeline,
-  } = useProfile();
+  const { toggleFavorite, isInFavorite, profile, hasAlreadyPurchasedService } =
+    useProfile();
 
   const [isFavorite, setIsFavorite] = useState(false);
   const [successScreen, setSuccessScreen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
-
   const [hasPurchasedService, setHasPurchasedService] = useState(false);
-  const [hasPurchasedTimeline, setHasPurchasedTimeline] = useState(false);
   const [hasReview, setHasReview] = useState(false);
-
   const [purchasedItems, setPurchasedItems] = useState([]);
-
   const [paymentConfig, setPaymentConfig] = useState({
     isOpen: false,
     clientSecret: "",
@@ -74,11 +65,13 @@ const ServiceProfile = ({ previewData = null }) => {
     if (previewData || !data) return;
     setIsFavorite(isInFavorite(data.id));
     // Check purchase status from context
-    const ps = isAlreadyPurchasedService(data);
-    setHasPurchasedService(ps);
-    setHasPurchasedTimeline(Boolean(isAlreadyPurchasedTimeline(data)));
-    if (ps) {
-      setPurchasedItems(ps);
+    const history = hasAlreadyPurchasedService(data);
+    console.log(history);
+    setHasPurchasedService(history);
+
+    // setHasPurchasedTimeline(Boolean(isAlreadyPurchasedTimeline(data)));
+    if (history) {
+      setPurchasedItems(history);
       (async () => {
         const review = await fetchUserReviewForServiceApi(data.id);
         setHasReview(review);

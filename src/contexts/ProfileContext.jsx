@@ -17,6 +17,8 @@ const ProfileContext = createContext(null);
 export const ProfileProvider = ({ children }) => {
   const { accessToken } = useAuth();
   const [profile, setProfile] = useState(null);
+  //TODO later on delete
+  console.log(profile);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const fetchProfile = useCallback(async () => {
@@ -93,24 +95,27 @@ export const ProfileProvider = ({ children }) => {
       return false;
     }
   };
-  const isAlreadyPurchasedService = (service) => {
+  const hasAlreadyPurchasedService = (service) => {
     if (profile) {
-      const exist = profile.orders?.filter((i) => {
-        return i.serviceId == service.id;
-      });
-      if (exist.length > 0) return exist;
+      const exist = profile.orders?.filter((i) => i.serviceId == service.id);
+      if (exist.length > 0) return exist.map((i) => i.variant || i.timeline);
     } else {
       return false;
     }
   };
-  const isAlreadyPurchasedTimeline = (service) => {
-    if (profile) {
-      const exist = profile.orders?.filter((i) => {
-        if (i.type === "timeline")
-          return (
-            i.serviceId == service.id &&
-            i.timelineId == service.activeTimeline.id
-          );
+  const hasPurchasedOptions = (service) => {
+    if (profile && (service.variants || service.timelines)) {
+      const options = service.timelines || service.variants;
+      const exist = options?.filter((option) => {
+        // if (
+        //   option.type === "timeline" &&
+        //   option.serviceId == service.id &&
+        //   option.timelines.length > 0
+        // )
+
+        return service.timelines.filter(
+          (timeline) => timeline.id == service.activeTimeline.id,
+        );
       });
       if (exist) return exist.length > 0;
     } else {
@@ -133,8 +138,7 @@ export const ProfileProvider = ({ children }) => {
       value={{
         isInFavorite,
         toggleFavorite,
-        isAlreadyPurchasedTimeline,
-        isAlreadyPurchasedService,
+        hasAlreadyPurchasedService,
         profile,
         loading,
         error,
