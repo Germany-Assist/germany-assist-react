@@ -38,7 +38,7 @@ const ServicesPage = () => {
           limit: "9",
           title: search,
           ...Object.fromEntries(
-            Object.entries(filters).filter(([_, v]) => v !== "")
+            Object.entries(filters).filter(([_, v]) => v !== ""),
           ),
         });
         const result = await fetchServicesApi(query);
@@ -50,7 +50,7 @@ const ServicesPage = () => {
         setIsSearching(false);
       }
     },
-    [page, search, filters]
+    [page, search, filters],
   );
 
   // Debounce search

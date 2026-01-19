@@ -22,7 +22,8 @@ const ServiceCard = ({
     title = "Untitled Service",
     description = "No description available.",
     rating = 0,
-    price = 0,
+    minPrice = 0,
+    maxPrice = 0,
   } = data;
   const handleFav = async (e) => {
     if (isDummy) return;
@@ -34,7 +35,6 @@ const ServiceCard = ({
       } catch (error) {}
     }
   };
-
   return (
     <div
       onClick={() => {
@@ -130,10 +130,16 @@ const ServiceCard = ({
           <div className="mt-6 pt-5 border-t border-light-700 dark:border-white/5 flex justify-between items-center">
             <div>
               <p className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">
-                Price
+                Min Price
               </p>
               <p className="text-2xl font-black text-slate-900 dark:text-white">
-                €{(price || 0).toFixed(2)}
+                €{(minPrice || 0).toFixed(2)}
+              </p>
+              <p className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">
+                Max Price
+              </p>
+              <p className="text-2xl font-black text-slate-900 dark:text-white">
+                €{(maxPrice || 0).toFixed(2)}
               </p>
             </div>
 
