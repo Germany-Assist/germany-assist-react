@@ -66,6 +66,7 @@ const ServiceProfile = ({ previewData = null }) => {
     setIsFavorite(isInFavorite(data.id));
     // Check purchase status from context
     const history = hasAlreadyPurchasedService(data);
+    // TODO i need to move on with history
     console.log(history);
     setHasPurchasedService(history);
 

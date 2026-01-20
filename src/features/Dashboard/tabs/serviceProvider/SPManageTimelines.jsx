@@ -30,7 +30,6 @@ export default function ServiceProviderTimelines() {
   const [loading, setLoading] = useState(false);
   const [statusModalCon, setStatusModalCon] = useState(null);
   const [selectedTimelineId, setSelectedTimelineId] = useState(null);
-
   async function handlePostCreation({ description, isPinned }) {
     const body = {
       timelineId: selectedTimelineId,
@@ -98,7 +97,7 @@ export default function ServiceProviderTimelines() {
       render: (service) => (
         <TransactionCell
           id={service.title}
-          subtext={`${service.category} • ${service.timelines?.length || 0} timelines`}
+          subtext={`${service.category} • ${service.timelines?.timelines?.length || 0} timelines`}
           icon={LayoutGrid}
           variant="default"
         />
@@ -108,7 +107,7 @@ export default function ServiceProviderTimelines() {
       header: "Timelines ",
       render: (service) => (
         <div className="flex flex-col gap-2 py-2 min-w-[300px]">
-          {service.timelines?.map((timeline) => (
+          {service.timelines?.timelines?.map((timeline) => (
             <div
               key={timeline.id}
               className="group flex items-center justify-between p-3 rounded-2xl border border-zinc-100 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.02] hover:border-blue-500/30 transition-colors"
@@ -144,7 +143,8 @@ export default function ServiceProviderTimelines() {
               </div>
             </div>
           ))}
-          {(!service.timelines || service.timelines.length === 0) && (
+          {(!service.timelines?.timelines ||
+            service.timelines?.timelines.length === 0) && (
             <span className="text-[10px] italic text-zinc-400">
               No Timelines found for this service.
             </span>

@@ -17,8 +17,6 @@ const ProfileContext = createContext(null);
 export const ProfileProvider = ({ children }) => {
   const { accessToken } = useAuth();
   const [profile, setProfile] = useState(null);
-  //TODO later on delete
-  console.log(profile);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const fetchProfile = useCallback(async () => {
@@ -99,25 +97,6 @@ export const ProfileProvider = ({ children }) => {
     if (profile) {
       const exist = profile.orders?.filter((i) => i.serviceId == service.id);
       if (exist.length > 0) return exist.map((i) => i.variant || i.timeline);
-    } else {
-      return false;
-    }
-  };
-  const hasPurchasedOptions = (service) => {
-    if (profile && (service.variants || service.timelines)) {
-      const options = service.timelines || service.variants;
-      const exist = options?.filter((option) => {
-        // if (
-        //   option.type === "timeline" &&
-        //   option.serviceId == service.id &&
-        //   option.timelines.length > 0
-        // )
-
-        return service.timelines.filter(
-          (timeline) => timeline.id == service.activeTimeline.id,
-        );
-      });
-      if (exist) return exist.length > 0;
     } else {
       return false;
     }
