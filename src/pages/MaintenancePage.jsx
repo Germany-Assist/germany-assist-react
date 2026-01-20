@@ -4,7 +4,7 @@ import NavigationBar from "../components/ui/NavigationBar";
 
 function MaintenancePage({ nav = true }) {
   return (
-    <div className="min-h-screen flex flex-col items-center  bg-light-950 dark:bg-dark-950  transition-colors duration-700 ease-elegant selection:bg-accent/20">
+    <div className="min-h-screen  flex-col items-center  bg-light-950 dark:bg-dark-950  transition-colors duration-700 ease-elegant selection:bg-accent/20">
       {nav && <NavigationBar />}
       <div
         className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
