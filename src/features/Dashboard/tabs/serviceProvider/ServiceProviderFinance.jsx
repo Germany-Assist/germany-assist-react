@@ -109,7 +109,7 @@ const ServiceProviderFinance = () => {
             },
             {
               label: "Close Order",
-              show: row.status === "active",
+              show: row.status === "active" && row.type === "oneTime",
               loading: processingId === row.orderId,
               onClick: () => handleCloseOrder(row.orderId),
               variant: "primary",
