@@ -24,7 +24,7 @@ const StepMedia = ({ data, onUpdate, onBack, onComplete }) => {
 
   const profileImg = data.assets.find((a) => a.key === "serviceProfileImage");
   const galleryImgs = data.assets.filter(
-    (a) => a.key === "serviceProfileGalleryImage"
+    (a) => a.key === "serviceProfileGalleryImage",
   );
 
   // Validation: Main image is required
@@ -128,7 +128,7 @@ const StepMedia = ({ data, onUpdate, onBack, onComplete }) => {
         </button>
         <button
           type="button"
-          // disabled={isInvalid}
+          disabled={isInvalid}
           onClick={onComplete}
           className="flex-1 flex items-center justify-center gap-2 bg-slate-900 dark:bg-white disabled:opacity-20 text-white dark:text-black font-bold py-4 rounded-2xl transition-all shadow-xl hover:bg-accent hover:text-white active:scale-95"
         >

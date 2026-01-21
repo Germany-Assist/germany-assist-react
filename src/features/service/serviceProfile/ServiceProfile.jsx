@@ -67,9 +67,7 @@ const ServiceProfile = ({ previewData = null }) => {
     // Check purchase status from context
     const history = hasAlreadyPurchasedService(data);
     // TODO i need to move on with history
-    console.log(history);
     setHasPurchasedService(history);
-
     // setHasPurchasedTimeline(Boolean(isAlreadyPurchasedTimeline(data)));
     if (history) {
       setPurchasedItems(history);
@@ -166,7 +164,7 @@ const ServiceProfile = ({ previewData = null }) => {
         message="Congratulations Your booking is confirmed."
       />
       {/* Breadcrumb Header */}
-      <nav className="border-b border-light-700 dark:border-white/5 bg-light-900/50 dark:bg-black/20 backdrop-blur-md sticky top-0 z-30">
+      <nav className="border-b border-light-700 dark:border-white/5 bg-light-900/50 dark:bg-black/20 backdrop-blur-md sticky top-0 ">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3 text-sm">
             <span

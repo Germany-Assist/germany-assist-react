@@ -44,11 +44,23 @@ export const serviceProviderFinanceInit = async () => {
   const res = await api.get(`/dashboard/provider/finance`);
   return res.data;
 };
-export const createNewPost = async (payload)=>{
-  const res = await api.post(`/post/createNewPost`,payload);
+export const createNewPost = async (payload) => {
+  const res = await api.post(`/post/createNewPost`, payload);
   return res.data;
-
-}
+};
+export const archiveTimeline = async (timelineId) => {
+  const res = await api.put(
+    `/service/timeline/provider/archiveTimeline/${timelineId}`,
+  );
+  return res.data;
+};
+export const createNewTimeline = async (payload) => {
+  const res = await api.post(
+    `/service/timeline/provider/createNewTimeline`,
+    payload,
+  );
+  return res.data;
+};
 const serviceProviderApis = {
   publishService,
   unpublishService,

@@ -38,7 +38,7 @@ const DropdownMenu = ({ categories, data, onUpdate }) => {
   }, [isOpen]);
 
   return (
-    <div className="relative z-10 w-full max-w-xs" ref={dropdownRef}>
+    <div className="relative z-30 w-full max-w-xs" ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
