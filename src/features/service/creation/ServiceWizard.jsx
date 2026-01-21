@@ -23,6 +23,7 @@ const ServiceWizard = () => {
     variants: [],
     timelines: [],
   });
+  console.log(formData.timelines);
   const updateFormData = (newData) => {
     setFormData((prev) => ({ ...prev, ...newData }));
   };
@@ -48,7 +49,7 @@ const ServiceWizard = () => {
       if (response.status == 201) {
         setIsSubmitting(false);
         setSuccessServiceId(response.data.data.id);
-        // nextStep();
+        nextStep();
       }
     } catch (error) {
       console.error("Upload failed", error);
@@ -57,9 +58,7 @@ const ServiceWizard = () => {
   };
 
   return (
-    // FIXED: Background colors to match ServiceProfile theme
     <div className="min-h-screen bg-light-950 dark:bg-dark-950 flex flex-col font-sans relative transition-colors duration-700">
-      {/* FIXED: Loading Overlay colors */}
       {isSubmitting && (
         <div className="fixed inset-0 bg-light-950/60 dark:bg-dark-950/60 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="flex flex-col items-center">

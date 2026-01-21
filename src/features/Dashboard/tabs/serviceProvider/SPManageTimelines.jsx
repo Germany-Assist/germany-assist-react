@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import {
-  History,
+  Archive,
   LayoutGrid,
   Calendar,
   Plus,
   Search,
   Edit3,
+  Signpost,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
@@ -19,10 +20,13 @@ import FilterContainer from "../../../../components/ui/FilterContainer";
 
 // API
 import serviceProviderApis, {
+  archiveTimeline,
   createNewPost,
+  createNewTimeline,
 } from "../../../../api/serviceProviderApis";
 import StatusModal from "../../../../components/ui/StatusModal";
 import PostCreationModal from "../../../../components/ui/PostCreationModal";
+import TimelineCreationModal from "../../../../components/ui/TimelineCreationModal";
 export default function ServiceProviderTimelines() {
   // --- 1. STATE MANAGEMENT ---
   const [services, setServices] = useState([]);
@@ -30,7 +34,7 @@ export default function ServiceProviderTimelines() {
   const [loading, setLoading] = useState(false);
   const [statusModalCon, setStatusModalCon] = useState(null);
   const [selectedTimelineId, setSelectedTimelineId] = useState(null);
-
+  const [addingNewTimelineId, setAddingNewTimelineId] = useState(null);
   async function handlePostCreation({ description, isPinned }) {
     const body = {
       timelineId: selectedTimelineId,
@@ -60,6 +64,27 @@ export default function ServiceProviderTimelines() {
     published: undefined,
   });
 
+  const handleArchiveTimeline = async (id) => {
+    try {
+      await archiveTimeline(id);
+      setStatusModalCon({
+        isOpen: true,
+        message: "Timeline Was Archived Successfully",
+      });
+    } catch (error) {}
+  };
+
+  const handleTimelineCreation = async (payload) => {
+    const resp = await createNewTimeline({
+      ...payload,
+      serviceId: addingNewTimelineId,
+    });
+    setAddingNewTimelineId(null);
+    setStatusModalCon({
+      isOpen: true,
+      message: "Timeline Was Created Successfully",
+    });
+  };
   // --- 2. API LOGIC ---
   const fetchGroupedData = useCallback(async () => {
     setLoading(true);
@@ -98,7 +123,7 @@ export default function ServiceProviderTimelines() {
       render: (service) => (
         <TransactionCell
           id={service.title}
-          subtext={`${service.category} • ${service.timelines?.length || 0} timelines`}
+          subtext={`${service.category} • ${service.timelines?.timelines?.length || 0} timelines`}
           icon={LayoutGrid}
           variant="default"
         />
@@ -108,7 +133,7 @@ export default function ServiceProviderTimelines() {
       header: "Timelines ",
       render: (service) => (
         <div className="flex flex-col gap-2 py-2 min-w-[300px]">
-          {service.timelines?.map((timeline) => (
+          {service.timelines?.timelines?.map((timeline) => (
             <div
               key={timeline.id}
               className="group flex items-center justify-between p-3 rounded-2xl border border-zinc-100 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.02] hover:border-blue-500/30 transition-colors"
@@ -139,12 +164,19 @@ export default function ServiceProviderTimelines() {
                   onClick={() => setSelectedTimelineId(timeline.id)}
                   className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-lg transition-all"
                 >
-                  <Edit3 size={12} className="text-zinc-400" />
+                  <Signpost size={12} className="text-zinc-400" />
+                </button>
+                <button
+                  onClick={() => handleArchiveTimeline(timeline.id)}
+                  className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-lg transition-all"
+                >
+                  <Archive size={12} className="text-zinc-400" />
                 </button>
               </div>
             </div>
           ))}
-          {(!service.timelines || service.timelines.length === 0) && (
+          {(!service.timelines?.timelines ||
+            service.timelines?.timelines.length === 0) && (
             <span className="text-[10px] italic text-zinc-400">
               No Timelines found for this service.
             </span>
@@ -175,14 +207,8 @@ export default function ServiceProviderTimelines() {
             {
               label: "Add Timeline",
               show: true,
-              onClick: () => console.log("Add to", service.id),
+              onClick: () => setAddingNewTimelineId(service.id),
               variant: "primary",
-            },
-            {
-              label: "Service Settings",
-              show: true,
-              onClick: () => console.log("Edit Service", service.id),
-              variant: "outline",
             },
           ]}
         />
@@ -206,7 +232,6 @@ export default function ServiceProviderTimelines() {
           <Plus size={14} /> Create Service
         </button>
       </div>
-
       {/* FILTERS */}
       <FilterContainer
         searchValue={filters.title}
@@ -265,6 +290,11 @@ export default function ServiceProviderTimelines() {
         onClose={() => {
           setSelectedTimelineId(null);
         }}
+      />
+      <TimelineCreationModal
+        isOpen={addingNewTimelineId}
+        onSubmit={handleTimelineCreation}
+        onClose={() => setAddingNewTimelineId(null)}
       />
     </div>
   );

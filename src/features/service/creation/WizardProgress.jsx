@@ -2,9 +2,8 @@ const WizardProgress = ({ currentStep }) => {
   const steps = ["Basics", "Pricing", "Media"];
 
   return (
-    <nav className="bg-white border-b px-8 py-4 sticky top-0 z-20">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <h2 className="font-bold text-xl text-gray-900">New Service</h2>
+    <nav className="bg-light-950 pt-10 dark:bg-dark-950 text-slate-900 dark:text-slate-400 transition-colors duration-700">
+      <div className="max-w-7xl mx-auto flex items-center justify-center">
         <div className="flex items-center gap-4">
           {steps.map((label, i) => {
             const stepNum = i + 1;
@@ -22,7 +21,9 @@ const WizardProgress = ({ currentStep }) => {
                 </div>
                 <span
                   className={`text-sm font-medium ${
-                    isActive ? "text-gray-900" : "text-gray-400"
+                    isActive
+                      ? "dark:text-slate-400 text-gray-900"
+                      : "text-gray-400"
                   }`}
                 >
                   {label}

@@ -64,7 +64,7 @@ export default function ServiceProviderVariants() {
       render: (service) => (
         <TransactionCell
           id={service.title}
-          subtext={`${service.category} • ${service.variants?.length || 0} Variants`}
+          subtext={`${service.category} • ${service.variants?.variants?.length || 0} Variants`}
           icon={Package}
           variant="default"
         />
@@ -74,7 +74,7 @@ export default function ServiceProviderVariants() {
       header: "Available Variants",
       render: (service) => (
         <div className="flex flex-col gap-2 py-2 min-w-[280px]">
-          {service.variants?.map((variant) => (
+          {service.variants?.variants?.map((variant) => (
             <div
               key={variant.id}
               className="group flex items-center justify-between p-3 rounded-2xl border border-zinc-100 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.02] hover:border-blue-500/30 transition-all"
@@ -106,7 +106,8 @@ export default function ServiceProviderVariants() {
               </div>
             </div>
           ))}
-          {(!service.variants || service.variants.length === 0) && (
+          {(!service.variants?.variants ||
+            service.variants?.variants?.length === 0) && (
             <span className="text-[10px] italic text-zinc-400 p-2">
               No variants defined.
             </span>
