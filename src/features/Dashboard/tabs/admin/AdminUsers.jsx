@@ -32,8 +32,6 @@ export default function AdminUsers() {
         Object.entries(filters).filter(([_, v]) => v !== undefined && v !== ""),
       );
       const response = await adminApis.getAllUsers(cleanParams);
-
-      // Adapted to your specific API response structure
       if (response) {
         setUsers(response.data || response || []);
         setMeta({
@@ -71,7 +69,13 @@ export default function AdminUsers() {
       header: "Identity",
       render: (user) => (
         <TransactionCell
-          id={user.fullName || user.username || "Anonymous User"}
+          id={
+            (user.firstName &&
+              user.lastName &&
+              `${user.firstName} ${user.lastName}`) ||
+            user.username ||
+            "Anonymous User"
+          }
           subtext={`UID: ${user.id?.substring(0, 8)}...`}
           icon={User}
         />
@@ -141,12 +145,6 @@ export default function AdminUsers() {
               onClick: () => window.open(`/user/${user.id}`, "_blank"),
               variant: "outline",
               icon: <ExternalLink size={12} />,
-            },
-            {
-              label: "Delete",
-              show: true,
-              onClick: () => console.log("Delete", user.id),
-              variant: "outline-danger",
             },
           ]}
         />

@@ -15,10 +15,11 @@ import ServiceProviderFinance from "./serviceProvider/ServiceProviderFinance";
 import ServiceProviderPage from "./serviceProvider/ServiceProviderPage";
 import AdminProfile from "./admin/AdminProfile";
 import SPCreateService from "./serviceProvider/SPCreateService";
-import CreateNewSP from "./serviceProvider/components/CreateNewSP";
+import CreateNewSP from "./admin/features/CreateNewSP";
 import { FiMessageCircle } from "react-icons/fi";
 import SPManageTimelines from "./serviceProvider/SPManageTimelines";
 import ServiceProviderVariants from "./serviceProvider/ServiceProviderVariants";
+import AdminFinance from "./admin/AdminFinance";
 
 export default {
   admin: {
@@ -38,6 +39,10 @@ export default {
     Orders: {
       label: "Orders",
       component: AdminOrders,
+    },
+    Finance: {
+      label: "Finance",
+      component: AdminFinance,
     },
     ServiceProvider: {
       label: "Service Providers",
@@ -68,6 +73,10 @@ export default {
     Orders: {
       label: "Orders",
       component: AdminOrders,
+    },
+    Finance: {
+      label: "Finance",
+      component: AdminFinance,
     },
     ServiceProvider: {
       label: "Service Providers",
