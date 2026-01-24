@@ -29,6 +29,7 @@ const ServiceProviderFinance = () => {
     disputes: 0,
     balance: 0,
   });
+  console.log(orders);
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 });
   const [loading, setLoading] = useState(true);
   const [tableLoading, setTableLoading] = useState(false);
@@ -103,7 +104,7 @@ const ServiceProviderFinance = () => {
           actions={[
             {
               label: "Close Order",
-              show: row.status === "active" && row.type === "oneTime",
+              show: row.status === "active" && row.serviceType === "oneTime",
               loading: processingId === row.orderId,
               onClick: () => handleCloseOrder(row.orderId),
               variant: "primary",
