@@ -3,6 +3,7 @@ import Hero from "../features/home/Hero";
 import ServiceGrid from "../features/home/ServiceGrid";
 import PartnerMarquee from "../components/ui/PartnerMarquee";
 import NavigationBar from "../components/ui/NavigationBar";
+import FooterSection from "../components/ui/FooterSection";
 
 const HomePage = () => {
   return (
@@ -20,11 +21,14 @@ const HomePage = () => {
         </section>
       </main>
 
-      <footer className="py-12 border-t border-light-700 dark:border-white/5 text-center bg-light-900/30 dark:bg-transparent">
+      {/* <footer className="py-12 border-t border-light-700 dark:border-white/5 text-center bg-light-900/30 dark:bg-transparent">
         <p className="text-sm text-slate-500 dark:text-slate-400 font-light tracking-widest uppercase">
           © 2026 Germany Assist
         </p>
-      </footer>
+      </footer> */}
+
+      {/* Footer Section */}
+      <FooterSection/>
     </div>
   );
 };
