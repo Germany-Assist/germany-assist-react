@@ -48,7 +48,6 @@ export default function AdminServices() {
       setMetrics(metrics.data);
     })();
   }, []);
-  console.log(metrics);
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {

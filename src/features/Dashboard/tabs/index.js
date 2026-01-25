@@ -20,6 +20,7 @@ import { FiMessageCircle } from "react-icons/fi";
 import SPManageTimelines from "./serviceProvider/SPManageTimelines";
 import ServiceProviderVariants from "./serviceProvider/ServiceProviderVariants";
 import AdminFinance from "./admin/AdminFinance";
+import SPDisputes from "./serviceProvider/SPDisputes";
 
 export default {
   admin: {
@@ -130,6 +131,10 @@ export default {
     Finance: {
       label: "Finance",
       component: ServiceProviderFinance,
+    },
+    Disputes: {
+      label: "Disputes",
+      component: SPDisputes,
     },
     Page: {
       label: "Page",
