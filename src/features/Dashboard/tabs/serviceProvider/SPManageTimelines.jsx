@@ -1,24 +1,13 @@
-import React, { useEffect, useState, useCallback } from "react";
-import {
-  Archive,
-  LayoutGrid,
-  Calendar,
-  Plus,
-  Search,
-  Edit3,
-  Signpost,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { Archive, LayoutGrid, Calendar, Plus, Signpost } from "lucide-react";
 
 // UI Components
 import MultiUseTable from "../../../../components/ui/MultiUseTable";
 import TransactionCell from "../../../../components/ui/TransactionCell";
-import OrderStatusBadge from "../../../../components/ui/OrderStatusBadge";
 import ActionGroup from "../../../../components/ui/ActionGroup";
 import FilterContainer from "../../../../components/ui/FilterContainer";
 
-// API
+// API & Modals
 import serviceProviderApis, {
   archiveTimeline,
   createNewPost,
@@ -27,65 +16,48 @@ import serviceProviderApis, {
 import StatusModal from "../../../../components/ui/StatusModal";
 import PostCreationModal from "../../../../components/ui/PostCreationModal";
 import TimelineCreationModal from "../../../../components/ui/TimelineCreationModal";
+
+// --- STATUS LOGIC ENGINE ---
+const getServiceStatus = (service) => {
+  if (service.rejected)
+    return { label: "Rejected", color: "text-red-500", dot: "bg-red-500" };
+  if (service.published && service.approved)
+    return {
+      label: "Live",
+      color: "text-emerald-500",
+      dot: "bg-emerald-500 animate-pulse",
+    };
+  if (service.published && !service.approved)
+    return {
+      label: "Pending Approval",
+      color: "text-amber-500",
+      dot: "bg-amber-500",
+    };
+  if (service.approved && !service.published)
+    return {
+      label: "Pending Publish",
+      color: "text-blue-500",
+      dot: "bg-blue-500",
+    };
+  return { label: "Pending", color: "text-zinc-400", dot: "bg-zinc-300" };
+};
+
 export default function ServiceProviderTimelines() {
-  // --- 1. STATE MANAGEMENT ---
   const [services, setServices] = useState([]);
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 });
   const [loading, setLoading] = useState(false);
   const [statusModalCon, setStatusModalCon] = useState(null);
   const [selectedTimelineId, setSelectedTimelineId] = useState(null);
   const [addingNewTimelineId, setAddingNewTimelineId] = useState(null);
-  async function handlePostCreation({ description, isPinned }) {
-    const body = {
-      timelineId: selectedTimelineId,
-      description,
-      isPinned,
-    };
-    try {
-      await createNewPost(body);
-      setSelectedTimelineId(null);
-      setStatusModalCon({ isOpen: true, message: "Post Created Successfully" });
-    } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message || "Something Went Wrong";
-      setStatusModalCon({
-        isOpen: true,
-        message: errorMessage,
-        type: "error",
-      });
-    }
-  }
+
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
     type: "timeline",
     title: "",
     category: "",
-    published: undefined,
   });
 
-  const handleArchiveTimeline = async (id) => {
-    try {
-      await archiveTimeline(id);
-      setStatusModalCon({
-        isOpen: true,
-        message: "Timeline Was Archived Successfully",
-      });
-    } catch (error) {}
-  };
-
-  const handleTimelineCreation = async (payload) => {
-    const resp = await createNewTimeline({
-      ...payload,
-      serviceId: addingNewTimelineId,
-    });
-    setAddingNewTimelineId(null);
-    setStatusModalCon({
-      isOpen: true,
-      message: "Timeline Was Created Successfully",
-    });
-  };
-  // --- 2. API LOGIC ---
   const fetchGroupedData = useCallback(async () => {
     setLoading(true);
     try {
@@ -102,7 +74,7 @@ export default function ServiceProviderTimelines() {
         });
       }
     } catch (err) {
-      console.error("Failed to fetch:", err);
+      console.error("Failed to fetch timelines:", err);
     } finally {
       setLoading(false);
     }
@@ -112,210 +84,270 @@ export default function ServiceProviderTimelines() {
     fetchGroupedData();
   }, [fetchGroupedData]);
 
-  const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
+  // --- 1. ARCHIVE EXECUTION ---
+  const executeArchive = async (id, serviceId) => {
+    const previousState = [...services];
+    setServices((prev) =>
+      prev.map((s) =>
+        s.id === serviceId
+          ? {
+              ...s,
+              timelines: {
+                ...s.timelines,
+                timelines: s.timelines.timelines.map((t) =>
+                  t.id === id ? { ...t, isArchived: true } : t,
+                ),
+              },
+            }
+          : s,
+      ),
+    );
+
+    try {
+      await archiveTimeline(id);
+      setStatusModalCon({
+        isOpen: true,
+        message: "Timeline branch archived.",
+        type: "success",
+        onClose: () => setStatusModalCon(null),
+      });
+    } catch (error) {
+      setServices(previousState);
+      setStatusModalCon({
+        isOpen: true,
+        type: "error",
+        title: "Sync Failed",
+        message:
+          error?.response?.data?.message ||
+          "Connection error. Timeline restored.",
+        onClose: () => setStatusModalCon(null),
+      });
+    }
   };
 
-  // --- 3. COLUMNS WITH NESTED GROUPING ---
-  const groupedColumns = [
-    {
-      header: "Service Group",
-      render: (service) => (
-        <TransactionCell
-          id={service.title}
-          subtext={`${service.category} • ${service.timelines?.timelines?.length || 0} timelines`}
-          icon={LayoutGrid}
-          variant="default"
-        />
-      ),
-    },
-    {
-      header: "Timelines ",
-      render: (service) => (
-        <div className="flex flex-col gap-2 py-2 min-w-[300px]">
-          {service.timelines?.timelines?.map((timeline) => (
-            <div
-              key={timeline.id}
-              className="group flex items-center justify-between p-3 rounded-2xl border border-zinc-100 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.02] hover:border-blue-500/30 transition-colors"
-            >
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase text-zinc-800 dark:text-zinc-200">
-                    {timeline.label}
-                  </span>
-                  {timeline.isArchived && (
-                    <span className="text-[7px] font-bold text-red-500 uppercase px-1.5 py-0.5 bg-red-500/5 border border-red-500/20 rounded">
-                      Archived
+  // --- 2. ARCHIVE REQUEST (CONFIRMATION) ---
+  const handleArchiveRequest = (id, serviceId) => {
+    setStatusModalCon({
+      isOpen: true,
+      type: "operation",
+      message:
+        "Are you sure you want to archive this timeline? It will be hidden from new client bookings.",
+      buttonText: "Archive Branch",
+      onConfirm: () => executeArchive(id, serviceId),
+      onClose: () => setStatusModalCon(null),
+    });
+  };
+
+  // --- 3. POST CREATION WITH ERROR CATCH ---
+  const handlePostCreation = async (payload) => {
+    try {
+      await createNewPost({
+        timelineId: selectedTimelineId,
+        description: payload.description,
+        isPinned: payload.isPinned,
+      });
+      setSelectedTimelineId(null);
+      setStatusModalCon({
+        isOpen: true,
+        message: "Update posted successfully.",
+        type: "success",
+        onClose: () => setStatusModalCon(null),
+      });
+      fetchGroupedData();
+    } catch (error) {
+      setStatusModalCon({
+        isOpen: true,
+        type: "error",
+        title: "Post Failed",
+        message:
+          error?.response?.data?.message ||
+          "Could not create update. Please try again.",
+      });
+    }
+  };
+
+  // --- 4. TIMELINE CREATION WITH ERROR CATCH ---
+  const handleTimelineCreation = async (payload) => {
+    try {
+      await createNewTimeline({ ...payload, serviceId: addingNewTimelineId });
+      setAddingNewTimelineId(null);
+      setStatusModalCon({
+        isOpen: true,
+        message: "New timeline branch created.",
+        type: "success",
+        onClose: () => setStatusModalCon(null),
+      });
+      fetchGroupedData();
+    } catch (error) {
+      setStatusModalCon({
+        isOpen: true,
+        type: "error",
+        title: "Creation Error",
+        message:
+          error?.response?.data?.message ||
+          "The server rejected this timeline. Check your dates.",
+      });
+    }
+  };
+
+  const groupedColumns = useMemo(
+    () => [
+      {
+        header: "Service Group",
+        render: (service) => (
+          <TransactionCell
+            id={service.title}
+            subtext={`${service.category} • ${service.timelines?.timelines?.length || 0} Branches`}
+            icon={LayoutGrid}
+          />
+        ),
+      },
+      {
+        header: "Timeline Branches",
+        render: (service) => (
+          <div className="flex flex-col gap-2 py-2 min-w-[340px]">
+            {service.timelines?.timelines?.map((timeline) => (
+              <div
+                key={timeline.id}
+                className={`group flex items-center justify-between p-3 rounded-2xl border transition-all ${
+                  timeline.isArchived
+                    ? "bg-zinc-100/50 dark:bg-white/[0.01] border-zinc-200 dark:border-white/5 opacity-50 grayscale"
+                    : "bg-zinc-50/50 dark:bg-white/[0.02] border-zinc-100 dark:border-white/5 hover:border-blue-500/30"
+                }`}
+              >
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`text-[10px] font-black uppercase ${timeline.isArchived ? "text-zinc-400" : "text-zinc-800 dark:text-zinc-200"}`}
+                    >
+                      {timeline.label}
                     </span>
+                    {timeline.isArchived && (
+                      <span className="text-[7px] font-black bg-zinc-200 dark:bg-white/10 text-zinc-500 px-1.5 py-0.5 rounded uppercase tracking-widest">
+                        Archived
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Calendar size={10} className="text-zinc-400" />
+                    <span className="text-[9px] font-bold text-zinc-500 uppercase">
+                      {new Date(timeline.startDate).toLocaleDateString()} —{" "}
+                      {new Date(timeline.endDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`text-sm font-black italic ${timeline.isArchived ? "text-zinc-400" : "text-blue-600"}`}
+                  >
+                    ${timeline.price}
+                  </span>
+                  {!timeline.isArchived && (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setSelectedTimelineId(timeline.id)}
+                        className="p-1.5 opacity-0 group-hover:opacity-100 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-all"
+                      >
+                        <Signpost size={12} />
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleArchiveRequest(timeline.id, service.id)
+                        }
+                        className="p-1.5 opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-red-500 transition-all"
+                      >
+                        <Archive size={12} />
+                      </button>
+                    </div>
                   )}
                 </div>
-                <span className="text-[12px] font-bold text-zinc-400 flex items-center gap-1 mt-0.5">
-                  <Calendar size={10} />
-                  {new Date(timeline.startDate).toLocaleDateString()} —{" "}
-                  {new Date(timeline.endDate).toLocaleDateString()}
-                </span>
               </div>
-
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-black italic tracking-tighter text-blue-600 dark:text-blue-400">
-                  ${timeline.price}
-                </span>
-                <button
-                  onClick={() => setSelectedTimelineId(timeline.id)}
-                  className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-lg transition-all"
-                >
-                  <Signpost size={12} className="text-zinc-400" />
-                </button>
-                <button
-                  onClick={() => handleArchiveTimeline(timeline.id)}
-                  className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-lg transition-all"
-                >
-                  <Archive size={12} className="text-zinc-400" />
-                </button>
-              </div>
+            ))}
+          </div>
+        ),
+      },
+      {
+        header: "Status",
+        render: (service) => {
+          const status = getServiceStatus(service);
+          return (
+            <div
+              className={`flex items-center gap-2 px-2.5 py-1 rounded-full border border-current w-fit ${status.color}`}
+            >
+              <span className={`w-1 h-1 rounded-full ${status.dot}`} />
+              <span className="text-[9px] font-black uppercase">
+                {status.label}
+              </span>
             </div>
-          ))}
-          {(!service.timelines?.timelines ||
-            service.timelines?.timelines.length === 0) && (
-            <span className="text-[10px] italic text-zinc-400">
-              No Timelines found for this service.
-            </span>
-          )}
-        </div>
-      ),
-    },
-    {
-      header: "Status",
-      render: (service) => (
-        <div className="flex flex-col gap-1">
-          <OrderStatusBadge status={service.level} />
-          {service.published && (
-            <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1">
-              <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-              Live
-            </span>
-          )}
-        </div>
-      ),
-    },
-    {
-      header: "Action",
-      align: "right",
-      render: (service) => (
-        <ActionGroup
-          actions={[
-            {
-              label: "Add Timeline",
-              show: true,
-              onClick: () => setAddingNewTimelineId(service.id),
-              variant: "primary",
-            },
-          ]}
-        />
-      ),
-    },
-  ];
+          );
+        },
+      },
+      {
+        header: "Action",
+        align: "right",
+        render: (service) => (
+          <ActionGroup
+            actions={[
+              {
+                label: "Add Timeline",
+                show: true,
+                onClick: () => setAddingNewTimelineId(service.id),
+                variant: "primary",
+              },
+            ]}
+          />
+        ),
+      },
+    ],
+    [services],
+  );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 p-5">
-      {/* HEADER */}
-      <div className="flex justify-between items-end">
+    <div className="max-w-7xl mx-auto space-y-6 p-6">
+      <div className="flex justify-between items-end gap-4">
         <div>
-          <h1 className="text-4xl font-black italic tracking-tighter uppercase">
+          <h1 className="text-5xl font-black italic tracking-tighter uppercase leading-none">
             Timeline Ledger
           </h1>
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-            Grouped Timelines management by service
+          <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest mt-2">
+            Service Phase Management
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-zinc-900 dark:bg-white dark:text-black text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-transform hover:scale-[1.02]">
-          <Plus size={14} /> Create Service
-        </button>
       </div>
-      {/* FILTERS */}
+
       <FilterContainer
         searchValue={filters.title}
-        onSearchChange={(val) => handleFilterChange("title", val)}
-        placeholder="Search Service Title..."
-      >
-        <select
-          value={filters.category || ""}
-          onChange={(e) =>
-            handleFilterChange(
-              "category",
-              e.target.value === "" ? undefined : e.target.value,
-            )
-          }
-          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 px-4 py-3 rounded-2xl text-[10px] font-black uppercase outline-none"
-        >
-          <option value="">All Categories</option>
-          <option value="visa-paperwork">Visa Paperwork</option>
-        </select>
+        onSearchChange={(val) =>
+          setFilters((prev) => ({ ...prev, title: val, page: 1 }))
+        }
+      />
 
-        <div className="flex gap-2 col-span-full pt-2">
-          <FilterToggle
-            label="Live Only"
-            active={filters.published === true}
-            color="emerald"
-            onClick={() =>
-              handleFilterChange(
-                "published",
-                filters.published === true ? undefined : true,
-              )
-            }
-          />
-        </div>
-      </FilterContainer>
-      {/* TABLE */}
-      <div className="relative">
+      <div className="bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-100 dark:border-white/5 overflow-hidden">
         <MultiUseTable
           columns={groupedColumns}
-          data={services} // Passing the raw nested services array
+          data={services}
           loading={loading}
           pagination={meta}
-          onPageChange={(newPage) => handleFilterChange("page", newPage)}
+          onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
         />
       </div>
+
       <StatusModal
-        isOpen={statusModalCon?.isOpen}
-        type={statusModalCon?.type}
-        message={statusModalCon?.message}
-        onClose={() => {
-          setStatusModalCon(null);
-        }}
+        {...statusModalCon}
+        onClose={() => setStatusModalCon(null)}
       />
+
       <PostCreationModal
-        isOpen={selectedTimelineId}
+        isOpen={selectedTimelineId !== null}
         onSubmit={handlePostCreation}
-        onClose={() => {
-          setSelectedTimelineId(null);
-        }}
+        onClose={() => setSelectedTimelineId(null)}
       />
       <TimelineCreationModal
-        isOpen={addingNewTimelineId}
+        isOpen={addingNewTimelineId !== null}
         onSubmit={handleTimelineCreation}
         onClose={() => setAddingNewTimelineId(null)}
       />
     </div>
   );
 }
-
-// Helper FilterToggle
-const FilterToggle = ({ label, active, onClick, color }) => {
-  const colorClasses = {
-    emerald: active
-      ? "bg-emerald-500/10 border-emerald-500 text-emerald-500 shadow-sm"
-      : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/5 text-zinc-400",
-    blue: active
-      ? "bg-blue-500/10 border-blue-500 text-blue-500"
-      : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/5 text-zinc-400",
-  };
-  return (
-    <button
-      onClick={onClick}
-      className={`px-5 py-2.5 rounded-xl text-[9px] font-black uppercase border transition-all duration-200 ${colorClasses[color]}`}
-    >
-      {label}
-    </button>
-  );
-};

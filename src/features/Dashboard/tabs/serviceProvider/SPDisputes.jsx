@@ -21,7 +21,7 @@ import MetricCard from "../../../../components/ui/MetricCard";
 import TransactionCell from "../../../../components/ui/TransactionCell";
 import ActionGroup from "../../../../components/ui/ActionGroup";
 
-const ServiceProviderFinance = () => {
+const SPDisputes = () => {
   const [orders, setOrders] = useState([]);
   const [metrics, setMetrics] = useState({
     grossTotal: 0,
@@ -66,6 +66,7 @@ const ServiceProviderFinance = () => {
     const res = await serviceProviderCloseOrder(id);
     //TODO update the fields
   };
+
   const columns = [
     {
       header: "Transaction",
@@ -280,4 +281,4 @@ const ServiceProviderFinance = () => {
   );
 };
 
-export default ServiceProviderFinance;
+export default SPDisputes;

@@ -8,11 +8,14 @@ import { createNewService } from "../../../api/serviceProviderApis";
 import CreationSuccess from "./CreationSuccess";
 import ServiceProfile from "../serviceProfile/ServiceProfile";
 import { useMeta } from "../../../contexts/MetadataContext";
+import StatusModal from "../../../components/ui/StatusModal";
+import { getErrorMessage } from "../../../api/errorMessages";
 
 const ServiceWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successServiceId, setSuccessServiceId] = useState(null);
+  const [statusModalCon, setStatusModalCon] = useState(null);
   const { categories } = useMeta();
   const [formData, setFormData] = useState({
     title: "",
@@ -23,7 +26,6 @@ const ServiceWizard = () => {
     variants: [],
     timelines: [],
   });
-  console.log(formData.timelines);
   const updateFormData = (newData) => {
     setFormData((prev) => ({ ...prev, ...newData }));
   };
@@ -52,13 +54,21 @@ const ServiceWizard = () => {
         nextStep();
       }
     } catch (error) {
-      console.error("Upload failed", error);
+      const message = getErrorMessage(error);
+      setStatusModalCon({
+        isOpen: true,
+        type: "error",
+        onClose: () => setStatusModalCon(null),
+        message: message,
+        buttonText: "Continue",
+      });
       setIsSubmitting(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-light-950 dark:bg-dark-950 flex flex-col font-sans relative transition-colors duration-700">
+      <StatusModal {...statusModalCon} />
       {isSubmitting && (
         <div className="fixed inset-0 bg-light-950/60 dark:bg-dark-950/60 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="flex flex-col items-center">

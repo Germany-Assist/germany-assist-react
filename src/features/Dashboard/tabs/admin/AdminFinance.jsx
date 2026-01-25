@@ -10,18 +10,14 @@ import {
   History,
   LayoutGrid,
 } from "lucide-react";
-import {
-  serviceProviderGetAllOrders,
-  serviceProviderFinanceInit,
-  serviceProviderCloseOrder,
-} from "../../../../api/serviceProviderApis";
 import MultiUseTable from "../../../../components/ui/MultiUseTable";
 import OrderStatusBadge from "../../../../components/ui/OrderStatusBadge";
 import MetricCard from "../../../../components/ui/MetricCard";
 import TransactionCell from "../../../../components/ui/TransactionCell";
 import ActionGroup from "../../../../components/ui/ActionGroup";
+import { getAllFinanceStatistical } from "../../../../api/adminApis";
 
-const ServiceProviderFinance = () => {
+const AdminFinance = () => {
   const [orders, setOrders] = useState([]);
   const [metrics, setMetrics] = useState({
     grossTotal: 0,
@@ -45,12 +41,11 @@ const ServiceProviderFinance = () => {
   const initDashboard = async () => {
     setLoading(true);
     try {
-      const response = await serviceProviderFinanceInit();
+      const response = await getAllFinanceStatistical();
       if (response.success) {
         setMetrics({
           grossTotal: response.data.grossTotal,
           escrow: response.data.escrow,
-          balance: response.data.balance,
           disputes: response.data.disputes,
         });
         setOrders(response.data.orders.data);
@@ -62,10 +57,7 @@ const ServiceProviderFinance = () => {
       setLoading(false);
     }
   };
-  const handleCloseOrder = async (id) => {
-    const res = await serviceProviderCloseOrder(id);
-    //TODO update the fields
-  };
+
   const columns = [
     {
       header: "Transaction",
@@ -102,7 +94,7 @@ const ServiceProviderFinance = () => {
           actions={[
             {
               label: "Close Order",
-              show: row.status === "active" && row.serviceType === "oneTime",
+              show: row.status === "active" && row.type === "oneTime",
               loading: processingId === row.orderId,
               onClick: () => handleCloseOrder(row.orderId),
               variant: "primary",
@@ -197,15 +189,7 @@ const ServiceProviderFinance = () => {
             variant="red"
             isCount
           />
-          <MetricCard
-            title="Balance"
-            amount={metrics.balance}
-            icon={ShieldAlert}
-            sub="Available to checkout"
-            variant="green"
-          />
         </div>
-
         {/* TODO i should create reuseable component */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <div className="relative group col-span-1">
@@ -280,4 +264,4 @@ const ServiceProviderFinance = () => {
   );
 };
 
-export default ServiceProviderFinance;
+export default AdminFinance;

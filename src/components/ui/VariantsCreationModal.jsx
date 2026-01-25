@@ -9,7 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-function VariantModal({ isOpen, onClose, onSubmit }) {
+function VariantsCreationModal({ isOpen, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
     label: "",
     price: "",
@@ -27,7 +27,7 @@ function VariantModal({ isOpen, onClose, onSubmit }) {
     onSubmit({
       label: formData.label.trim(),
       price: parseFloat(formData.price) || 0,
-      limit: formData.limit ? parseInt(formData.limit) : "Unlimited",
+      limit: formData.limit ? parseInt(formData.limit) : null,
     });
     // Reset form
     setFormData({ label: "", price: "", limit: "" });
@@ -144,4 +144,4 @@ function VariantModal({ isOpen, onClose, onSubmit }) {
   );
 }
 
-export default VariantModal;
+export default VariantsCreationModal;

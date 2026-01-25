@@ -9,14 +9,17 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { createServiceProvider } from "../../../../../api/adminApis";
+import StatusModal from "../../../../../components/ui/StatusModal";
+import { getErrorMessage } from "../../../../../api/errorMessages";
 
 const CreateNewSP = () => {
+  const [statusCon, setStatusCon] = useState(null);
   const [formData, setFormData] = useState({
     name: "King Technology",
     about: "We build scalable enterprise solutions...",
     description:
       "We build scalable enterprise solutions with cutting-edge technology, serving clients globally since 2015.",
-    email: "amr_imad@hotmail.com",
+    email: "sample@provider.com",
     phone_number: "+1 (555) 123-4567",
     password: "Aa@123456",
   });
@@ -28,14 +31,30 @@ const CreateNewSP = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createServiceProvider(formData);
+      const res = await createServiceProvider(formData);
+      if (res)
+        setStatusCon({
+          isOpen: true,
+          message: "Successfully created Service Provider",
+          onClose() {
+            setStatusCon(null);
+          },
+        });
     } catch (error) {
-      console.log(error);
+      setStatusCon({
+        isOpen: true,
+        type: "error",
+        message: getErrorMessage(error),
+        onClose() {
+          setStatusCon(null);
+        },
+      });
     }
   };
 
   return (
     <div className="min-h-screen bg-white dark:bg-dark-950 text-slate-900 dark:text-white transition-colors duration-500">
+      <StatusModal {...statusCon} />
       {/* Top Navigation Bar */}
       <nav className="border-b border-light-700 dark:border-white/5 px-8 py-4 flex items-center justify-between sticky top-0 bg-white/80 dark:bg-dark-950/80 backdrop-blur-md z-10">
         <div className="flex items-center gap-4">
