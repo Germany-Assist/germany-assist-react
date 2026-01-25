@@ -73,7 +73,7 @@ export const ProfileProvider = ({ children }) => {
       if (resp)
         setProfile((p) => ({
           ...p,
-          favorites: p.favorites.filter((i) => i.id !== service.id),
+          favorites: p.favorites.filter((i) => i.service.id !== service.id),
         }));
       return resp;
     } else {

@@ -98,6 +98,10 @@ export default {
       label: "General",
       component: ClientGeneral,
     },
+    Orders: {
+      label: "Orders",
+      component: ClientOrders,
+    },
     Favorite: {
       label: "Favorite",
       component: ClientFavorite,
@@ -105,10 +109,6 @@ export default {
     Profile: {
       label: "Profile",
       component: ClientProfile,
-    },
-    Orders: {
-      label: "Orders",
-      component: ClientOrders,
     },
     Disputes: {
       label: "Disputes",
