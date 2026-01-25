@@ -21,6 +21,8 @@ import SPManageTimelines from "./serviceProvider/SPManageTimelines";
 import ServiceProviderVariants from "./serviceProvider/ServiceProviderVariants";
 import AdminFinance from "./admin/AdminFinance";
 import SPDisputes from "./serviceProvider/SPDisputes";
+import ClientDisputes from "./client/ClientDisputes";
+import ClientFavorite from "./client/ClientFavorite";
 
 export default {
   admin: {
@@ -97,8 +99,8 @@ export default {
       component: ClientGeneral,
     },
     Favorite: {
-      label: "Services",
-      component: ClientServices,
+      label: "Favorite",
+      component: ClientFavorite,
     },
     Profile: {
       label: "Profile",
@@ -107,6 +109,10 @@ export default {
     Orders: {
       label: "Orders",
       component: ClientOrders,
+    },
+    Disputes: {
+      label: "Disputes",
+      component: ClientDisputes,
     },
     Messages: {
       label: "Messages",
@@ -122,9 +128,9 @@ export default {
       label: "Services",
       component: ServiceProviderServices,
       children: [
+        { label: "Manage Service", component: ServiceProviderServices },
         { label: "Manage Variants", component: ServiceProviderVariants },
         { label: "Manage Timelines", component: SPManageTimelines },
-        { label: "Manage Service", component: ServiceProviderServices },
         { label: "Create New Service", component: SPCreateService },
       ],
     },

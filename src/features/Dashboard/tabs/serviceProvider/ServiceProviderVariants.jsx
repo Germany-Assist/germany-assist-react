@@ -2,15 +2,15 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { LayoutGrid, Plus, Search, Archive, Tag, Package } from "lucide-react";
 
 // UI Components
-import MultiUseTable from "../../../../components/ui/MultiUseTable";
-import TransactionCell from "../../../../components/ui/TransactionCell";
-import ActionGroup from "../../../../components/ui/ActionGroup";
-import FilterContainer from "../../../../components/ui/FilterContainer";
+import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
+import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
+import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
+import FilterContainer from "../../../../components/ui/dashboard/FilterContainer";
 import serviceProviderApis, {
   archiveVariant,
   createNewVariant,
 } from "../../../../api/serviceProviderApis";
-import VariantsCreationModal from "../../../../components/ui/VariantsCreationModal";
+import VariantsCreationModal from "../../../../components/ui/dashboard/VariantsCreationModal";
 import StatusModal from "../../../../components/ui/StatusModal";
 
 // --- STATUS LOGIC ENGINE ---

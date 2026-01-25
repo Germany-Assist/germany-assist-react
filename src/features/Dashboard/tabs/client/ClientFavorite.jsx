@@ -1,10 +1,12 @@
 import React from "react";
 import MaintenancePage from "../../../../pages/MaintenancePage";
 
-export default function ClientGeneral() {
+function ClientFavorite() {
   return (
     <div>
       <MaintenancePage nav={false} />
     </div>
   );
 }
+
+export default ClientFavorite;

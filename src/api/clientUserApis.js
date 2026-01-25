@@ -9,6 +9,6 @@ export async function fetchClientOrders(params) {
 }
 
 export async function openNewDispute(payload) {
-  const res = await api.get(`/dispute`, payload);
+  const res = await api.post(`/dispute`, payload);
   return res.data;
 }

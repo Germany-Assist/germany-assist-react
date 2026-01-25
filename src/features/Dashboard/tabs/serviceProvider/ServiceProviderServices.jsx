@@ -10,10 +10,10 @@ import {
 } from "lucide-react";
 
 // UI Components
-import MultiUseTable from "../../../../components/ui/MultiUseTable";
-import TransactionCell from "../../../../components/ui/TransactionCell";
-import ActionGroup from "../../../../components/ui/ActionGroup";
-import FilterContainer from "../../../../components/ui/FilterContainer";
+import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
+import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
+import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
+import FilterContainer from "../../../../components/ui/dashboard/FilterContainer";
 import StatusModal from "../../../../components/ui/StatusModal";
 
 // API
