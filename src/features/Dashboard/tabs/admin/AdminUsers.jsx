@@ -7,10 +7,10 @@ import {
   Trash2,
   ExternalLink,
 } from "lucide-react";
-import MultiUseTable from "../../../../components/ui/MultiUseTable";
-import TransactionCell from "../../../../components/ui/TransactionCell";
-import ActionGroup from "../../../../components/ui/ActionGroup";
-import FilterContainer from "../../../../components/ui/FilterContainer";
+import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
+import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
+import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
+import FilterContainer from "../../../../components/ui/dashboard/FilterContainer";
 import adminApis from "../../../../api/adminApis";
 
 export default function AdminUsers() {

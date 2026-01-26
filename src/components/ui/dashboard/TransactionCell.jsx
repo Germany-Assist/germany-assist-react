@@ -1,8 +1,8 @@
 const TransactionCell = ({
-  id,
   subtext,
   icon: Icon = History, // Default icon
   variant = "default", // "default", "danger", "success"
+  title,
 }) => {
   const variants = {
     default: "bg-zinc-100 dark:bg-zinc-800 text-zinc-400",
@@ -15,9 +15,10 @@ const TransactionCell = ({
       <div className={`p-2 rounded-xl ${variants[variant]}`}>
         <Icon size={16} />
       </div>
+
       <div>
-        <p className="font-black text-lg tracking-tight">{id}</p>
-        <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-tighter">
+        <p className="font-black text-lg tracking-tight">{title}</p>
+        <p className="text-[9px] font-bold text-zinc-400  tracking-tighter">
           {subtext}
         </p>
       </div>

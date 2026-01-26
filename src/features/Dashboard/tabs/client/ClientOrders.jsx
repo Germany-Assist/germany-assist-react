@@ -11,19 +11,24 @@ import {
   Loader2,
   History,
 } from "lucide-react";
-import ActionGroup from "../../../../components/ui/ActionGroup";
-import MultiUseTable from "../../../../components/ui/MultiUseTable";
-import TransactionCell from "../../../../components/ui/TransactionCell";
-import OrderStatusBadge from "../../../../components/ui/OrderStatusBadge";
-import DisputeModal from "../../../../components/ui/DisputeModal";
-
+import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
+import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
+import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
+import OrderStatusBadge from "../../../../components/ui/dashboard/OrderStatusBadge";
+import DisputeModal from "../../../../components/ui/dashboard/DisputeModal";
+import StatusModal from "../../../../components/ui/StatusModal";
+import { getErrorMessage } from "../../../../api/errorMessages";
+import { Navigate, useNavigate } from "react-router-dom";
+import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader";
+import LoadingIcon from "../../../../components/ui/LoadingIcon";
 export default function ClientOrders() {
   const [orders, setOrders] = useState([]);
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 });
   const [tableLoading, setTableLoading] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [disputeOrderId, setDisputeOrderId] = useState(null);
   const [statusModalCon, setStatusModalCon] = useState(null);
+  const navigate = useNavigate(null);
+
   const [filters, setFilters] = useState({
     page: 1,
     limit: 20,
@@ -31,6 +36,7 @@ export default function ClientOrders() {
     type: "",
     onlyDisputed: false,
   });
+
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
   };
@@ -60,8 +66,22 @@ export default function ClientOrders() {
 
   const handleDispute = async (data) => {
     try {
-      await openNewDispute(data);
-    } catch (error) {}
+      const payload = { ...data, orderId: disputeOrderId };
+      const res = await openNewDispute(payload);
+      setStatusModalCon({
+        isOpen: true,
+        message: res.message || "Dispute is now open",
+        onClose: () => setStatusModalCon(null),
+      });
+    } catch (error) {
+      const errorMessage = getErrorMessage(error);
+      setStatusModalCon({
+        isOpen: true,
+        type: "error",
+        message: errorMessage,
+        onClose: () => setStatusModalCon(null),
+      });
+    }
   };
   // flag i stopped here im to sleepy i need to fix this
   const columns = [
@@ -71,8 +91,8 @@ export default function ClientOrders() {
         const isDisputed = order.dispute !== null;
         return (
           <TransactionCell
-            id={order.orderId}
-            subtext={new Date(order.createdAt).toLocaleDateString()}
+            title={order.serviceTitle}
+            subtext={`ORDER ID ${order.orderId}`}
             icon={isDisputed ? Gavel : History}
             variant={isDisputed ? "danger" : "default"}
           />
@@ -91,16 +111,36 @@ export default function ClientOrders() {
           actions={[
             {
               label: "Open Dispute",
-              show: row.status === "pending_completion",
+              show:
+                (row.status === "pending_completion" ||
+                  row.status === "active") &&
+                !row.dispute,
               onClick: () => setDisputeOrderId(row.orderId),
-              variant: "primary",
+              variant: "danger",
+            },
+            {
+              label: "Go To Dispute Center",
+              show: row.dispute,
+              onClick: () => console.log(row.dispute.id),
+              variant: "danger",
+            },
+            {
+              label: "Go To Conversation",
+              show: row.serviceType === "oneTime",
+              onClick: () => console.log(row),
+              variant: "secondary",
+            },
+            {
+              label: "Go To Timeline",
+              show: row.serviceType === "timeline",
+              onClick: () => navigate(`/timeline/${row.id}`),
+              variant: "secondary",
             },
           ]}
         />
       ),
     },
   ];
-
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-6">
       <DisputeModal
@@ -109,16 +149,12 @@ export default function ClientOrders() {
         itemName={`Order id ${disputeOrderId}`}
         onSubmit={handleDispute}
       />
+      <StatusModal {...statusModalCon} />
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* HEADER */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <h1 className="text-5xl font-black tracking-tighter uppercase italic dark:text-white">
-              ORDERS
-            </h1>
-            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em]"></p>
-          </div>
-        </div>
+        <DashboardHeader
+          title={"Orders Console"}
+          subtitle={"Client Order Control center"}
+        />
       </div>
       {/* TODO i should create reuseable component */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -168,25 +204,17 @@ export default function ClientOrders() {
           <AlertTriangle size={14} /> Only Disputed
         </button>
       </div>
-      {/* LEDGER */}
-      <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-white/5 shadow-sm overflow-hidden relative">
-        {tableLoading && (
-          <div className="absolute inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-            <Loader2 className="animate-spin text-blue-500" />
-          </div>
-        )}
-
-        <div className="overflow-x-auto">
-          <MultiUseTable
-            columns={columns}
-            data={orders}
-            loading={tableLoading}
-            pagination={meta}
-            onPageChange={(newPage) =>
-              setFilters((f) => ({ ...f, page: newPage }))
-            }
-          />
-        </div>
+      {tableLoading && <LoadingIcon />}
+      <div className="overflow-x-auto">
+        <MultiUseTable
+          columns={columns}
+          data={orders}
+          loading={tableLoading}
+          pagination={meta}
+          onPageChange={(newPage) =>
+            setFilters((f) => ({ ...f, page: newPage }))
+          }
+        />
       </div>
     </div>
   );

@@ -15,11 +15,11 @@ import {
   serviceProviderFinanceInit,
   serviceProviderCloseOrder,
 } from "../../../../api/serviceProviderApis";
-import MultiUseTable from "../../../../components/ui/MultiUseTable";
-import OrderStatusBadge from "../../../../components/ui/OrderStatusBadge";
-import MetricCard from "../../../../components/ui/MetricCard";
-import TransactionCell from "../../../../components/ui/TransactionCell";
-import ActionGroup from "../../../../components/ui/ActionGroup";
+import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
+import OrderStatusBadge from "../../../../components/ui/dashboard/OrderStatusBadge";
+import MetricCard from "../../../../components/ui/dashboard/MetricCard";
+import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
+import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
 
 const SPDisputes = () => {
   const [orders, setOrders] = useState([]);

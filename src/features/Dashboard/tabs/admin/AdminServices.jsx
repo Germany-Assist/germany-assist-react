@@ -14,15 +14,16 @@ import {
   Clock,
   XCircle,
 } from "lucide-react";
-import MultiUseTable from "../../../../components/ui/MultiUseTable";
-import TransactionCell from "../../../../components/ui/TransactionCell";
-import ActionGroup from "../../../../components/ui/ActionGroup";
-import FilterContainer from "../../../../components/ui/FilterContainer";
+import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
+import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
+import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
+import FilterContainer from "../../../../components/ui/dashboard/FilterContainer";
 import StatusModal from "../../../../components/ui/StatusModal";
 import adminApis, {
   getAllServicesStatistical,
 } from "../../../../api/adminApis";
-import MetricCard from "../../../../components/ui/MetricCard";
+import MetricCard from "../../../../components/ui/dashboard/MetricCard";
+import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader";
 
 export default function AdminServices() {
   const [services, setServices] = useState([]);
@@ -329,16 +330,10 @@ export default function AdminServices() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-6">
-      <div className="flex justify-between items-end">
-        <div>
-          <h1 className="text-4xl font-black italic tracking-tighter uppercase leading-none">
-            Admin Services Console
-          </h1>
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-2">
-            Deep-Audit Service Verification
-          </p>
-        </div>
-      </div>
+      <DashboardHeader
+        title={"Admin Services Console"}
+        subtitle={"Audit Service"}
+      />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
           title="Total Services"
@@ -370,7 +365,6 @@ export default function AdminServices() {
           variant="red"
         />
       </div>
-
       <FilterContainer
         searchValue={filters.title}
         onSearchChange={(val) =>
@@ -434,7 +428,6 @@ export default function AdminServices() {
           />
         </div>
       </FilterContainer>
-
       <div className="bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-100 dark:border-white/5 overflow-hidden">
         <MultiUseTable
           columns={adminColumns}
@@ -444,7 +437,6 @@ export default function AdminServices() {
           onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
         />
       </div>
-
       <StatusModal
         {...statusModalCon}
         onClose={() => setStatusModalCon(null)}

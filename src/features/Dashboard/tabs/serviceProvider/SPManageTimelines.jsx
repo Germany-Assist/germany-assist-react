@@ -2,10 +2,10 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Archive, LayoutGrid, Calendar, Plus, Signpost } from "lucide-react";
 
 // UI Components
-import MultiUseTable from "../../../../components/ui/MultiUseTable";
-import TransactionCell from "../../../../components/ui/TransactionCell";
-import ActionGroup from "../../../../components/ui/ActionGroup";
-import FilterContainer from "../../../../components/ui/FilterContainer";
+import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
+import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
+import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
+import FilterContainer from "../../../../components/ui/dashboard/FilterContainer";
 
 // API & Modals
 import serviceProviderApis, {
@@ -14,8 +14,8 @@ import serviceProviderApis, {
   createNewTimeline,
 } from "../../../../api/serviceProviderApis";
 import StatusModal from "../../../../components/ui/StatusModal";
-import PostCreationModal from "../../../../components/ui/PostCreationModal";
-import TimelineCreationModal from "../../../../components/ui/TimelineCreationModal";
+import PostCreationModal from "../../../../components/ui/dashboard/PostCreationModal";
+import TimelineCreationModal from "../../../../components/ui/dashboard/TimelineCreationModal";
 
 // --- STATUS LOGIC ENGINE ---
 const getServiceStatus = (service) => {
