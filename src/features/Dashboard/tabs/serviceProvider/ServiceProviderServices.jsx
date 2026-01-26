@@ -1,26 +1,24 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import {
-  LayoutGrid,
-  Plus,
   CheckCircle2,
   AlertCircle,
   Clock,
   Globe,
   Eye,
+  Box,
 } from "lucide-react";
-
-// UI Components
 import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
 import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
 import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
 import FilterContainer from "../../../../components/ui/dashboard/FilterContainer";
 import StatusModal from "../../../../components/ui/StatusModal";
-
-// API
 import serviceProviderApis, {
   publishService,
   unpublishService,
 } from "../../../../api/serviceProviderApis";
+import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader";
+import { getErrorMessage } from "../../../../api/errorMessages";
+import { useNavigate } from "react-router-dom";
 
 // --- STATUS LOGIC ENGINE ---
 const getServiceStatus = (service) => {
@@ -65,7 +63,6 @@ export default function ServiceProviderServices() {
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 });
   const [loading, setLoading] = useState(false);
   const [statusModalCon, setStatusModalCon] = useState(null);
-
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
@@ -78,15 +75,13 @@ export default function ServiceProviderServices() {
     approved: undefined,
     rejected: undefined,
   });
-
-  // --- 1. DATA FETCHING ---
+  const navigate = useNavigate();
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
       const cleanParams = Object.fromEntries(
         Object.entries(filters).filter(([_, v]) => v !== undefined && v !== ""),
       );
-
       const response = await serviceProviderApis.getAllServices(cleanParams);
       if (response) {
         setServices(response.data || []);
@@ -97,7 +92,12 @@ export default function ServiceProviderServices() {
         });
       }
     } catch (err) {
-      console.error("API Error:", err);
+      setStatusModalCon({
+        isOpen: true,
+        onClose: () => setStatusModalCon(null),
+        message: getErrorMessage(err),
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -107,31 +107,24 @@ export default function ServiceProviderServices() {
     fetchServices();
   }, [fetchServices]);
 
-  // --- 2. OPTIMISTIC UPDATE LOGIC ---
   const handleTogglePublish = async (id, currentlyPublished) => {
     const previousState = [...services];
     const targetStatus = !currentlyPublished;
-
-    // Optimistically update the UI locally
     setServices((prev) =>
       prev.map((s) => (s.id === id ? { ...s, published: targetStatus } : s)),
     );
-
     try {
       if (currentlyPublished) {
         await unpublishService(id);
       } else {
         await publishService(id);
       }
-      // Optional: Background fetch to ensure ID and meta are perfectly synced
-      // fetchServices();
     } catch (error) {
-      // Rollback on Axios failure
       setServices(previousState);
       setStatusModalCon({
         isOpen: true,
         type: "error",
-        message: `Failed to ${targetStatus ? "publish" : "unpublish"} service. Sync error.`,
+        message: `Failed to ${targetStatus ? "publish" : "unpublish"} service. ${getErrorMessage(error)}.`,
       });
     }
   };
@@ -140,16 +133,15 @@ export default function ServiceProviderServices() {
     setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
   };
 
-  // --- 3. TABLE COLUMNS ---
   const serviceColumns = useMemo(
     () => [
       {
         header: "Service",
         render: (service) => (
           <TransactionCell
-            id={service.title}
+            title={service.title}
             subtext={`ID: ${service.id} • ${service.category}`}
-            icon={LayoutGrid}
+            icon={Box}
             variant={service.rejected ? "danger" : "default"}
           />
         ),
@@ -158,7 +150,7 @@ export default function ServiceProviderServices() {
         header: "Delivery Type",
         render: (service) => (
           <div className="flex flex-col gap-1">
-            <span className="text-[9px] font-black uppercase px-2.5 py-1 bg-zinc-100 dark:bg-white/5 rounded-lg border border-zinc-200 dark:border-white/5 w-fit">
+            <span className="text-[11px] font-black uppercase px-2.5 py-1 bg-zinc-100 dark:bg-white/5 rounded-lg border border-zinc-200 dark:border-white/5 w-fit">
               {service.type === "oneTime"
                 ? "One-Time Payment"
                 : "Timeline Based"}
@@ -213,13 +205,25 @@ export default function ServiceProviderServices() {
                 show: !service.rejected, // Cannot toggle if rejected
                 onClick: () =>
                   handleTogglePublish(service.id, service.published),
-                variant: service.published ? "outline" : "emerald",
+                variant: service.published ? "danger" : "success",
+              },
+              {
+                label: "VIEW",
+                show: !service.rejected, // Cannot toggle if rejected
+                onClick: () => navigate(`/admin/service/${service.id}`),
+                variant: "success",
               },
               {
                 label: "Edit",
                 show: true,
-                onClick: () => console.log("Edit", service.id),
-                variant: "outline",
+                onClick: () =>
+                  setStatusModalCon({
+                    isOpen: true,
+                    type: "warning",
+                    message:
+                      "Please note that the update is not allowed at this moment we will discuss this in a meeting with the core team",
+                  }),
+                variant: "alert",
               },
             ]}
           />
@@ -231,21 +235,7 @@ export default function ServiceProviderServices() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-6">
-      {/* HEADER */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-        <div>
-          <h1 className="text-5xl font-black italic tracking-tighter uppercase leading-none">
-            Services
-          </h1>
-          <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.2em] mt-2">
-            Inventory & Market Visibility
-          </p>
-        </div>
-        <button className="flex items-center gap-2 bg-zinc-900 dark:bg-white dark:text-black text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-[1.02] transition-transform">
-          <Plus size={16} /> Create Service
-        </button>
-      </div>
-
+      <DashboardHeader title={"Services"} subtitle={"manage your services"} />
       {/* FILTERS */}
       <FilterContainer
         searchValue={filters.title}
@@ -260,6 +250,7 @@ export default function ServiceProviderServices() {
           className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 px-4 py-3 rounded-2xl text-[10px] font-black uppercase outline-none focus:ring-2 ring-blue-500/20"
         >
           <option value="">All Categories</option>
+          {/* TODO fix the categories after meeting with core team */}
           <option value="visa-paperwork">Visa Paperwork</option>
         </select>
 
@@ -300,16 +291,13 @@ export default function ServiceProviderServices() {
         </div>
       </FilterContainer>
 
-      {/* TABLE */}
-      <div className="bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-100 dark:border-white/5 overflow-hidden">
-        <MultiUseTable
-          columns={serviceColumns}
-          data={services}
-          loading={loading}
-          pagination={meta}
-          onPageChange={(newPage) => handleFilterChange("page", newPage)}
-        />
-      </div>
+      <MultiUseTable
+        columns={serviceColumns}
+        data={services}
+        loading={loading}
+        pagination={meta}
+        onPageChange={(newPage) => handleFilterChange("page", newPage)}
+      />
 
       <StatusModal
         {...statusModalCon}
