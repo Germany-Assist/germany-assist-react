@@ -1,13 +1,16 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { Archive, LayoutGrid, Calendar, Plus, Signpost } from "lucide-react";
-
-// UI Components
+import {
+  Archive,
+  LayoutGrid,
+  Calendar,
+  Plus,
+  Signpost,
+  Eye,
+} from "lucide-react";
 import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
 import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
 import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
 import FilterContainer from "../../../../components/ui/dashboard/FilterContainer";
-
-// API & Modals
 import serviceProviderApis, {
   archiveTimeline,
   createNewPost,
@@ -16,8 +19,10 @@ import serviceProviderApis, {
 import StatusModal from "../../../../components/ui/StatusModal";
 import PostCreationModal from "../../../../components/ui/dashboard/PostCreationModal";
 import TimelineCreationModal from "../../../../components/ui/dashboard/TimelineCreationModal";
+import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader";
+import { useNavigate } from "react-router-dom";
+import { getErrorMessage } from "../../../../api/errorMessages";
 
-// --- STATUS LOGIC ENGINE ---
 const getServiceStatus = (service) => {
   if (service.rejected)
     return { label: "Rejected", color: "text-red-500", dot: "bg-red-500" };
@@ -55,9 +60,8 @@ export default function ServiceProviderTimelines() {
     limit: 10,
     type: "timeline",
     title: "",
-    category: "",
   });
-
+  const navigate = useNavigate();
   const fetchGroupedData = useCallback(async () => {
     setLoading(true);
     try {
@@ -74,7 +78,12 @@ export default function ServiceProviderTimelines() {
         });
       }
     } catch (err) {
-      console.error("Failed to fetch timelines:", err);
+      setStatusModalCon({
+        isOpen: true,
+        onClose: () => setStatusModalCon(null),
+        message: getErrorMessage(err),
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -84,7 +93,6 @@ export default function ServiceProviderTimelines() {
     fetchGroupedData();
   }, [fetchGroupedData]);
 
-  // --- 1. ARCHIVE EXECUTION ---
   const executeArchive = async (id, serviceId) => {
     const previousState = [...services];
     setServices((prev) =>
@@ -117,28 +125,24 @@ export default function ServiceProviderTimelines() {
         isOpen: true,
         type: "error",
         title: "Sync Failed",
-        message:
-          error?.response?.data?.message ||
-          "Connection error. Timeline restored.",
+        message: getErrorMessage(error),
         onClose: () => setStatusModalCon(null),
       });
     }
   };
 
-  // --- 2. ARCHIVE REQUEST (CONFIRMATION) ---
   const handleArchiveRequest = (id, serviceId) => {
     setStatusModalCon({
       isOpen: true,
       type: "operation",
       message:
         "Are you sure you want to archive this timeline? It will be hidden from new client bookings.",
-      buttonText: "Archive Branch",
+      buttonText: "Archive Timeline",
       onConfirm: () => executeArchive(id, serviceId),
       onClose: () => setStatusModalCon(null),
     });
   };
 
-  // --- 3. POST CREATION WITH ERROR CATCH ---
   const handlePostCreation = async (payload) => {
     try {
       await createNewPost({
@@ -147,26 +151,23 @@ export default function ServiceProviderTimelines() {
         isPinned: payload.isPinned,
       });
       setSelectedTimelineId(null);
+      await fetchGroupedData();
       setStatusModalCon({
         isOpen: true,
         message: "Update posted successfully.",
         type: "success",
         onClose: () => setStatusModalCon(null),
       });
-      fetchGroupedData();
     } catch (error) {
       setStatusModalCon({
         isOpen: true,
         type: "error",
         title: "Post Failed",
-        message:
-          error?.response?.data?.message ||
-          "Could not create update. Please try again.",
+        message: getErrorMessage(error),
       });
     }
   };
 
-  // --- 4. TIMELINE CREATION WITH ERROR CATCH ---
   const handleTimelineCreation = async (payload) => {
     try {
       await createNewTimeline({ ...payload, serviceId: addingNewTimelineId });
@@ -183,9 +184,7 @@ export default function ServiceProviderTimelines() {
         isOpen: true,
         type: "error",
         title: "Creation Error",
-        message:
-          error?.response?.data?.message ||
-          "The server rejected this timeline. Check your dates.",
+        message: getErrorMessage(error),
       });
     }
   };
@@ -196,7 +195,7 @@ export default function ServiceProviderTimelines() {
         header: "Service Group",
         render: (service) => (
           <TransactionCell
-            id={service.title}
+            title={service.title}
             subtext={`${service.category} • ${service.timelines?.timelines?.length || 0} Branches`}
             icon={LayoutGrid}
           />
@@ -249,7 +248,7 @@ export default function ServiceProviderTimelines() {
                         onClick={() => setSelectedTimelineId(timeline.id)}
                         className="p-1.5 opacity-0 group-hover:opacity-100 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-all"
                       >
-                        <Signpost size={12} />
+                        <Signpost size={16} />
                       </button>
                       <button
                         onClick={() =>
@@ -257,7 +256,17 @@ export default function ServiceProviderTimelines() {
                         }
                         className="p-1.5 opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-red-500 transition-all"
                       >
-                        <Archive size={12} />
+                        <Archive size={16} />
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          navigate(`/admin/timeline/${timeline.id}`)
+                        }
+                        className="p-1.5 opacity-0 group-hover:opacity-100 bg-green-500/10 text-blue-500 rounded-lg hover:bg-green-500 hover:text-white transition-all"
+                        title="Archive Timeline"
+                      >
+                        <Eye size={16} strokeWidth={2.5} />
                       </button>
                     </div>
                   )}
@@ -295,6 +304,12 @@ export default function ServiceProviderTimelines() {
                 onClick: () => setAddingNewTimelineId(service.id),
                 variant: "primary",
               },
+              {
+                label: "View",
+                show: true,
+                onClick: () => navigate(`/admin/service/${service.id}`),
+                variant: "success",
+              },
             ]}
           />
         ),
@@ -305,17 +320,10 @@ export default function ServiceProviderTimelines() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-6">
-      <div className="flex justify-between items-end gap-4">
-        <div>
-          <h1 className="text-5xl font-black italic tracking-tighter uppercase leading-none">
-            Timeline Ledger
-          </h1>
-          <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest mt-2">
-            Service Phase Management
-          </p>
-        </div>
-      </div>
-
+      <DashboardHeader
+        title={"Timeline CONSOLE"}
+        subtitle={"manage timelines"}
+      />
       <FilterContainer
         searchValue={filters.title}
         onSearchChange={(val) =>
@@ -323,15 +331,13 @@ export default function ServiceProviderTimelines() {
         }
       />
 
-      <div className="bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-100 dark:border-white/5 overflow-hidden">
-        <MultiUseTable
-          columns={groupedColumns}
-          data={services}
-          loading={loading}
-          pagination={meta}
-          onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
-        />
-      </div>
+      <MultiUseTable
+        columns={groupedColumns}
+        data={services}
+        loading={loading}
+        pagination={meta}
+        onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
+      />
 
       <StatusModal
         {...statusModalCon}

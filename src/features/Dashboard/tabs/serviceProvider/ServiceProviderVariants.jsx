@@ -1,7 +1,14 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { LayoutGrid, Plus, Search, Archive, Tag, Package } from "lucide-react";
-
-// UI Components
+import {
+  Archive,
+  Tag,
+  Package,
+  CheckCircle2,
+  Clock,
+  Globe,
+  AlertCircle,
+} from "lucide-react";
+import { getErrorMessage } from "../../../../api/errorMessages";
 import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
 import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
 import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
@@ -10,32 +17,47 @@ import serviceProviderApis, {
   archiveVariant,
   createNewVariant,
 } from "../../../../api/serviceProviderApis";
+import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader";
 import VariantsCreationModal from "../../../../components/ui/dashboard/VariantsCreationModal";
 import StatusModal from "../../../../components/ui/StatusModal";
+import { useNavigate } from "react-router-dom";
 
-// --- STATUS LOGIC ENGINE ---
+// TODO move this to component
 const getServiceStatus = (service) => {
   if (service.rejected)
-    return { label: "Rejected", color: "text-red-500", dot: "bg-red-500" };
+    return {
+      label: "Rejected",
+      color: "text-red-500",
+      dot: "bg-red-500",
+      icon: AlertCircle,
+    };
   if (service.published && service.approved)
     return {
       label: "Live",
       color: "text-emerald-500",
       dot: "bg-emerald-500 animate-pulse",
+      icon: CheckCircle2,
     };
   if (service.published && !service.approved)
     return {
       label: "Pending Approval",
       color: "text-amber-500",
       dot: "bg-amber-500",
+      icon: Clock,
     };
   if (service.approved && !service.published)
     return {
       label: "Pending Publish",
       color: "text-blue-500",
       dot: "bg-blue-500",
+      icon: Globe,
     };
-  return { label: "Pending", color: "text-zinc-400", dot: "bg-zinc-300" };
+  return {
+    label: "Pending",
+    color: "text-zinc-400",
+    dot: "bg-zinc-300",
+    icon: Clock,
+  };
 };
 
 export default function ServiceProviderVariants() {
@@ -50,8 +72,8 @@ export default function ServiceProviderVariants() {
     limit: 10,
     type: "oneTime",
     title: "",
-    category: "",
   });
+  const navigate = useNavigate();
 
   const fetchVariantsData = useCallback(async () => {
     setLoading(true);
@@ -59,6 +81,7 @@ export default function ServiceProviderVariants() {
       const cleanParams = Object.fromEntries(
         Object.entries(filters).filter(([_, v]) => v !== undefined && v !== ""),
       );
+
       const response = await serviceProviderApis.getAllServices(cleanParams);
       if (response) {
         setServices(response.data || []);
@@ -69,7 +92,12 @@ export default function ServiceProviderVariants() {
         });
       }
     } catch (err) {
-      console.error("Fetch Error:", err);
+      setStatusModalCon({
+        isOpen: true,
+        onClose: () => setStatusModalCon(null),
+        message: getErrorMessage(err),
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -79,11 +107,8 @@ export default function ServiceProviderVariants() {
     fetchVariantsData();
   }, [fetchVariantsData]);
 
-  // --- 1. ARCHIVE EXECUTION ---
   const executeArchive = async (variantId, serviceId) => {
     const previousState = [...services];
-
-    // Optimistically toggle isArchived
     setServices((prev) =>
       prev.map((service) => {
         if (service.id === serviceId) {
@@ -106,24 +131,21 @@ export default function ServiceProviderVariants() {
       setStatusModalCon({
         isOpen: true,
         type: "success",
-        message: "Variant successfully flagged as archived.",
+        message: "Variant successfully archived.",
         onClose: () => setStatusModalCon(null),
       });
     } catch (error) {
-      setServices(previousState); // Rollback
+      setServices(previousState);
       setStatusModalCon({
         isOpen: true,
         type: "error",
         title: "Sync Error",
-        message:
-          error?.response?.data?.message ||
-          "Failed to archive variant. State reverted.",
+        message: getErrorMessage(error),
         onClose: () => setStatusModalCon(null),
       });
     }
   };
 
-  // --- 2. ARCHIVE REQUEST (CONFIRMATION) ---
   const handleArchiveRequest = (variantId, serviceId) => {
     setStatusModalCon({
       isOpen: true,
@@ -135,23 +157,44 @@ export default function ServiceProviderVariants() {
       onClose: () => setStatusModalCon(null),
     });
   };
-
+  const handleVariantCreation = async (payload) => {
+    try {
+      await createNewVariant({
+        ...payload,
+        serviceId: newVariantServiceId,
+      });
+      setNewVariantServiceId(null);
+      await fetchVariantsData();
+      setStatusModalCon({
+        isOpen: true,
+        type: "success",
+        message: "New variant created successfully",
+      });
+    } catch (e) {
+      setStatusModalCon({
+        isOpen: true,
+        type: "error",
+        title: "Creation Error",
+        message: getErrorMessage(e),
+      });
+    }
+  };
   const variantColumns = useMemo(
     () => [
       {
         header: "Service",
         render: (service) => (
           <TransactionCell
-            id={service.title}
+            title={service.title}
             subtext={`${service.category} • ${service.variants?.variants?.length || 0} Total Tiers`}
             icon={Package}
           />
         ),
       },
       {
-        header: "Tier Ledger",
+        header: "Tiers",
         render: (service) => (
-          <div className="flex flex-col gap-2 py-2 min-w-[320px]">
+          <div className="flex flex-col gap-2 py-2 min-w-[250px]">
             {service.variants?.variants?.map((variant) => (
               <div
                 key={variant.id}
@@ -232,6 +275,12 @@ export default function ServiceProviderVariants() {
           <ActionGroup
             actions={[
               {
+                label: "view",
+                show: true,
+                onClick: () => navigate(`/admin/service/${service.id}`),
+                variant: "success",
+              },
+              {
                 label: "Add Variant",
                 show: true,
                 onClick: () => setNewVariantServiceId(service.id),
@@ -247,67 +296,34 @@ export default function ServiceProviderVariants() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-6">
-      <div>
-        <h1 className="text-4xl font-black italic tracking-tighter uppercase leading-none">
-          Variant Ledger
-        </h1>
-        <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest mt-1">
-          Audit and manage service tiers
-        </p>
-      </div>
-
+      <DashboardHeader
+        title={"Variant Ledger"}
+        subtitle={"Audit and manage service tiers"}
+      />
       <VariantsCreationModal
         isOpen={newVariantServiceId !== null}
         onClose={() => setNewVariantServiceId(null)}
-        onSubmit={async (payload) => {
-          try {
-            await createNewVariant({
-              ...payload,
-              serviceId: newVariantServiceId,
-            });
-            setNewVariantServiceId(null);
-            fetchVariantsData();
-            setStatusModalCon({
-              isOpen: true,
-              type: "success",
-              message: "New variant created successfully",
-            });
-          } catch (e) {
-            setStatusModalCon({
-              isOpen: true,
-              type: "error",
-              title: "Creation Error",
-              message:
-                e?.response?.data?.message ||
-                "Could not create the new variant. Please check your data.",
-            });
-          }
-        }}
+        onSubmit={handleVariantCreation}
       />
-
       <StatusModal
         {...statusModalCon}
         onClose={() => setStatusModalCon(null)}
       />
-
       <FilterContainer
         searchValue={filters.title}
         onSearchChange={(val) =>
           setFilters((prev) => ({ ...prev, title: val, page: 1 }))
         }
       />
-
-      <div className="bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-100 dark:border-white/5 overflow-hidden">
-        <MultiUseTable
-          columns={variantColumns}
-          data={services}
-          loading={loading}
-          pagination={meta}
-          onPageChange={(newPage) =>
-            setFilters((prev) => ({ ...prev, page: newPage }))
-          }
-        />
-      </div>
+      <MultiUseTable
+        columns={variantColumns}
+        data={services}
+        loading={loading}
+        pagination={meta}
+        onPageChange={(newPage) =>
+          setFilters((prev) => ({ ...prev, page: newPage }))
+        }
+      />
     </div>
   );
 }
