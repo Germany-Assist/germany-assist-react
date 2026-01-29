@@ -120,7 +120,7 @@ export default function ClientOrders() {
             },
             {
               label: "Go To Dispute Center",
-              show: row.dispute,
+              show: Boolean(row.dispute),
               onClick: () => console.log(row.dispute.id),
               variant: "danger",
             },
