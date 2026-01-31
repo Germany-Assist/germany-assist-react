@@ -23,6 +23,8 @@ import AdminFinance from "./admin/AdminFinance";
 import SPDisputes from "./serviceProvider/SPDisputes";
 import ClientDisputes from "./client/ClientDisputes";
 import ClientFavorite from "./client/ClientFavorite";
+import ProviderVerification from "./serviceProvider/ProviderVerification";
+import AdminVerificationRequests from "./admin/AdminVerificationRequests";
 
 export default {
   admin: {
@@ -85,7 +87,11 @@ export default {
       label: "Service Providers",
       component: AdminServiceProviders,
       children: [
-        { label: "Create New Service Provider", component: CreateNewSP },
+        { label: "New Service Provider", component: CreateNewSP },
+        {
+          label: "Verification Requests",
+          component: AdminVerificationRequests,
+        },
       ],
     },
     Profile: {
@@ -145,6 +151,10 @@ export default {
     Page: {
       label: "Page",
       component: ServiceProviderPage,
+    },
+    Verification: {
+      label: "Verification",
+      component: ProviderVerification,
     },
   },
 };
