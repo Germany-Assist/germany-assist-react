@@ -23,6 +23,7 @@ import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader
 import adminApis from "../../../../api/adminApis";
 import { getErrorMessage } from "../../../../api/errorMessages";
 import { useNavigate } from "react-router-dom";
+import { useMeta } from "../../../../contexts/MetadataContext";
 
 /* ---------------- MAIN COMPONENT ---------------- */
 
@@ -32,7 +33,7 @@ export default function AdminVerificationManager() {
   const [loading, setLoading] = useState(false);
   const [processingId, setProcessingId] = useState(null); // To show loading on specific actions
   const [statusModalCon, setStatusModalCon] = useState(null);
-
+  const { categories } = useMeta();
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
@@ -101,11 +102,15 @@ export default function AdminVerificationManager() {
     }
   };
 
+  const getCategory = (id) => {
+    const cat = categories.find((i) => i.id === id);
+    return cat ? cat.title : "unknown";
+  };
   /* ---------------- TABLE COLUMNS ---------------- */
 
   const verificationColumns = [
     {
-      header: "Provider & Request ID",
+      header: "Request ",
       render: (req) => (
         <TransactionCell
           title={`Request ${req.id}`}
@@ -119,7 +124,7 @@ export default function AdminVerificationManager() {
       header: "Verification Type",
       render: (req) => (
         <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-blue-500/5 text-blue-400 rounded-lg border border-blue-500/10 tracking-widest">
-          {req.type || "identity"}
+          {req.type} {req.relatedId && getCategory(req.relatedId)}
         </span>
       ),
     },
@@ -274,7 +279,6 @@ export default function AdminVerificationManager() {
       />
 
       <FilterContainer hideSearch={true}>
-        {/* Verification Type Dropdown */}
         <div className="flex items-center gap-3">
           <span className="text-[10px] font-black uppercase text-zinc-500 ml-2">
             Type:
