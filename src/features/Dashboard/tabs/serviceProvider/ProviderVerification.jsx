@@ -11,6 +11,9 @@ import {
   Fingerprint,
   Award,
   AlertCircle,
+  ChevronRight,
+  Mail,
+  XCircle,
 } from "lucide-react";
 
 import {
@@ -29,7 +32,6 @@ const VerificationHub = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // 'identity' or the 'relatedId' of a category
   const [activeTarget, setActiveTarget] = useState("identity");
   const [verificationList, setVerificationList] = useState([]);
   const [statusModalCon, setStatusModalCon] = useState(null);
@@ -43,7 +45,6 @@ const VerificationHub = () => {
     setLoading(true);
     try {
       const res = await serviceProviderGetVerificationStatus();
-      // res.data is the array you provided
       setVerificationList(res?.data || []);
     } catch (err) {
       setStatusModalCon({
@@ -60,7 +61,6 @@ const VerificationHub = () => {
     init();
   }, []);
 
-  // Helper to find the status object for the current selection
   const getCurrentItem = () => {
     if (activeTarget === "identity") {
       return verificationList.find((v) => v.type === "identity");
@@ -75,9 +75,7 @@ const VerificationHub = () => {
       const isIdentity = activeTarget === "identity";
 
       formData.append("type", isIdentity ? "identity" : "category");
-      if (!isIdentity) {
-        formData.append("relatedId", activeTarget);
-      }
+      if (!isIdentity) formData.append("relatedId", activeTarget);
 
       if (files.verificationImage)
         formData.append("verificationImage", files.verificationImage);
@@ -86,17 +84,35 @@ const VerificationHub = () => {
 
       const currentItem = getCurrentItem();
 
-      // Use logic: if data exists (not null) and status is adminRequest -> ReSubmit
       if (currentItem && currentItem.status === "adminRequest") {
         await serviceProviderReSubmitVerification(formData);
       } else {
         await serviceProviderSubmitVerification(formData);
       }
 
+      setVerificationList((prev) => {
+        const newList = [...prev];
+        const index = newList.findIndex((v) =>
+          isIdentity ? v.type === "identity" : v.relatedId === activeTarget,
+        );
+
+        if (index !== -1) {
+          newList[index] = { ...newList[index], status: "pending" };
+        } else {
+          newList.push({
+            type: isIdentity ? "identity" : "category",
+            relatedId: isIdentity ? null : activeTarget,
+            status: "pending",
+            assets: [],
+          });
+        }
+        return newList;
+      });
+
       setStatusModalCon({
         isOpen: true,
         type: "success",
-        message: "Your documents have been submitted successfully.",
+        message: "Your application is now under review.",
         onClose: () => {
           setStatusModalCon(null);
           setFiles({ verificationImage: null, verificationDocument: null });
@@ -122,39 +138,43 @@ const VerificationHub = () => {
     );
 
   const currentItem = getCurrentItem();
-  const currentStatus = currentItem?.status || null; // null means can 'create'
+  const currentStatus = currentItem?.status || null;
   const activeCategoryLabel =
     categories.find((c) => c.id === activeTarget)?.label || "Identity";
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8 animate-in fade-in duration-700">
+    <div className="max-w-7xl mx-auto p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <StatusModal
         {...statusModalCon}
         onClose={() => setStatusModalCon(null)}
       />
 
       <DashboardHeader
-        title="Verification Center"
-        subtitle="Manage your identity and professional certifications"
+        title="Verification Hub"
+        subtitle="Manage your professional credentials and identity"
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* SIDEBAR */}
-        <div className="lg:col-span-4 space-y-3">
-          <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-2 mb-4">
-            Core
-          </h4>
-          <VerificationTab
-            icon={Fingerprint}
-            label="Identity"
-            status={verificationList.find((v) => v.type === "identity")?.status}
-            isActive={activeTarget === "identity"}
-            onClick={() => setActiveTarget("identity")}
-          />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* SIDEBAR NAVIGATION */}
+        <div className="lg:col-span-4 space-y-6">
+          <section>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 ml-4 mb-4">
+              Core Verification
+            </h4>
+            <VerificationTab
+              icon={Fingerprint}
+              label="Identity"
+              status={
+                verificationList.find((v) => v.type === "identity")?.status
+              }
+              isActive={activeTarget === "identity"}
+              onClick={() => setActiveTarget("identity")}
+            />
+          </section>
 
-          <div className="pt-4">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-2 mb-4">
-              Categories
+          <section>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500 ml-4 mb-4">
+              Category Badges
             </h4>
             <div className="space-y-2">
               {categories.map((cat) => (
@@ -170,64 +190,96 @@ const VerificationHub = () => {
                 />
               ))}
             </div>
-          </div>
+          </section>
         </div>
 
-        {/* CONTENT AREA */}
-        <div className="lg:col-span-8 bg-zinc-900 border border-white/5 rounded-[2.5rem] p-8 shadow-2xl min-h-[500px]">
+        {/* MAIN DISPLAY AREA */}
+        <div className="lg:col-span-8 bg-zinc-900/50 border border-white/5 rounded-[3rem] p-10 shadow-2xl backdrop-blur-md min-h-[600px] relative overflow-hidden">
           {currentStatus === "approved" ? (
-            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 py-12">
-              <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500">
-                <ShieldCheck size={48} />
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-6 py-20">
+              <div className="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500 border border-emerald-500/20">
+                <ShieldCheck size={56} strokeWidth={1.5} />
               </div>
-              <h2 className="text-2xl font-black uppercase tracking-tighter">
+              <h2 className="text-3xl font-black uppercase tracking-tighter italic">
                 Verified
               </h2>
-              <p className="text-zinc-500 text-sm max-w-xs">
-                This certification is active and verified on your profile.
+              <p className="text-zinc-500 text-sm max-w-xs mx-auto">
+                Your {activeCategoryLabel} is fully verified.
               </p>
             </div>
           ) : currentStatus === "pending" ? (
-            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 py-12">
-              <div className="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-500 animate-pulse">
-                <UploadCloud size={40} />
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-6 py-20 animate-in fade-in">
+              <div className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-500 border border-amber-500/20 animate-pulse">
+                <Loader2 size={48} className="animate-spin" />
               </div>
-              <h2 className="text-2xl font-black uppercase tracking-tighter">
-                Under Review
+              <h2 className="text-3xl font-black uppercase tracking-tighter italic">
+                Reviewing
               </h2>
-              <p className="text-zinc-500 text-sm max-w-xs">
-                Our team is currently reviewing the documents for{" "}
-                {activeCategoryLabel}.
+              <p className="text-zinc-500 text-sm max-w-xs mx-auto">
+                Our team is reviewing your documents.
               </p>
             </div>
-          ) : (
-            <div className="space-y-8">
-              <header>
-                <h2 className="text-2xl font-black uppercase tracking-tighter italic">
-                  Verify {activeCategoryLabel}
+          ) : currentStatus === "rejected" ? (
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-8 py-20 animate-in zoom-in-95">
+              <div className="w-24 h-24 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 border border-red-500/20">
+                <XCircle size={56} strokeWidth={1.5} />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-3xl font-black uppercase tracking-tighter italic text-red-500">
+                  Rejected
                 </h2>
-                <p className="text-zinc-500 text-xs font-bold uppercase mt-1">
-                  Upload files to begin the verification process
+                <p className="text-zinc-400 text-sm max-w-md mx-auto">
+                  This verification request has been permanently declined by our
+                  compliance team.
                 </p>
-              </header>
+              </div>
 
-              {currentStatus === "adminRequest" && (
-                <div className="p-6 rounded-3xl bg-blue-500/5 border border-blue-500/10 flex gap-4 items-start border-l-4 border-l-blue-500">
-                  <MessageCircle className="text-blue-400 shrink-0" size={24} />
-                  <div>
-                    <span className="text-[10px] font-black uppercase text-blue-400 tracking-widest">
-                      Admin Note
-                    </span>
-                    <p className="text-zinc-300 text-sm italic mt-1 leading-relaxed">
-                      "{currentItem.adminNote}"
-                    </p>
-                  </div>
+              {currentItem.adminNote && (
+                <div className="w-full max-w-md p-6 bg-red-500/5 border border-red-500/10 rounded-[2rem] text-left">
+                  <span className="text-[10px] font-black uppercase text-red-400 tracking-widest">
+                    Rejection Reason
+                  </span>
+                  <p className="text-zinc-300 text-sm italic mt-2">
+                    "{currentItem.adminNote}"
+                  </p>
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <a
+                href={`mailto:support@yourdomain.com?subject=Verification Rejection - ${activeCategoryLabel}`}
+                className="flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/5 rounded-2xl transition-all"
+              >
+                <Mail size={18} className="text-zinc-400" />
+                <span className="text-xs font-black uppercase tracking-widest">
+                  Appeal to Support
+                </span>
+              </a>
+            </div>
+          ) : (
+            <div className="space-y-10 animate-in slide-in-from-top-2 duration-500">
+              <header className="flex justify-between items-end">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">
+                    Verification Step
+                  </span>
+                  <h2 className="text-3xl font-black uppercase tracking-tighter italic leading-none">
+                    {activeCategoryLabel}
+                  </h2>
+                </div>
+              </header>
+
+              {currentStatus === "adminRequest" && (
+                <div className="p-6 rounded-[2rem] bg-blue-500/5 border border-blue-500/10 flex gap-5 items-center border-l-4 border-l-blue-500">
+                  <MessageCircle className="text-blue-400" size={24} />
+                  <p className="text-zinc-300 text-sm italic font-medium leading-relaxed">
+                    "{currentItem.adminNote}"
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <UploadBox
-                  label="Image Reference"
+                  label="Reference Image"
                   file={files.verificationImage}
                   type="image"
                   onChange={(f) =>
@@ -238,7 +290,7 @@ const VerificationHub = () => {
                   }
                 />
                 <UploadBox
-                  label="PDF Document"
+                  label="Official Document"
                   file={files.verificationDocument}
                   type="pdf"
                   onChange={(f) =>
@@ -256,15 +308,15 @@ const VerificationHub = () => {
                   (!files.verificationImage && !files.verificationDocument)
                 }
                 onClick={handleAction}
-                className="w-full bg-white text-black py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 hover:bg-zinc-200 transition-all active:scale-95 disabled:opacity-10"
+                className="w-full bg-white text-black py-6 rounded-[1.5rem] font-black uppercase tracking-[0.25em] text-[11px] flex items-center justify-center gap-4 hover:bg-zinc-200 transition-all active:scale-[0.98] disabled:opacity-20 shadow-xl"
               >
                 {submitting ? (
-                  <Loader2 className="animate-spin" size={18} />
+                  <Loader2 className="animate-spin" size={20} />
                 ) : (
-                  <UploadCloud size={18} />
+                  <UploadCloud size={20} />
                 )}
                 {currentStatus === "adminRequest"
-                  ? "Re-submit Updates"
+                  ? "Resubmit Fixes"
                   : "Submit Verification"}
               </button>
             </div>
@@ -275,66 +327,80 @@ const VerificationHub = () => {
   );
 };
 
-/* --- HELPER COMPONENTS --- */
-
+/* --- TAB COMPONENT --- */
 const VerificationTab = ({ icon: Icon, label, status, isActive, onClick }) => {
-  const statusColors = {
-    approved: "text-emerald-500 bg-emerald-500/5",
-    pending: "text-amber-500 bg-amber-500/5",
-    adminRequest: "text-blue-400 bg-blue-400/5",
+  const statusConfig = {
+    approved: {
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+      label: "Verified",
+    },
+    pending: {
+      color: "text-amber-500",
+      bg: "bg-amber-500/10",
+      label: "In Review",
+    },
+    adminRequest: {
+      color: "text-blue-400",
+      bg: "bg-blue-400/10",
+      label: "Action",
+    },
+    rejected: { color: "text-red-400", bg: "bg-red-400/10", label: "Rejected" },
   };
+  const current = statusConfig[status];
 
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center justify-between p-5 rounded-3xl border transition-all duration-300 ${
+      className={`w-full flex items-center justify-between p-5 rounded-[2rem] border transition-all duration-500 ${
         isActive
-          ? "bg-white border-white shadow-xl scale-[1.02]"
-          : "bg-zinc-900 border-white/5 hover:border-white/20"
+          ? "bg-white border-white shadow-2xl scale-[1.03] z-10"
+          : "bg-zinc-900 border-white/5"
       }`}
     >
-      <div className="flex items-center gap-4 text-left">
-        <Icon size={18} className={isActive ? "text-black" : "text-zinc-500"} />
+      <div className="flex items-center gap-4">
+        <Icon size={20} className={isActive ? "text-black" : "text-zinc-500"} />
         <span
-          className={`text-[11px] font-black uppercase tracking-tight ${isActive ? "text-black" : "text-zinc-400"}`}
+          className={`text-xs font-black uppercase tracking-tight ${isActive ? "text-black" : "text-zinc-400"}`}
         >
           {label}
         </span>
       </div>
-
-      {status && (
+      {status ? (
         <div
-          className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter ${statusColors[status] || "text-zinc-600"}`}
+          className={`px-3 py-1 rounded-full text-[8px] font-black uppercase ${current.bg} ${current.color}`}
         >
-          {status === "adminRequest" ? "Action" : status}
+          {current.label}
         </div>
+      ) : (
+        <ChevronRight
+          size={14}
+          className={isActive ? "text-black/20" : "text-zinc-800"}
+        />
       )}
     </button>
   );
 };
 
+/* --- UPLOAD COMPONENT --- */
 const UploadBox = ({ label, file, type, onChange, onClear }) => {
   const isImage = type === "image";
   return (
-    <div className="space-y-3">
-      <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">
+    <div className="space-y-4">
+      <h5 className="text-[10px] font-black uppercase tracking-widest text-zinc-200 ml-1">
         {label}
-      </span>
-      <div className="relative aspect-video rounded-[2rem] bg-zinc-800 border-2 border-dashed border-white/5 flex flex-col items-center justify-center overflow-hidden transition-all hover:border-white/10">
+      </h5>
+      <div className="relative aspect-video rounded-[2.5rem] bg-zinc-800/50 border-2 border-dashed border-white/5 flex flex-col items-center justify-center overflow-hidden transition-all hover:border-blue-500/30">
         {file ? (
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-full animate-in zoom-in-95">
             {isImage ? (
               <img
                 src={URL.createObjectURL(file)}
                 className="w-full h-full object-cover"
-                alt="preview"
               />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center">
-                <FileText className="text-blue-500 mb-2" size={40} />
-                <p className="text-[9px] font-mono text-zinc-500 px-4 truncate w-full text-center">
-                  {file.name}
-                </p>
+              <div className="w-full h-full flex items-center justify-center bg-zinc-900">
+                <FileText className="text-blue-500" size={48} />
               </div>
             )}
             <button
@@ -345,14 +411,8 @@ const UploadBox = ({ label, file, type, onChange, onClear }) => {
             </button>
           </div>
         ) : (
-          <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer p-8 group">
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center mb-3 group-hover:bg-white/10 transition-colors">
-              {isImage ? (
-                <ImageIcon className="text-zinc-500" size={20} />
-              ) : (
-                <Plus className="text-zinc-500" size={20} />
-              )}
-            </div>
+          <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer">
+            <Plus size={24} className="text-zinc-600 mb-2" />
             <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
               Select {type}
             </span>

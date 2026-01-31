@@ -32,20 +32,6 @@ export default function DashboardSideBar({
     setExpandedMenus((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
-  const icons = {
-    Home: <FiHome />,
-    Profile: <FiUser />,
-    Settings: <FiSettings />,
-    Messages: <FiMessageCircle />,
-    Orders: <FiShoppingCart />,
-    Logout: <FiLogOut />,
-    General: <FiGrid />,
-    Services: <FiPackage />,
-    "Create New User": <FiPlusCircle />,
-    ServiceProvider: <PiUserSoundDuotone />,
-    Users: <PiUsersFourFill />,
-  };
-
   return (
     <div className="w-72 min-h-screen bg-white dark:bg-dark-900 border-r border-light-700 dark:border-white/5 flex flex-col transition-colors duration-700 shadow-xl shadow-black/5">
       {/* Sidebar Header */}
@@ -74,7 +60,6 @@ export default function DashboardSideBar({
           const hasChildren = item.children && item.children.length > 0;
           const isExpanded = expandedMenus[label];
           const isActive = activeSection === label;
-
           return (
             <div key={index} className="space-y-1">
               <button
@@ -95,7 +80,7 @@ export default function DashboardSideBar({
                       isActive ? "scale-110" : "group-hover:scale-110"
                     }`}
                   >
-                    {icons[label] || <FiGrid />}
+                    {item.icon ? <item.icon /> : <FiGrid />}
                   </span>
                   <span className="text-sm tracking-wide">{label}</span>
                 </div>
@@ -109,7 +94,6 @@ export default function DashboardSideBar({
                   </span>
                 )}
               </button>
-
               {hasChildren && isExpanded && (
                 <div className="ml-6 pl-4 border-l border-light-200 dark:border-white/10 space-y-1 mt-2 animate-in slide-in-from-left-2">
                   {item.children.map((child, childIdx) => (
@@ -124,9 +108,7 @@ export default function DashboardSideBar({
                         }`}
                     >
                       <span>
-                        {icons[child.label] || (
-                          <div className="w-1 h-1 rounded-full bg-current" />
-                        )}
+                        <div className="w-1 h-1 rounded-full bg-current" />
                       </span>
                       {child.label}
                     </button>
