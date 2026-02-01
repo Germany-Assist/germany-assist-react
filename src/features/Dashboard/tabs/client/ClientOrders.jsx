@@ -133,7 +133,7 @@ export default function ClientOrders() {
             {
               label: "Go To Timeline",
               show: row.serviceType === "timeline",
-              onClick: () => navigate(`/timeline/${row.id}`),
+              onClick: () => navigate(`/timeline/${row.relatedId}`),
               variant: "secondary",
             },
           ]}

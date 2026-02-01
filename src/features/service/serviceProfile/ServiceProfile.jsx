@@ -14,7 +14,7 @@ import PaymentModal from "../../../components/ui/payments/PaymentModal";
 import { useProfile } from "../../../contexts/ProfileContext";
 import { fetchUserReviewForServiceApi } from "../../../api/profile";
 import StatusModal from "../../../components/ui/StatusModal";
-
+import { checkIfBoughtClientApi } from "../../../api/clientUserApis";
 const ServiceProfile = ({ previewData = null }) => {
   const { serviceId } = useParams();
   const navigate = useNavigate();
@@ -64,18 +64,14 @@ const ServiceProfile = ({ previewData = null }) => {
   useEffect(() => {
     if (previewData || !data) return;
     setIsFavorite(isInFavorite(data.id));
-    // Check purchase status from context
-    const history = hasAlreadyPurchasedService(data);
-    // TODO i need to move on with history
-    setHasPurchasedService(history);
-    // setHasPurchasedTimeline(Boolean(isAlreadyPurchasedTimeline(data)));
-    if (history) {
+    (async () => {
+      const history = await checkIfBoughtClientApi(data.id);
       setPurchasedItems(history);
-      (async () => {
+      if (history.length > 0) {
         const review = await fetchUserReviewForServiceApi(data.id);
         setHasReview(review);
-      })();
-    }
+      }
+    })();
   }, [profile, data, previewData]);
 
   /* -------------------- Payments -------------------- */
