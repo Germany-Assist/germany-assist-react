@@ -1,14 +1,6 @@
 import React from "react";
 import { Plus } from "lucide-react";
 
-/**
- * PageHeader Component
- * @param {string} title - The main heading (e.g., "Services")
- * @param {string} subtitle - The small text below the heading
- * @param {string} buttonText - The label for the action button
- * @param {function} onAction - Function to trigger on button click
- * @param {React.ReactNode} icon - Optional icon to replace the default Plus
- */
 const DashboardHeader = ({
   title,
   subtitle,

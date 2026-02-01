@@ -74,9 +74,25 @@ export const createNewVariant = async (payload) => {
   );
   return res.data;
 };
+export const serviceProviderSubmitVerification = async (payload) => {
+  const res = await api.post(`/requests/provider`, payload);
+  return res.data;
+};
+export const serviceProviderReSubmitVerification = async (payload) => {
+  const res = await api.put(`/requests/provider`, payload);
+  return res.data;
+};
+export const serviceProviderGetVerificationStatus = async () => {
+  const res = await api.get(`/requests/provider/profile`);
+  return res.data;
+};
+
 const serviceProviderApis = {
   publishService,
   unpublishService,
+  serviceProviderGetVerificationStatus,
+  serviceProviderReSubmitVerification,
+  serviceProviderSubmitVerification,
   getAllServices,
 };
 export default serviceProviderApis;

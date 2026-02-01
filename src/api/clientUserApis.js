@@ -7,7 +7,10 @@ export async function fetchClientOrders(params) {
   const res = await api.get(`/order/client/getAll${queryString}`);
   return res.data;
 }
-
+export async function checkIfBoughtClientApi(serviceId) {
+  const res = await api.get(`/order/client/checkIfBought/${serviceId}`);
+  return res.data;
+}
 export async function openNewDispute(payload) {
   const res = await api.post(`/dispute`, payload);
   return res.data;

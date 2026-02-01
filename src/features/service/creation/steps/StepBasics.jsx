@@ -1,11 +1,19 @@
 import { ChevronRight } from "lucide-react";
 import DropdownMenu from "../DropdownMenu";
 
-const StepBasics = ({ data, onUpdate, onNext, categories }) => {
+const StepBasics = ({
+  data,
+  onUpdate,
+  onNext,
+  categories,
+  updateCategory,
+  subcategories,
+}) => {
   const isInvalid =
     data.title.length < 5 ||
     (data.description?.length || 0) < 100 ||
-    !data.category;
+    !data.category ||
+    !data.subcategory;
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div>
@@ -48,11 +56,21 @@ const StepBasics = ({ data, onUpdate, onNext, categories }) => {
           <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
             Category
           </label>
-          <DropdownMenu
-            categories={categories}
-            data={data}
-            onUpdate={onUpdate}
-          />
+          <div className="flex gap-4">
+            <DropdownMenu
+              placeholder="Category"
+              categories={categories}
+              selectedValue={data.category}
+              onSelect={(cat) => updateCategory({ category: cat.id })}
+            />
+            <DropdownMenu
+              placeholder="Subcategory"
+              disabled={!data.category}
+              categories={subcategories}
+              selectedValue={data.subcategory}
+              onSelect={(sub) => onUpdate({ subcategory: sub.id })}
+            />
+          </div>
         </div>
       </div>
 

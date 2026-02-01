@@ -116,9 +116,22 @@ export const createServiceProvider = async (payload = {}) => {
   return res.data;
 };
 
+export const getAllRequests = async (filters) => {
+  const queryString = filters
+    ? `?${new URLSearchParams(filters).toString()}`
+    : "";
+  const res = await api.get(`/requests/admin${queryString}`);
+  return res.data;
+};
+export const updateRequest = async (id, payload = {}) => {
+  const res = await api.put(`/requests/admin/${id}`, payload);
+  return res.data;
+};
 const adminApis = {
   getOrderById,
+  updateRequest,
   getAllOrders,
+  getAllRequests,
   deleteAsset,
   getAllAssets,
   uploadAsset,

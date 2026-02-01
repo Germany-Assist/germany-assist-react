@@ -22,7 +22,6 @@ const BookingSidebar = ({
   onNavigate,
 }) => {
   const [selectedId, setSelectedId] = useState(null);
-
   useEffect(() => {
     if (options.length > 0 && !selectedId) {
       setSelectedId(options[0].id);
@@ -32,9 +31,7 @@ const BookingSidebar = ({
   const selectedOption = options.find((o) => o.id === selectedId) || options[0];
 
   // Check if the selected option is already in purchasedItems
-  const isAlreadyPurchased = purchasedItems.some(
-    (item) => item?.id === selectedId,
-  );
+  const isAlreadyPurchased = purchasedItems.some((item) => item === selectedId);
 
   const displayPrice = selectedOption?.price || 0;
 

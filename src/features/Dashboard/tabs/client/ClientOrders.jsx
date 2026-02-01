@@ -120,7 +120,7 @@ export default function ClientOrders() {
             },
             {
               label: "Go To Dispute Center",
-              show: row.dispute,
+              show: Boolean(row.dispute),
               onClick: () => console.log(row.dispute.id),
               variant: "danger",
             },
@@ -133,7 +133,7 @@ export default function ClientOrders() {
             {
               label: "Go To Timeline",
               show: row.serviceType === "timeline",
-              onClick: () => navigate(`/timeline/${row.id}`),
+              onClick: () => navigate(`/timeline/${row.relatedId}`),
               variant: "secondary",
             },
           ]}
