@@ -134,7 +134,7 @@ const BookingSidebar = ({
       </div>
 
       {/* Dynamic Action Button */}
-      {isAlreadyPurchased ? (
+      {isAlreadyPurchased && serviceType == "timeline" ? (
         <button
           onClick={() => onNavigate(selectedId)}
           className="w-full bg-emerald-500 text-white font-black uppercase tracking-widest py-5 rounded-2xl transition-all active:scale-[0.98] mb-6 shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 group hover:bg-emerald-600"
