@@ -21,16 +21,16 @@ const ServiceProfile = ({ previewData = null }) => {
   const [data, setData] = useState(previewData);
   const [loading, setLoading] = useState(!previewData);
   const [error, setError] = useState(false);
-  const { toggleFavorite, isInFavorite, profile, hasAlreadyPurchasedService } =
-    useProfile();
-
+  const { toggleFavorite, isInFavorite, profile } = useProfile();
   const [isFavorite, setIsFavorite] = useState(false);
   const [successScreen, setSuccessScreen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
-  const [hasPurchasedService, setHasPurchasedService] = useState(false);
-  const [hasReview, setHasReview] = useState(false);
+
   const [purchasedItems, setPurchasedItems] = useState([]);
+
+  const [hasReview, setHasReview] = useState(false);
+
   const [paymentConfig, setPaymentConfig] = useState({
     isOpen: false,
     clientSecret: "",
@@ -239,7 +239,7 @@ const ServiceProfile = ({ previewData = null }) => {
                 rating={data.rating || 0}
                 serviceId={data.id}
                 existingReview={hasReview}
-                canReview={hasPurchasedService}
+                canReview={Boolean(purchasedItems.length > 0)}
               />
             </section>
           </div>
