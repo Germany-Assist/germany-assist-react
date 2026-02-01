@@ -66,8 +66,8 @@ const ServiceProfile = ({ previewData = null }) => {
     setIsFavorite(isInFavorite(data.id));
     (async () => {
       const history = await checkIfBoughtClientApi(data.id);
-      setPurchasedItems(history);
-      if (history.length > 0) {
+      if (history && history.length > 0) {
+        setPurchasedItems(history);
         const review = await fetchUserReviewForServiceApi(data.id);
         setHasReview(review);
       }
