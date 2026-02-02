@@ -21,13 +21,6 @@ const HomePage = () => {
         </section>
       </main>
 
-      {/* <footer className="py-12 border-t border-light-700 dark:border-white/5 text-center bg-light-900/30 dark:bg-transparent">
-        <p className="text-sm text-slate-500 dark:text-slate-400 font-light tracking-widest uppercase">
-          © 2026 Germany Assist
-        </p>
-      </footer> */}
-
-      {/* Footer Section */}
       <FooterSection/>
     </div>
   );
