@@ -11,10 +11,12 @@
     "tailwind": "tailwindcss"
   },
   "dependencies": {
+    "@ai-sdk/react": "^3.0.69",
     "@fortawesome/fontawesome-free": "^7.0.0",
     "@heroicons/react": "^2.2.0",
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.6.0",
+    "ai": "^6.0.67",
     "axios": "^1.10.0",
     "chart.js": "^4.5.0",
     "fontawesome-free": "^1.0.4",
