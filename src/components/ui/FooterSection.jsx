@@ -3,7 +3,7 @@ import logo from "../../assets/brand/logo.png";
 import { Link } from 'react-router-dom';
 import { Linkedin, Facebook, Instagram } from 'lucide-react';
 
- //FOOTER LINKS
+//FOOTER LINKS
 const FOOTER_LINKS = {
   Company: [
     { name: 'About Us', href: '#' },
