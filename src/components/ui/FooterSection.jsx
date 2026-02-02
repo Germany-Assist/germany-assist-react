@@ -3,7 +3,7 @@ import logo from "../../assets/brand/logo.png";
 import { Link } from 'react-router-dom';
 import { Linkedin, Facebook, Instagram } from 'lucide-react';
 
-// روابط الفوتر
+ //FOOTER LINKS
 const FOOTER_LINKS = {
   Company: [
     { name: 'About Us', href: '#' },
@@ -16,7 +16,7 @@ const FOOTER_LINKS = {
   ],
 };
 
-// الأيقونات الاجتماعية
+//SOCIAL LINKS
 const SOCIAL_LINKS = [
   { name: "LinkedIn", href: "#", icon: Linkedin },
   { name: "Facebook", href: "#", icon: Facebook },
