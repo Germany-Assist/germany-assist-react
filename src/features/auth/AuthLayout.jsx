@@ -10,11 +10,12 @@ const AuthLayout = ({ children, title, subtitle }) => {
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 blur-[120px] rounded-full" />
       <div className="max-w-md w-full z-10">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center mb-4 group">
-            <div className=" border border-black p-2 rounded-xl group-hover:border-cyan-500/50 transition-all">
-              <Logo className="w-60" href={"/"} />
+          {/* delete Link to avid the conflict  */}
+          <div className="inline-flex items-center mb-4 group cursor-pointer">
+            <div className="border border-black p-2 rounded-xl group-hover:border-cyan-500/50 transition-all">
+              <Logo className="w-60" href="/" />
             </div>
-          </Link>
+          </div>
           <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
           <p className="text-gray-400 text-sm mt-2 font-light">{subtitle}</p>
         </div>
