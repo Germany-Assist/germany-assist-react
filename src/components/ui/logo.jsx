@@ -1,5 +1,5 @@
 import logo from "../../assets/brand/logo.png";
-
+import { Link } from "react-router-dom";
 export default function Logo({ className = "", alt = "Logo", onClick, href }) {
   const img = (
     <img
@@ -11,9 +11,9 @@ export default function Logo({ className = "", alt = "Logo", onClick, href }) {
 
   if (href) {
     return (
-      <a href={href} className="inline-block">
+      <Link to={href} className="inline-block">
         {img}
-      </a>
+      </Link>
     );
   }
 
