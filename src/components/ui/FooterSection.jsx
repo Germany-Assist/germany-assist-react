@@ -1,7 +1,7 @@
 import React from 'react';
-import logo from "../../assets/brand/logo.png";
 import { Link } from 'react-router-dom';
 import { Linkedin, Facebook, Instagram } from 'lucide-react';
+import Logo from './logo';
 
 //FOOTER LINKS
 const FOOTER_LINKS = {
@@ -36,14 +36,7 @@ function FooterSection() {
           
           {/* Logo Column */}
           <div className="col-span-1 flex justify-center md:justify-start ">
-            <Link to="/" className="flex items-center">
-              <img
-                src={logo}
-                alt="Germany Assist Logo"
-                className="max-w-[120px] dark:brightness-110 transition-all"
-              />
-            </Link>
-
+            <Logo/>
           </div>
 
           {/* Link Columns */}
