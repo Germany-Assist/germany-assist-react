@@ -22,6 +22,7 @@ const HomePage = () => {
       </main>
 
       
+
       <FooterSection/>
     </div>
   );

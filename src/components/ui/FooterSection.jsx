@@ -17,6 +17,8 @@ const FOOTER_LINKS = {
 };
 
 //SOCIAL LINKS
+
+
 const SOCIAL_LINKS = [
   { name: "LinkedIn", href: "#", icon: Linkedin },
   { name: "Facebook", href: "#", icon: Facebook },
