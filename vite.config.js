@@ -6,7 +6,10 @@ export default defineConfig({
   plugins: [react(), svgr()],
   server: {
     proxy: {
-      "/api": "http://localhost:3000",
+      "/staging/backend": {
+        target: "http://www.germany-assist.com",
+        changeOrigin: true,
+      },
     },
   },
 });
