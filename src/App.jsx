@@ -19,7 +19,7 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/jobs" element={<JobsPage />} />
         <Route path="/auth" element={<AuthPortal />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard/*" element={<DashboardPage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/service/:serviceId" element={<ServiceProfile />} />
         <Route path="/timeline/:timelineId" element={<TimelinePage />} />

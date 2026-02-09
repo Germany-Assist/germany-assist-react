@@ -2,35 +2,47 @@ import React, { useState } from "react";
 import ProfileAvatar from "../../components/ui/ProfileAvatar";
 import { useAuth } from "../../contexts/AuthContext";
 import { FiGrid, FiLogOut, FiHome, FiChevronDown } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; 
 import { useProfile } from "../../contexts/ProfileContext";
 import ThemeSwitch from "../../components/ui/ThemeSwitch";
 
-export default function DashboardSideBar({
-  navElements,
-  setActiveSection,
-  activeSection,
-}) {
+export default function DashboardSideBar({ navElements }) {
   const { logOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation(); // Used to determine the current active route
   const [expandedMenus, setExpandedMenus] = useState({});
   const { profile } = useProfile();
+
+  /**
+   * Helper function to transform labels into URL-friendly paths
+   * Example: "Service Providers" -> "service-providers"
+   */
+  const formatPath = (label) => label.toLowerCase().replace(/\s+/g, '-');
 
   const toggleMenu = (label) => {
     setExpandedMenus((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
+  /**
+   * Handles navigation by updating the URL path
+   * This ensures the browser URL stays in sync with the displayed component
+   */
+  const handleNavigation = (item) => {
+    const path = formatPath(item.label);
+    navigate(`/dashboard/${path}`);
+  };
+
   return (
     <div className="p-4 h-screen bg-light-50 dark:bg-black transition-colors duration-500">
-      {/* Main Container with your requested styling */}
       <div className="relative h-full w-72 flex flex-col rounded-[2.5rem] border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden">
-        {/* THE COOL COLOR LAYER: Ambient Glows */}
+        
+        {/* Background Visual Effects */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/10 dark:bg-blue-400/10 blur-[100px]" />
           <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-400/10 blur-[100px]" />
         </div>
 
-        {/* Sidebar Header */}
+        {/* Sidebar Header: Profile & Theme Toggle */}
         <div className="relative z-10 p-8 flex flex-col items-center border-b border-zinc-100 dark:border-white/5">
           <div className="relative group">
             <div className="absolute -inset-1.5 bg-gradient-to-tr from-blue-600 to-indigo-400 rounded-full blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
@@ -47,32 +59,35 @@ export default function DashboardSideBar({
           </div>
         </div>
 
-        {/* Navigation */}
+        {/* Main Navigation Links */}
         <nav className="relative z-10 flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar">
           {navElements.map((item, index) => {
             const label = item.label;
             const hasChildren = item.children && item.children.length > 0;
             const isExpanded = expandedMenus[label];
-            const isActive = activeSection === label;
+            
+            // Highlight the button if the current URL matches the item's path
+            const itemPath = formatPath(label);
+            const isActive = location.pathname.includes(`/dashboard/${itemPath}`);
 
             return (
               <div key={index} className="space-y-1">
                 <button
                   onClick={() => {
-                    if (hasChildren) toggleMenu(label);
-                    setActiveSection(item);
+                    if (hasChildren) {
+                      toggleMenu(label);
+                    } else {
+                      handleNavigation(item);
+                    }
                   }}
                   className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 group
-                    ${
-                      isActive
-                        ? "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-xl shadow-black/10 scale-[1.02]"
-                        : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5"
+                    ${isActive
+                      ? "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-xl shadow-black/10 scale-[1.02]"
+                      : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5"
                     }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span
-                      className={`text-lg transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`}
-                    >
+                    <span className={`text-lg transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
                       {item.icon ? <item.icon /> : <FiGrid />}
                     </span>
                     <span className="text-sm font-semibold tracking-tight">
@@ -87,22 +102,27 @@ export default function DashboardSideBar({
                   )}
                 </button>
 
+                {/* Sub-navigation Items (Nested Menus) */}
                 {hasChildren && isExpanded && (
                   <div className="ml-9 border-l border-zinc-200 dark:border-white/10 space-y-1 mt-1">
-                    {item.children.map((child, childIdx) => (
-                      <button
-                        key={childIdx}
-                        onClick={() => setActiveSection(child)}
-                        className={`w-full flex items-center gap-3 px-4 py-2 text-xs font-medium rounded-xl transition-all
-                          ${
-                            activeSection === child.label
+                    {item.children.map((child, childIdx) => {
+                      const childPath = formatPath(child.label);
+                      const isChildActive = location.pathname.endsWith(childPath);
+                      
+                      return (
+                        <button
+                          key={childIdx}
+                          onClick={() => handleNavigation(child)}
+                          className={`w-full flex items-center gap-3 px-4 py-2 text-xs font-medium rounded-xl transition-all
+                            ${isChildActive
                               ? "text-blue-600 dark:text-blue-400"
                               : "text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
-                          }`}
-                      >
-                        {child.label}
-                      </button>
-                    ))}
+                            }`}
+                        >
+                          {child.label}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -110,7 +130,7 @@ export default function DashboardSideBar({
           })}
         </nav>
 
-        {/* Sidebar Footer */}
+        {/* Sidebar Footer: App Navigation & Logout */}
         <div className="relative z-10 p-4 bg-zinc-50/50 dark:bg-white/5 border-t border-zinc-100 dark:border-white/5 rounded-b-[2.5rem]">
           <button
             onClick={() => navigate("/")}
