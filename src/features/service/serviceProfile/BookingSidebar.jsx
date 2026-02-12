@@ -22,7 +22,6 @@ const BookingSidebar = ({
   onNavigate,
 }) => {
   const [selectedId, setSelectedId] = useState(null);
-
   useEffect(() => {
     if (options.length > 0 && !selectedId) {
       setSelectedId(options[0].id);
@@ -30,11 +29,9 @@ const BookingSidebar = ({
   }, [options, selectedId]);
 
   const selectedOption = options.find((o) => o.id === selectedId) || options[0];
-
+  console.log(purchasedItems);
   // Check if the selected option is already in purchasedItems
-  const isAlreadyPurchased = purchasedItems.some(
-    (item) => item.id === selectedId,
-  );
+  const isAlreadyPurchased = purchasedItems.some((item) => item === selectedId);
 
   const displayPrice = selectedOption?.price || 0;
 
@@ -65,74 +62,79 @@ const BookingSidebar = ({
         </label>
 
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
-          {options.map((option) => {
-            const isItemPurchased = purchasedItems.some(
-              (item) => item.id === option.id,
-            );
+          {options &&
+            purchasedItems &&
+            options.length > 0 &&
+            options.map((option) => {
+              const isItemPurchased = purchasedItems.some(
+                (item) => item?.id === option?.id,
+              );
+              return (
+                <button
+                  key={option.id}
+                  onClick={() => setSelectedId(option.id)}
+                  className={`w-full text-left p-4 rounded-2xl border transition-all relative group ${
+                    selectedId === option.id
+                      ? "border-accent bg-accent/5 ring-2 ring-accent/20"
+                      : "border-light-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20"
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex-1 pr-4">
+                      <div className="flex items-center gap-2">
+                        <p
+                          className={`font-bold text-sm ${
+                            selectedId === option.id
+                              ? "text-accent"
+                              : "text-slate-700 dark:text-slate-200"
+                          }`}
+                        >
+                          {option.label}
+                        </p>
+                        {isItemPurchased && (
+                          <CheckCircle2
+                            size={12}
+                            className="text-emerald-500"
+                          />
+                        )}
+                      </div>
 
-            return (
-              <button
-                key={option.id}
-                onClick={() => setSelectedId(option.id)}
-                className={`w-full text-left p-4 rounded-2xl border transition-all relative group ${
-                  selectedId === option.id
-                    ? "border-accent bg-accent/5 ring-2 ring-accent/20"
-                    : "border-light-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20"
-                }`}
-              >
-                <div className="flex justify-between items-center">
-                  <div className="flex-1 pr-4">
-                    <div className="flex items-center gap-2">
-                      <p
-                        className={`font-bold text-sm ${
-                          selectedId === option.id
-                            ? "text-accent"
-                            : "text-slate-700 dark:text-slate-200"
-                        }`}
-                      >
-                        {option.label}
-                      </p>
-                      {isItemPurchased && (
-                        <CheckCircle2 size={12} className="text-emerald-500" />
+                      {serviceType === "timeline" && option.startDate && (
+                        <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
+                          <Calendar size={10} />
+                          {new Date(option.startDate).toLocaleDateString(
+                            undefined,
+                            { month: "short", day: "numeric" },
+                          )}{" "}
+                          -{" "}
+                          {new Date(option.endDate).toLocaleDateString(
+                            undefined,
+                            { month: "short", day: "numeric" },
+                          )}
+                        </p>
                       )}
                     </div>
 
-                    {serviceType === "timeline" && option.startDate && (
-                      <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
-                        <Calendar size={10} />
-                        {new Date(option.startDate).toLocaleDateString(
-                          undefined,
-                          { month: "short", day: "numeric" },
-                        )}{" "}
-                        -{" "}
-                        {new Date(option.endDate).toLocaleDateString(
-                          undefined,
-                          { month: "short", day: "numeric" },
-                        )}
+                    <div className="text-right">
+                      <p className="font-black text-slate-900 dark:text-white">
+                        ${option.price}
                       </p>
-                    )}
+                    </div>
                   </div>
 
-                  <div className="text-right">
-                    <p className="font-black text-slate-900 dark:text-white">
-                      ${option.price}
-                    </p>
-                  </div>
-                </div>
-
-                {selectedId === option.id && (
-                  <div className="absolute top-0 right-0 p-1 bg-accent text-white rounded-bl-lg">
-                    <Check size={10} strokeWidth={4} />
-                  </div>
-                )}
-              </button>
-            );
-          })}
+                  {selectedId === option.id && (
+                    <div className="absolute top-0 right-0 p-1 bg-accent text-white rounded-bl-lg">
+                      <Check size={10} strokeWidth={4} />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
         </div>
       </div>
 
       {/* Dynamic Action Button */}
-      {isAlreadyPurchased ? (
+      {isAlreadyPurchased && serviceType == "timeline" ? (
         <button
           onClick={() => onNavigate(selectedId)}
           className="w-full bg-emerald-500 text-white font-black uppercase tracking-widest py-5 rounded-2xl transition-all active:scale-[0.98] mb-6 shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 group hover:bg-emerald-600"

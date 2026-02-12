@@ -61,9 +61,38 @@ export const createNewTimeline = async (payload) => {
   );
   return res.data;
 };
+export const archiveVariant = async (variantId) => {
+  const res = await api.put(
+    `/service/variant/provider/archiveVariant/${variantId}`,
+  );
+  return res.data;
+};
+export const createNewVariant = async (payload) => {
+  const res = await api.post(
+    `/service/variant/provider/createNewVariant`,
+    payload,
+  );
+  return res.data;
+};
+export const serviceProviderSubmitVerification = async (payload) => {
+  const res = await api.post(`/requests/provider`, payload);
+  return res.data;
+};
+export const serviceProviderReSubmitVerification = async (payload) => {
+  const res = await api.put(`/requests/provider`, payload);
+  return res.data;
+};
+export const serviceProviderGetVerificationStatus = async () => {
+  const res = await api.get(`/requests/provider/profile`);
+  return res.data;
+};
+
 const serviceProviderApis = {
   publishService,
   unpublishService,
+  serviceProviderGetVerificationStatus,
+  serviceProviderReSubmitVerification,
+  serviceProviderSubmitVerification,
   getAllServices,
 };
 export default serviceProviderApis;

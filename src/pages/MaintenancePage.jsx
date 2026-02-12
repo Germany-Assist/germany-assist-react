@@ -1,66 +1,79 @@
 import React from "react";
-import { HardHat, Construction, Instagram, Twitter } from "lucide-react";
+import { Construction, Instagram, Twitter, Mail } from "lucide-react";
 import NavigationBar from "../components/ui/NavigationBar";
 
 function MaintenancePage({ nav = true }) {
   return (
-    <div className="min-h-screen  flex-col items-center  bg-light-950 dark:bg-dark-950  transition-colors duration-700 ease-elegant selection:bg-accent/20">
+    <div className="relative min-h-screen w-full bg-zinc-50 dark:bg-black flex flex-col items-center justify-center overflow-hidden transition-colors duration-700 selection:bg-amber-500/30">
       {nav && <NavigationBar />}
-      <div
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}
-      />
-      <div className="relative z-10 w-full max-w-2xl px-6 mt-20">
-        <div className="flex flex-col items-center">
-          {/* Logo/Icon with a "Scan" line animation */}
-          <div className="relative mb-12">
-            <div className="w-24 h-24 border-4 border-slate-900 dark:border-white rounded-full flex items-center justify-center relative overflow-hidden">
-              <Construction
-                size={40}
-                className="text-slate-900 dark:text-white"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-400/20 to-transparent w-full h-1/2 animate-[scan_2s_linear_infinite]" />
-            </div>
+
+      {/* 1. MATCHING AMBIENT GLOWS (From your Dashboard) */}
+      <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-amber-500/10 dark:bg-amber-400/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[10%] left-[10%] w-[500px] h-[500px] bg-orange-500/10 dark:bg-orange-400/5 blur-[120px] rounded-full pointer-events-none" />
+
+      {/* 2. REPLACED DATA-SVG WITH PURE TAILWIND GRID (Build-Safe) */}
+      <div className="absolute inset-0 opacity-[0.15] dark:opacity-[0.2] pointer-events-none [mask-image:radial-gradient(ellipse_at_center,white,transparent)]">
+        <div className="absolute inset-0 h-full w-full bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-2xl px-6 flex flex-col items-center">
+        {/* Animated Icon Pod */}
+        <div className="relative mb-10 group">
+          <div className="absolute -inset-4 bg-amber-500/20 rounded-full blur-2xl group-hover:bg-amber-500/30 transition duration-1000"></div>
+          <div className="relative w-28 h-28 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-[2.5rem] flex items-center justify-center shadow-2xl">
+            <Construction
+              size={44}
+              className="text-amber-500 animate-bounce [animation-duration:3s]"
+            />
           </div>
+        </div>
 
-          <span className="px-4 py-1.5 rounded-full bg-amber-500 text-black text-[10px] font-black uppercase tracking-[0.3em] mb-6">
-            Under Construction
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 mb-8">
+          <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+          <span className="text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-[0.3em]">
+            System Upgrade in Progress
           </span>
+        </div>
 
-          <h1 className="text-6xl md:text-8xl font-black text-slate-900 dark:text-white text-center mb-8 tracking-tighter italic">
-            STAY <br /> TUNED.
-          </h1>
+        <h1 className="text-7xl md:text-9xl font-black text-zinc-900 dark:text-white text-center mb-8 tracking-tighter italic leading-none">
+          STAY <br /> <span className="text-amber-500">TUNED.</span>
+        </h1>
 
-          <div className="w-full max-w-md bg-slate-100 dark:bg-zinc-900/80 p-8 rounded-[32px] border border-slate-200 dark:border-zinc-800 backdrop-blur-md">
-            <p className="text-center text-slate-600 dark:text-zinc-400 font-medium mb-8">
-              We are upgrading our engines to provide you with a faster, more
-              powerful experience.
-            </p>
+        {/* Glass Content Card */}
+        <div className="w-full max-w-md bg-white/40 dark:bg-zinc-900/40 backdrop-blur-2xl p-10 rounded-[2.5rem] border border-zinc-200 dark:border-white/5 shadow-2xl text-center">
+          <p className="text-zinc-600 dark:text-zinc-400 font-medium mb-10 leading-relaxed">
+            We are refining our digital workspace to bring you a more seamless
+            experience. Join the waitlist for updates.
+          </p>
 
-            <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Mail
+                size={16}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"
+              />
               <input
                 type="email"
-                placeholder="Enter Email"
-                className="flex-1 bg-white dark:bg-black border border-slate-200 dark:border-zinc-700 rounded-2xl px-6 text-sm focus:outline-none focus:ring-2 ring-amber-500 transition-all dark:text-white"
+                placeholder="email@example.com"
+                className="w-full bg-white dark:bg-black border border-zinc-200 dark:border-white/10 rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 ring-amber-500/50 transition-all dark:text-white"
               />
-              <button className="bg-slate-900 dark:bg-white text-white dark:text-black p-4 rounded-2xl hover:scale-105 transition-transform active:scale-95">
-                <Instagram size={20} />
-              </button>
             </div>
+            <button className="bg-zinc-900 dark:bg-white text-white dark:text-black font-bold text-xs uppercase tracking-widest px-8 py-4 rounded-2xl hover:scale-105 transition-all active:scale-95 shadow-lg shadow-amber-500/10">
+              Notify
+            </button>
           </div>
+        </div>
 
-          <div className="mt-12 flex gap-8 text-slate-400">
-            <Twitter
-              className="hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors"
-              size={20}
+        {/* Social Links */}
+        <div className="mt-12 flex gap-10">
+          {[Twitter, Instagram].map((Icon, i) => (
+            <Icon
+              key={i}
+              className="text-zinc-400 hover:text-amber-500 cursor-pointer transition-all duration-300 hover:scale-110"
+              size={22}
             />
-            <Instagram
-              className="hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors"
-              size={20}
-            />
-          </div>
+          ))}
         </div>
       </div>
     </div>

@@ -1,5 +1,13 @@
-import { ArrowRight, AlertCircle, CheckCircle2, X, Info } from "lucide-react";
-import React, { useEffect } from "react";
+import {
+  ArrowRight,
+  AlertCircle,
+  CheckCircle2,
+  X,
+  Info,
+  Trash2,
+  MessageSquare,
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 const STYLES = {
   success: {
@@ -13,26 +21,46 @@ const STYLES = {
     title: "System Error",
   },
   warning: {
-    icon: <Info size={48} />,
+    icon: <AlertCircle size={48} />, // Changed to AlertCircle for warning distinction
     bgIcon: "bg-amber-500/10 text-amber-500",
     title: "Wait a moment",
+  },
+  info: {
+    icon: <Info size={48} />,
+    bgIcon: "bg-cyan-500/10 text-cyan-500",
+    title: "Information",
+  },
+  operation: {
+    icon: <Trash2 size={48} className="animate-pulse" />,
+    bgIcon: "bg-red-500/10 text-red-600",
+    title: "Confirm Operation",
+  },
+  input: {
+    icon: <MessageSquare size={48} />,
+    bgIcon: "bg-blue-500/10 text-blue-500",
+    title: "Action Required",
   },
 };
 
 function StatusModal({
   isOpen,
   onClose,
+  onConfirm,
   type = "success",
   message = "",
   buttonText = "Continue",
+  secondaryButtonText = "Cancel",
   autoCloseMs = 0,
+  showInput = false,
+  inputPlaceholder = "Enter reason...",
 }) {
-  // Handle auto-close timeout
+  const [inputValue, setInputValue] = useState("");
+
   useEffect(() => {
+    if (isOpen) setInputValue("");
+
     if (isOpen && autoCloseMs > 0) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, autoCloseMs);
+      const timer = setTimeout(() => onClose(), autoCloseMs);
       return () => clearTimeout(timer);
     }
   }, [isOpen, autoCloseMs, onClose]);
@@ -40,50 +68,69 @@ function StatusModal({
   if (!isOpen) return null;
 
   const currentStyle = STYLES[type] || STYLES.success;
+  const isConfirmation = !!onConfirm;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Modal Container */}
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="relative z-10 w-full max-w-md rounded-3xl bg-white dark:bg-zinc-900 shadow-2xl p-6 animate-in zoom-in-95 duration-200"
-      >
-        {/* Close button */}
+      <div className="relative z-10 w-full max-w-md rounded-[2.5rem] bg-white dark:bg-zinc-900 shadow-2xl p-8 animate-in zoom-in-95 duration-200">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 rounded-full p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition"
+          className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition"
         >
           <X size={18} />
         </button>
 
-        {/* Dynamic Content */}
-        <div className="flex flex-col items-center justify-center text-center py-10">
+        <div className="flex flex-col items-center text-center">
           <div
-            className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 ${currentStyle.bgIcon}`}
+            className={`w-20 h-20 rounded-3xl flex items-center justify-center mb-6 ${currentStyle.bgIcon}`}
           >
             {currentStyle.icon}
           </div>
 
-          <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-2">
+          <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter">
             {currentStyle.title}
           </h3>
 
-          <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-[280px]">
+          <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm">
             {message}
           </p>
 
-          <button
-            onClick={onClose}
-            className="flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-black px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:opacity-90 transition-all active:scale-95"
-          >
-            {buttonText} <ArrowRight size={16} />
-          </button>
+          {showInput && (
+            <div className="w-full mb-6">
+              <textarea
+                autoFocus
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder={inputPlaceholder}
+                className="w-full min-h-[100px] p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-white/5 text-sm text-white outline-none focus:ring-2 ring-blue-500/20 transition-all resize-none"
+              />
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-3 w-full font-black uppercase tracking-widest text-[10px]">
+            {isConfirmation && (
+              <button
+                onClick={onClose}
+                className="flex-1 px-6 py-4 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-zinc-800 transition-all"
+              >
+                {secondaryButtonText}
+              </button>
+            )}
+
+            <button
+              disabled={showInput && !inputValue.trim()}
+              onClick={() => (onConfirm ? onConfirm(inputValue) : onClose())}
+              className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-30
+                ${type === "operation" || type === "input" ? "bg-red-600 text-white" : "bg-white text-black dark:bg-white dark:text-black"}`}
+            >
+              {buttonText} <ArrowRight size={16} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

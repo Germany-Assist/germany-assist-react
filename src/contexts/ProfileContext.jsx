@@ -73,7 +73,7 @@ export const ProfileProvider = ({ children }) => {
       if (resp)
         setProfile((p) => ({
           ...p,
-          favorites: p.favorites.filter((i) => i.id !== service.id),
+          favorites: p.favorites.filter((i) => i.service.id !== service.id),
         }));
       return resp;
     } else {
@@ -93,14 +93,7 @@ export const ProfileProvider = ({ children }) => {
       return false;
     }
   };
-  const hasAlreadyPurchasedService = (service) => {
-    if (profile) {
-      const exist = profile.orders?.filter((i) => i.serviceId == service.id);
-      if (exist.length > 0) return exist.map((i) => i.variant || i.timeline);
-    } else {
-      return false;
-    }
-  };
+
   useEffect(() => {
     if (accessToken) {
       if (!profile) {
@@ -117,7 +110,6 @@ export const ProfileProvider = ({ children }) => {
       value={{
         isInFavorite,
         toggleFavorite,
-        hasAlreadyPurchasedService,
         profile,
         loading,
         error,

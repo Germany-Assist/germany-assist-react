@@ -71,6 +71,6 @@ export const setupInterceptors = ({
         }
       }
       return Promise.reject(err);
-    }
+    },
   );
 };

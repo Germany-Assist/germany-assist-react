@@ -10,20 +10,14 @@ import {
   History,
   LayoutGrid,
 } from "lucide-react";
-import {
-  serviceProviderGetAllOrders,
-  serviceProviderFinanceInit,
-  serviceProviderCloseOrder,
-} from "../../../../api/serviceProviderApis";
 import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
 import OrderStatusBadge from "../../../../components/ui/dashboard/OrderStatusBadge";
 import MetricCard from "../../../../components/ui/dashboard/MetricCard";
 import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
 import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
-import { getErrorMessage } from "../../../../api/errorMessages";
-import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader";
+import { getAllFinanceStatistical } from "../../../../api/adminApis";
 
-const ServiceProviderFinance = () => {
+const AdminFinance = () => {
   const [orders, setOrders] = useState([]);
   const [metrics, setMetrics] = useState({
     grossTotal: 0,
@@ -35,7 +29,6 @@ const ServiceProviderFinance = () => {
   const [loading, setLoading] = useState(true);
   const [tableLoading, setTableLoading] = useState(false);
   const [processingId, setProcessingId] = useState(null);
-  const [statusModalCon, setStatusModalCon] = useState(null);
 
   const [filters, setFilters] = useState({
     page: 1,
@@ -48,41 +41,23 @@ const ServiceProviderFinance = () => {
   const initDashboard = async () => {
     setLoading(true);
     try {
-      const response = await serviceProviderFinanceInit();
+      const response = await getAllFinanceStatistical();
       if (response.success) {
         setMetrics({
           grossTotal: response.data.grossTotal,
           escrow: response.data.escrow,
-          balance: response.data.balance,
           disputes: response.data.disputes,
         });
-        // setOrders(response.data.orders.data);
+        setOrders(response.data.orders.data);
         setMeta(response.data.orders.meta);
       }
     } catch (err) {
-      setStatusModalCon({
-        isOpen: true,
-        onClose: () => setStatusModalCon(null),
-        message: getErrorMessage(err),
-        type: "error",
-      });
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
-  const handleCloseOrder = async (id) => {
-    try {
-      const res = await serviceProviderCloseOrder(id);
-    } catch (error) {
-      setStatusModalCon({
-        isOpen: true,
-        onClose: () => setStatusModalCon(null),
-        message: getErrorMessage(error),
-        type: "error",
-      });
-    }
-    //TODO update the fields
-  };
+
   const columns = [
     {
       header: "Transaction",
@@ -114,29 +89,19 @@ const ServiceProviderFinance = () => {
     {
       header: "Action",
       align: "right",
-      render: (row) => {
-        console.log(row);
-        return (
-          <ActionGroup
-            actions={[
-              {
-                label: "Close Order",
-                show: row.status === "active" && row.serviceType === "oneTime",
-                loading: processingId === row.orderId,
-                onClick: () => handleCloseOrder(row.orderId),
-                variant: "primary",
-              },
-              {
-                label: "Go To Dispute Center",
-                show: Boolean(row.dispute),
-                loading: processingId === row.orderId,
-                onClick: () => handleCloseOrder(row.orderId),
-                variant: "danger",
-              },
-            ]}
-          />
-        );
-      },
+      render: (row) => (
+        <ActionGroup
+          actions={[
+            {
+              label: "Close Order",
+              show: row.status === "active" && row.type === "oneTime",
+              loading: processingId === row.orderId,
+              onClick: () => handleCloseOrder(row.orderId),
+              variant: "primary",
+            },
+          ]}
+        />
+      ),
     },
   ];
   // Specialized cell for Currency
@@ -160,13 +125,9 @@ const ServiceProviderFinance = () => {
       };
       const response = await serviceProviderGetAllOrders(params);
       setOrders(response.data || []);
+      setMeta(response.meta || { page: 1, totalPages: 1 });
     } catch (err) {
-      setStatusModalCon({
-        isOpen: true,
-        onClose: () => setStatusModalCon(null),
-        message: getErrorMessage(err),
-        type: "error",
-      });
+      console.error(err);
     } finally {
       setTableLoading(false);
     }
@@ -175,9 +136,8 @@ const ServiceProviderFinance = () => {
   useEffect(() => {
     initDashboard();
   }, []);
-
   useEffect(() => {
-    fetchFilteredData();
+    if (!loading) fetchFilteredData();
   }, [filters, fetchFilteredData]);
 
   const handleFilterChange = (key, value) => {
@@ -194,7 +154,18 @@ const ServiceProviderFinance = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-6">
       <div className="max-w-6xl mx-auto space-y-8">
-        <DashboardHeader title={"finance"} subtitle={"financial console"} />
+        {/* HEADER */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-5xl font-black tracking-tighter uppercase italic dark:text-white">
+              FINANCE
+            </h1>
+            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em]">
+              Operational Ledger & Payouts
+            </p>
+          </div>
+        </div>
+
         {/* METRICS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <MetricCard
@@ -218,15 +189,7 @@ const ServiceProviderFinance = () => {
             variant="red"
             isCount
           />
-          <MetricCard
-            title="Balance"
-            amount={metrics.balance}
-            icon={ShieldAlert}
-            sub="Available to checkout"
-            variant="green"
-          />
         </div>
-
         {/* TODO i should create reuseable component */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <div className="relative group col-span-1">
@@ -276,18 +239,29 @@ const ServiceProviderFinance = () => {
           </button>
         </div>
 
-        <MultiUseTable
-          columns={columns}
-          data={orders}
-          loading={tableLoading}
-          pagination={meta}
-          onPageChange={(newPage) =>
-            setFilters((f) => ({ ...f, page: newPage }))
-          }
-        />
+        {/* LEDGER */}
+        <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-white/5 shadow-sm overflow-hidden relative">
+          {tableLoading && (
+            <div className="absolute inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+              <Loader2 className="animate-spin text-blue-500" />
+            </div>
+          )}
+
+          <div className="overflow-x-auto">
+            <MultiUseTable
+              columns={columns}
+              data={orders}
+              loading={tableLoading}
+              pagination={meta}
+              onPageChange={(newPage) =>
+                setFilters((f) => ({ ...f, page: newPage }))
+              }
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default ServiceProviderFinance;
+export default AdminFinance;
