@@ -3,17 +3,16 @@ import {
   Star,
   Loader2,
   CreditCard,
-  CheckCircle2,
   ArrowRight,
-  History,
   Calendar,
   Check,
+  CheckCircle2,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 
 const BookingSidebar = ({
   serviceType,
-  options = [], // This is either 'variants' or 'timelines'
+  options = [],
   purchasedItems = [],
   category,
   rating,
@@ -22,16 +21,20 @@ const BookingSidebar = ({
   isProcessing,
   onNavigate,
 }) => {
-  // 1. Manage selection state
   const [selectedId, setSelectedId] = useState(null);
-  // 2. Initialize selection with the first available option
   useEffect(() => {
     if (options.length > 0 && !selectedId) {
       setSelectedId(options[0].id);
     }
   }, [options, selectedId]);
+
   const selectedOption = options.find((o) => o.id === selectedId) || options[0];
+  console.log(purchasedItems);
+  // Check if the selected option is already in purchasedItems
+  const isAlreadyPurchased = purchasedItems.some((item) => item === selectedId);
+
   const displayPrice = selectedOption?.price || 0;
+
   return (
     <div className="sticky top-32 bg-white dark:bg-dark-900 border border-light-700 dark:border-white/5 rounded-[2.5rem] p-8 shadow-2xl shadow-light-900/50 dark:shadow-none transition-all duration-500">
       {/* Price and Rating Header */}
@@ -59,80 +62,108 @@ const BookingSidebar = ({
         </label>
 
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
-          {options.map((option) => (
-            <button
-              key={option.id}
-              onClick={() => setSelectedId(option.id)}
-              className={`w-full text-left p-4 rounded-2xl border transition-all relative group ${
-                selectedId === option.id
-                  ? "border-accent bg-accent/5 ring-2 ring-accent/20"
-                  : "border-light-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20"
-              }`}
-            >
-              <div className="flex justify-between items-center">
-                <div className="flex-1 pr-4">
-                  <p
-                    className={`font-bold text-sm ${
-                      selectedId === option.id
-                        ? "text-accent"
-                        : "text-slate-700 dark:text-slate-200"
-                    }`}
-                  >
-                    {option.label}
-                  </p>
+          {options &&
+            purchasedItems &&
+            options.length > 0 &&
+            options.map((option) => {
+              const isItemPurchased = purchasedItems.some(
+                (item) => item?.id === option?.id,
+              );
+              return (
+                <button
+                  key={option.id}
+                  onClick={() => setSelectedId(option.id)}
+                  className={`w-full text-left p-4 rounded-2xl border transition-all relative group ${
+                    selectedId === option.id
+                      ? "border-accent bg-accent/5 ring-2 ring-accent/20"
+                      : "border-light-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20"
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex-1 pr-4">
+                      <div className="flex items-center gap-2">
+                        <p
+                          className={`font-bold text-sm ${
+                            selectedId === option.id
+                              ? "text-accent"
+                              : "text-slate-700 dark:text-slate-200"
+                          }`}
+                        >
+                          {option.label}
+                        </p>
+                        {isItemPurchased && (
+                          <CheckCircle2
+                            size={12}
+                            className="text-emerald-500"
+                          />
+                        )}
+                      </div>
 
-                  {/* Show Dates only if it's a timeline */}
-                  {serviceType === "timeline" && option.startDate && (
-                    <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
-                      <Calendar size={10} />
-                      {new Date(option.startDate).toLocaleDateString(
-                        undefined,
-                        { month: "short", day: "numeric" }
-                      )}{" "}
-                      -{" "}
-                      {new Date(option.endDate).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </p>
+                      {serviceType === "timeline" && option.startDate && (
+                        <p className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
+                          <Calendar size={10} />
+                          {new Date(option.startDate).toLocaleDateString(
+                            undefined,
+                            { month: "short", day: "numeric" },
+                          )}{" "}
+                          -{" "}
+                          {new Date(option.endDate).toLocaleDateString(
+                            undefined,
+                            { month: "short", day: "numeric" },
+                          )}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="text-right">
+                      <p className="font-black text-slate-900 dark:text-white">
+                        ${option.price}
+                      </p>
+                    </div>
+                  </div>
+
+                  {selectedId === option.id && (
+                    <div className="absolute top-0 right-0 p-1 bg-accent text-white rounded-bl-lg">
+                      <Check size={10} strokeWidth={4} />
+                    </div>
                   )}
-                </div>
-
-                <div className="text-right">
-                  <p className="font-black text-slate-900 dark:text-white">
-                    ${option.price}
-                  </p>
-                </div>
-              </div>
-
-              {selectedId === option.id && (
-                <div className="absolute top-0 right-0 p-1 bg-accent text-white rounded-bl-lg">
-                  <Check size={10} strokeWidth={4} />
-                </div>
-              )}
-            </button>
-          ))}
+                </button>
+              );
+            })}
         </div>
       </div>
 
-      {/* Action Button */}
-      <button
-        onClick={() => onBuy(selectedOption)}
-        disabled={isProcessing || !selectedId}
-        className="w-full bg-slate-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-widest py-5 rounded-2xl transition-all active:scale-[0.98] mb-6 shadow-xl flex items-center justify-center gap-3 group hover:bg-accent hover:text-white disabled:opacity-50"
-      >
-        {isProcessing ? (
-          <Loader2 className="animate-spin" size={20} />
-        ) : (
-          <>
-            <CreditCard
-              size={18}
-              className="group-hover:scale-110 transition-transform"
-            />
-            <span>Book Now</span>
-          </>
-        )}
-      </button>
+      {/* Dynamic Action Button */}
+      {isAlreadyPurchased && serviceType == "timeline" ? (
+        <button
+          onClick={() => onNavigate(selectedId)}
+          className="w-full bg-emerald-500 text-white font-black uppercase tracking-widest py-5 rounded-2xl transition-all active:scale-[0.98] mb-6 shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-3 group hover:bg-emerald-600"
+        >
+          <span>View Timeline</span>
+          <ArrowRight
+            size={18}
+            className="group-hover:translate-x-1 transition-transform"
+          />
+        </button>
+      ) : (
+        <button
+          onClick={() => onBuy(selectedOption)}
+          disabled={isProcessing || !selectedId}
+          className="w-full bg-slate-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-widest py-5 rounded-2xl transition-all active:scale-[0.98] mb-6 shadow-xl flex items-center justify-center gap-3 group hover:bg-accent hover:text-white disabled:opacity-50"
+        >
+          {isProcessing ? (
+            <Loader2 className="animate-spin" size={20} />
+          ) : (
+            <>
+              <CreditCard
+                size={18}
+                className="group-hover:scale-110 transition-transform"
+              />
+              <span>Book Now</span>
+            </>
+          )}
+        </button>
+      )}
 
       {/* Footer Details */}
       <div className="space-y-4 pt-6 border-t border-light-100 dark:border-white/5">
@@ -144,6 +175,14 @@ const BookingSidebar = ({
             {category?.label || "General"}
           </span>
         </div>
+
+        {isAlreadyPurchased && (
+          <div className="p-3 bg-emerald-50 dark:bg-emerald-500/5 rounded-xl border border-emerald-100 dark:border-emerald-500/10">
+            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase text-center">
+              You already own this session
+            </p>
+          </div>
+        )}
 
         {providerEmail && (
           <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-4 italic">

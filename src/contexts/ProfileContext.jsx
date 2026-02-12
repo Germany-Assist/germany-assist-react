@@ -73,7 +73,7 @@ export const ProfileProvider = ({ children }) => {
       if (resp)
         setProfile((p) => ({
           ...p,
-          favorites: p.favorites.filter((i) => i.id !== service.id),
+          favorites: p.favorites.filter((i) => i.service.id !== service.id),
         }));
       return resp;
     } else {
@@ -93,30 +93,7 @@ export const ProfileProvider = ({ children }) => {
       return false;
     }
   };
-  const isAlreadyPurchasedService = (service) => {
-    if (profile) {
-      const exist = profile.orders?.filter((i) => {
-        return i.serviceId == service.id;
-      });
-      if (exist.length > 0) return exist;
-    } else {
-      return false;
-    }
-  };
-  const isAlreadyPurchasedTimeline = (service) => {
-    if (profile) {
-      const exist = profile.orders?.filter((i) => {
-        if (i.type === "timeline")
-          return (
-            i.serviceId == service.id &&
-            i.timelineId == service.activeTimeline.id
-          );
-      });
-      if (exist) return exist.length > 0;
-    } else {
-      return false;
-    }
-  };
+
   useEffect(() => {
     if (accessToken) {
       if (!profile) {
@@ -133,8 +110,6 @@ export const ProfileProvider = ({ children }) => {
       value={{
         isInFavorite,
         toggleFavorite,
-        isAlreadyPurchasedTimeline,
-        isAlreadyPurchasedService,
         profile,
         loading,
         error,

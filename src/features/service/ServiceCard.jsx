@@ -22,18 +22,30 @@ const ServiceCard = ({
     title = "Untitled Service",
     description = "No description available.",
     rating = 0,
-    price = 0,
+    variants = null,
+    timelines = null,
   } = data;
+  const minPrice = variants
+    ? variants.minPrice
+    : timelines
+      ? timelines.minPrice
+      : 0;
+  const maxPrice = variants
+    ? variants.maxPrice
+    : timelines
+      ? timelines.maxPrice
+      : 0;
 
   const handleFav = async (e) => {
     if (isDummy) return;
     e.stopPropagation();
     if (onFavoriteClick) {
-      const resp = await onFavoriteClick();
-      if (resp) setIsFavorite(!isFavorite);
+      try {
+        const resp = await onFavoriteClick();
+        if (resp) setIsFavorite(!isFavorite);
+      } catch (error) {}
     }
   };
-
   return (
     <div
       onClick={() => {
@@ -116,11 +128,11 @@ const ServiceCard = ({
             </p>
 
             <div className="flex gap-4 mt-4">
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono italic">
+              <span className="text-[14px] text-slate-400 dark:text-slate-500 font-mono italic">
                 ID: {id}
               </span>
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-                ⭐ {rating.toFixed(1)}
+              <span className="text-[14px] text-slate-400 dark:text-slate-500 font-mono">
+                ⭐ {rating?.toFixed(1)}
               </span>
             </div>
           </div>
@@ -129,10 +141,16 @@ const ServiceCard = ({
           <div className="mt-6 pt-5 border-t border-light-700 dark:border-white/5 flex justify-between items-center">
             <div>
               <p className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">
-                Price
+                Starting Price
               </p>
               <p className="text-2xl font-black text-slate-900 dark:text-white">
-                €{(price || 0).toFixed(2)}
+                €{(minPrice || 0).toFixed(2)}
+              </p>
+              <p className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-bold">
+                Highest Price
+              </p>
+              <p className="text-2xl font-black text-slate-900 dark:text-white">
+                €{(maxPrice || 0).toFixed(2)}
               </p>
             </div>
 

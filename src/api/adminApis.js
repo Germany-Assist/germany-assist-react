@@ -42,8 +42,20 @@ export const updateCategory = async (payload) => {
 /* ---------------------- Services ---------------------- */
 
 // Get all services (admin view)
-export const getAllServices = async () => {
-  const res = await api.get("/service/admin/services");
+export const getAllServices = async (params) => {
+  const queryString = params
+    ? `?${new URLSearchParams(params).toString()}`
+    : "";
+  const res = await api.get(`/service/admin/services${queryString}`);
+  return res.data;
+};
+
+export const getAllServicesStatistical = async () => {
+  const res = await api.get(`/dashboard/admin/services`);
+  return res.data;
+};
+export const getAllFinanceStatistical = async () => {
+  const res = await api.get(`/dashboard/admin/finance`);
   return res.data;
 };
 
@@ -68,7 +80,7 @@ export const uploadAsset = async (formData) => {
     formData,
     {
       headers: { "Content-Type": "multipart/form-data" },
-    }
+    },
   );
   return res.data;
 };
@@ -104,9 +116,22 @@ export const createServiceProvider = async (payload = {}) => {
   return res.data;
 };
 
+export const getAllRequests = async (filters) => {
+  const queryString = filters
+    ? `?${new URLSearchParams(filters).toString()}`
+    : "";
+  const res = await api.get(`/requests/admin${queryString}`);
+  return res.data;
+};
+export const updateRequest = async (id, payload = {}) => {
+  const res = await api.put(`/requests/admin/${id}`, payload);
+  return res.data;
+};
 const adminApis = {
   getOrderById,
+  updateRequest,
   getAllOrders,
+  getAllRequests,
   deleteAsset,
   getAllAssets,
   uploadAsset,

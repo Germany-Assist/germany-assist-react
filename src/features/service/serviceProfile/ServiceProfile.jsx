@@ -14,31 +14,22 @@ import PaymentModal from "../../../components/ui/payments/PaymentModal";
 import { useProfile } from "../../../contexts/ProfileContext";
 import { fetchUserReviewForServiceApi } from "../../../api/profile";
 import StatusModal from "../../../components/ui/StatusModal";
-
+import { checkIfBoughtClientApi } from "../../../api/clientUserApis";
 const ServiceProfile = ({ previewData = null }) => {
   const { serviceId } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState(previewData);
   const [loading, setLoading] = useState(!previewData);
   const [error, setError] = useState(false);
-  const {
-    toggleFavorite,
-    isInFavorite,
-    profile,
-    isAlreadyPurchasedService,
-    isAlreadyPurchasedTimeline,
-  } = useProfile();
-
+  const { toggleFavorite, isInFavorite, profile } = useProfile();
   const [isFavorite, setIsFavorite] = useState(false);
   const [successScreen, setSuccessScreen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
 
-  const [hasPurchasedService, setHasPurchasedService] = useState(false);
-  const [hasPurchasedTimeline, setHasPurchasedTimeline] = useState(false);
-  const [hasReview, setHasReview] = useState(false);
-
   const [purchasedItems, setPurchasedItems] = useState([]);
+
+  const [hasReview, setHasReview] = useState(false);
 
   const [paymentConfig, setPaymentConfig] = useState({
     isOpen: false,
@@ -73,17 +64,14 @@ const ServiceProfile = ({ previewData = null }) => {
   useEffect(() => {
     if (previewData || !data) return;
     setIsFavorite(isInFavorite(data.id));
-    // Check purchase status from context
-    const ps = isAlreadyPurchasedService(data);
-    setHasPurchasedService(ps);
-    setHasPurchasedTimeline(Boolean(isAlreadyPurchasedTimeline(data)));
-    if (ps) {
-      setPurchasedItems(ps);
-      (async () => {
+    (async () => {
+      const history = await checkIfBoughtClientApi(data.id);
+      if (history && history.length > 0) {
+        setPurchasedItems(history);
         const review = await fetchUserReviewForServiceApi(data.id);
         setHasReview(review);
-      })();
-    }
+      }
+    })();
   }, [profile, data, previewData]);
 
   /* -------------------- Payments -------------------- */
@@ -172,7 +160,7 @@ const ServiceProfile = ({ previewData = null }) => {
         message="Congratulations Your booking is confirmed."
       />
       {/* Breadcrumb Header */}
-      <nav className="border-b border-light-700 dark:border-white/5 bg-light-900/50 dark:bg-black/20 backdrop-blur-md sticky top-0 z-30">
+      <nav className="border-b border-light-700 dark:border-white/5 bg-light-900/50 dark:bg-black/20 backdrop-blur-md sticky top-0 ">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3 text-sm">
             <span
@@ -251,7 +239,7 @@ const ServiceProfile = ({ previewData = null }) => {
                 rating={data.rating || 0}
                 serviceId={data.id}
                 existingReview={hasReview}
-                canReview={hasPurchasedService}
+                canReview={Boolean(purchasedItems.length > 0)}
               />
             </section>
           </div>

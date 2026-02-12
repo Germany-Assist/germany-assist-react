@@ -5,7 +5,7 @@ module.exports = {
     extend: {
       colors: {
         dark: {
-          950: "#111111ff", // Deepest background
+          950: "#04080f", // Deepest background
           900: "#3f3f3fff", // Section background
           800: "#313131ff", // Card background
           700: "#1f1f1f", // Borders / Hover states

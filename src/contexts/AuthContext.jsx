@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
         if (goHome) navigate("/");
       }
     },
-    [clearAuthState, navigate]
+    [clearAuthState, navigate],
   );
 
   // 4. JWT Schedule Logic
@@ -128,7 +128,7 @@ export const AuthProvider = ({ children }) => {
         accessToken,
         isAuthenticated,
         authLoading,
-        setAuthLoading, // Exported so BootstrapGate can toggle it
+        setAuthLoading,
         login,
         signUp,
         googleLogin,

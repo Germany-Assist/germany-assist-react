@@ -1,20 +1,70 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { LayoutGrid, Loader2, Plus, Search, Ban } from "lucide-react";
-import MultiUseTable from "../../../../components/ui/MultiUseTable";
-import TransactionCell from "../../../../components/ui/TransactionCell";
-import OrderStatusBadge from "../../../../components/ui/OrderStatusBadge";
-import ActionGroup from "../../../../components/ui/ActionGroup";
-import FilterContainer from "../../../../components/ui/FilterContainer";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import {
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  Globe,
+  Eye,
+  Box,
+} from "lucide-react";
+import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
+import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
+import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
+import FilterContainer, {
+  FilterToggle,
+} from "../../../../components/ui/dashboard/FilterContainer";
+import StatusModal from "../../../../components/ui/StatusModal";
 import serviceProviderApis, {
   publishService,
   unpublishService,
 } from "../../../../api/serviceProviderApis";
+import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader";
+import { getErrorMessage } from "../../../../api/errorMessages";
+import { useNavigate } from "react-router-dom";
+
+// TODO move this to component
+const getServiceStatus = (service) => {
+  if (service.rejected)
+    return {
+      label: "Rejected",
+      color: "text-red-500",
+      dot: "bg-red-500",
+      icon: AlertCircle,
+    };
+  if (service.published && service.approved)
+    return {
+      label: "Live",
+      color: "text-emerald-500",
+      dot: "bg-emerald-500 animate-pulse",
+      icon: CheckCircle2,
+    };
+  if (service.published && !service.approved)
+    return {
+      label: "Pending Approval",
+      color: "text-amber-500",
+      dot: "bg-amber-500",
+      icon: Clock,
+    };
+  if (service.approved && !service.published)
+    return {
+      label: "Pending Publish",
+      color: "text-blue-500",
+      dot: "bg-blue-500",
+      icon: Globe,
+    };
+  return {
+    label: "Pending",
+    color: "text-zinc-400",
+    dot: "bg-zinc-300",
+    icon: Clock,
+  };
+};
 
 export default function ServiceProviderServices() {
   const [services, setServices] = useState([]);
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 });
   const [loading, setLoading] = useState(false);
-
+  const [statusModalCon, setStatusModalCon] = useState(null);
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
@@ -26,15 +76,12 @@ export default function ServiceProviderServices() {
     published: undefined,
     approved: undefined,
     rejected: undefined,
-    minPrice: undefined,
-    maxPrice: undefined,
   });
+  const navigate = useNavigate();
 
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
-      // Logic: Only remove keys if they are EXACTLY undefined or empty strings.
-      // We want to keep 'false' values if we explicitly filter for un-published.
       const cleanParams = Object.fromEntries(
         Object.entries(filters).filter(([_, v]) => v !== undefined && v !== ""),
       );
@@ -49,7 +96,12 @@ export default function ServiceProviderServices() {
         });
       }
     } catch (err) {
-      console.error(err);
+      setStatusModalCon({
+        isOpen: true,
+        onClose: () => setStatusModalCon(null),
+        message: getErrorMessage(err),
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -59,14 +111,34 @@ export default function ServiceProviderServices() {
     fetchServices();
   }, [fetchServices]);
 
-  const handleTogglePublish = async (id, isPublished) => {
-    if (isPublished) await unpublishService(id);
-    else await publishService(id);
-    fetchServices();
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+      page: key === "page" ? value : 1,
+    }));
   };
 
-  const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
+  const handleTogglePublish = async (id, currentlyPublished) => {
+    const previousState = [...services];
+    const targetStatus = !currentlyPublished;
+    setServices((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, published: targetStatus } : s)),
+    );
+    try {
+      if (currentlyPublished) {
+        await unpublishService(id);
+      } else {
+        await publishService(id);
+      }
+    } catch (error) {
+      setServices(previousState);
+      setStatusModalCon({
+        isOpen: true,
+        type: "error",
+        message: `Failed to ${targetStatus ? "publish" : "unpublish"} service. ${getErrorMessage(error)}.`,
+      });
+    }
   };
 
   const serviceColumns = [
@@ -74,57 +146,58 @@ export default function ServiceProviderServices() {
       header: "Service",
       render: (service) => (
         <TransactionCell
-          id={service.title}
+          title={service.title}
           subtext={`ID: ${service.id} • ${service.category}`}
-          icon={LayoutGrid}
-          // Shift style to red ONLY if rejected
+          icon={Box}
           variant={service.rejected ? "danger" : "default"}
         />
       ),
     },
     {
-      header: "Type",
+      header: "Delivery Type",
       render: (service) => (
-        <span className="text-[10px] font-black uppercase px-3 py-1 bg-zinc-100 dark:bg-white/5 rounded-lg border border-zinc-200 dark:border-white/5">
-          {service.type === "oneTime" ? "One-Time" : "Timeline"}
-        </span>
+        <div className="flex flex-col gap-1">
+          <span className="text-[11px] font-black uppercase px-2.5 py-1 bg-zinc-100 dark:bg-white/5 rounded-lg border border-zinc-200 dark:border-white/5 w-fit">
+            {service.type === "oneTime" ? "One-Time Payment" : "Timeline Based"}
+          </span>
+        </div>
       ),
     },
     {
       header: "Performance",
       render: (service) => (
-        <div>
-          <p className="text-sm font-black italic">
-            {service.views || 0} Views
-          </p>
-          <div className="flex items-center gap-1 text-[9px] font-bold text-zinc-400 uppercase">
-            <span className="text-amber-500">{service.rating || 0} ★</span>
-            <span>•</span>
-            <span>{service.totalReviews || 0} Reviews</span>
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5 text-sm font-black italic">
+              <Eye size={12} className="text-zinc-400" />
+              {service.views || 0}
+            </div>
+            <div className="flex items-center gap-1 text-[9px] font-bold text-zinc-400 uppercase">
+              <span className="text-amber-500">{service.rating || 0} ★</span>
+              <span>•</span>
+              <span>{service.totalReviews || 0} Reviews</span>
+            </div>
           </div>
         </div>
       ),
     },
     {
-      header: "Status",
-      render: (service) => (
-        <div className="flex flex-col gap-1">
-          <OrderStatusBadge status={service.level} />
-          <div className="flex flex-col gap-0.5">
-            {service.published && (
-              <span className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />{" "}
-                Live
+      header: "Platform Status",
+      render: (service) => {
+        const status = getServiceStatus(service);
+        return (
+          <div className="flex flex-col gap-1.5">
+            <div
+              className={`flex items-center gap-2 px-3 py-1 rounded-full border border-current bg-transparent w-fit ${status.color} opacity-90`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
+              <span className="text-[10px] font-black uppercase tracking-tight">
+                {status.label}
               </span>
-            )}
-            {service.rejected && (
-              <span className="text-[8px] font-bold text-red-500 uppercase tracking-widest">
-                Rejected
-              </span>
-            )}
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       header: "Action",
@@ -134,15 +207,27 @@ export default function ServiceProviderServices() {
           actions={[
             {
               label: service.published ? "Unpublish" : "Publish",
-              show: true,
+              show: !service.rejected,
               onClick: () => handleTogglePublish(service.id, service.published),
-              variant: service.published ? "outline" : "emerald",
+              variant: service.published ? "danger" : "success",
+            },
+            {
+              label: "VIEW",
+              show: true,
+              onClick: () => navigate(`/admin/service/${service.id}`),
+              variant: "success",
             },
             {
               label: "Edit",
               show: true,
-              onClick: () => console.log("Edit", service.id),
-              variant: "outline",
+              onClick: () =>
+                setStatusModalCon({
+                  isOpen: true,
+                  type: "warning",
+                  message:
+                    "Please note that update is not allowed at this moment. We will discuss this in a meeting with the core team.",
+                }),
+              variant: "alert",
             },
           ]}
         />
@@ -151,46 +236,31 @@ export default function ServiceProviderServices() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 p-5">
-      {/* HEADER */}
-      <div className="flex justify-between items-end">
-        <div>
-          <h1 className="text-4xl font-black italic tracking-tighter uppercase">
-            Services
-          </h1>
-          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-            Manage Ledger & Visibility
-          </p>
-        </div>
-        <button className="flex items-center gap-2 bg-zinc-900 dark:bg-white dark:text-black text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest">
-          <Plus size={14} /> Create
-        </button>
-      </div>
+    <div className="max-w-7xl mx-auto space-y-6 p-6">
+      <DashboardHeader title={"Services"} subtitle={"manage your services"} />
 
+      {/* FILTERS */}
       <FilterContainer
         searchValue={filters.title}
         onSearchChange={(val) => handleFilterChange("title", val)}
+        placeholder="Filter by title..."
       >
         <select
           value={filters.category || ""}
           onChange={(e) =>
-            handleFilterChange(
-              "category",
-              e.target.value === "" ? undefined : e.target.value,
-            )
+            handleFilterChange("category", e.target.value || undefined)
           }
-          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 px-4 py-3 rounded-2xl text-[10px] font-black uppercase outline-none"
+          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 px-4 py-3 rounded-2xl text-[10px] font-black uppercase outline-none focus:ring-2 ring-blue-500/20"
         >
           <option value="">All Categories</option>
           <option value="visa-paperwork">Visa Paperwork</option>
         </select>
 
         <div className="flex flex-wrap gap-2 col-span-full pt-2">
-          {/* TRIPLE STATE TOGGLES */}
           <FilterToggle
             label="Published"
             active={filters.published === true}
-            color="emerald"
+            variant="emerald"
             onClick={() =>
               handleFilterChange(
                 "published",
@@ -201,7 +271,7 @@ export default function ServiceProviderServices() {
           <FilterToggle
             label="Approved"
             active={filters.approved === true}
-            color="emerald"
+            variant="emerald"
             onClick={() =>
               handleFilterChange(
                 "approved",
@@ -212,7 +282,7 @@ export default function ServiceProviderServices() {
           <FilterToggle
             label="Rejected"
             active={filters.rejected === true}
-            color="red"
+            variant="red"
             onClick={() =>
               handleFilterChange(
                 "rejected",
@@ -220,62 +290,21 @@ export default function ServiceProviderServices() {
               )
             }
           />
-          <FilterToggle
-            label="One-Time"
-            active={filters.type === "oneTime"}
-            color="blue"
-            onClick={() =>
-              handleFilterChange(
-                "type",
-                filters.type === "oneTime" ? undefined : "oneTime",
-              )
-            }
-          />
-          <FilterToggle
-            label="Timeline"
-            active={filters.type === "timeline"}
-            color="blue"
-            onClick={() =>
-              handleFilterChange(
-                "type",
-                filters.type === "timeline" ? undefined : "timeline",
-              )
-            }
-          />
         </div>
       </FilterContainer>
 
-      <div className="relative">
-        <MultiUseTable
-          columns={serviceColumns}
-          data={services}
-          loading={loading}
-          pagination={meta}
-          onPageChange={(newPage) => handleFilterChange("page", newPage)}
-        />
-      </div>
+      <MultiUseTable
+        columns={serviceColumns}
+        data={services}
+        loading={loading}
+        pagination={meta}
+        onPageChange={(newPage) => handleFilterChange("page", newPage)}
+      />
+
+      <StatusModal
+        {...statusModalCon}
+        onClose={() => setStatusModalCon(null)}
+      />
     </div>
   );
 }
-
-const FilterToggle = ({ label, active, onClick, color }) => {
-  const colorClasses = {
-    emerald: active
-      ? "bg-emerald-500/10 border-emerald-500 text-emerald-500"
-      : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/5 text-zinc-400",
-    blue: active
-      ? "bg-blue-500/10 border-blue-500 text-blue-500"
-      : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/5 text-zinc-400",
-    red: active
-      ? "bg-red-500/10 border-red-500 text-red-500"
-      : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/5 text-zinc-400",
-  };
-  return (
-    <button
-      onClick={onClick}
-      className={`px-5 py-2.5 rounded-xl text-[9px] font-black uppercase border transition-all ${colorClasses[color]}`}
-    >
-      {label}
-    </button>
-  );
-};
