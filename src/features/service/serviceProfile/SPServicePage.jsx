@@ -27,7 +27,6 @@ const SPServicePage = () => {
       try {
         if (isAuthenticated) {
           const res = await serviceProfilePageSP(serviceId);
-          console.log(res);
           setData(res);
         }
       } catch (err) {

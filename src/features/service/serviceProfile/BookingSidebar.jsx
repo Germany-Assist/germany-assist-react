@@ -29,7 +29,6 @@ const BookingSidebar = ({
   }, [options, selectedId]);
 
   const selectedOption = options.find((o) => o.id === selectedId) || options[0];
-  console.log(purchasedItems);
   // Check if the selected option is already in purchasedItems
   const isAlreadyPurchased = purchasedItems.some((item) => item === selectedId);
 

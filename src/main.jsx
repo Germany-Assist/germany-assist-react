@@ -6,7 +6,7 @@ import App from "./App.jsx";
 import { AuthProvider, useAuth } from "./contexts/AuthContext.jsx";
 import { ProfileProvider } from "./contexts/ProfileContext.jsx";
 import { MetaContextProvider } from "./contexts/MetadataContext.jsx";
-
+import { SocketProvider } from "./contexts/SocketContext.jsx";
 export const BootstrapGate = ({ children }) => {
   const { refreshAccessToken } = useAuth();
   const [bootstrapped, setBootstrapped] = useState(false);
@@ -33,13 +33,15 @@ createRoot(document.getElementById("root")).render(
     <MetaContextProvider>
       <BrowserRouter>
         <AuthProvider>
-          <ProfileProvider>
-            <BootstrapGate>
-              <App />
-            </BootstrapGate>
-          </ProfileProvider>
+          <SocketProvider>
+            <ProfileProvider>
+              <BootstrapGate>
+                <App />
+              </BootstrapGate>
+            </ProfileProvider>
+          </SocketProvider>
         </AuthProvider>
       </BrowserRouter>
     </MetaContextProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
