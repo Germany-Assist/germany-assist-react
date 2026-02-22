@@ -52,7 +52,6 @@ export default function AdminServices() {
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
-      // Logic: Only strip undefined or empty strings. Explicit 'false' is allowed to pass to the API.
       const cleanParams = Object.fromEntries(
         Object.entries(filters).filter(([_, v]) => v !== undefined && v !== ""),
       );
@@ -116,6 +115,7 @@ export default function AdminServices() {
         render: (service) => (
           <TransactionCell
             id={service.title || "Untitled Service"}
+            title={service.title || "Untitled Service"}
             subtext={service.serviceProvider || "Unknown Provider"}
             icon={LayoutGrid}
           />
