@@ -29,6 +29,7 @@ jobs:
           VITE_LOCAL_BACKEND_URL: ${{ vars.VITE_LOCAL_BACKEND_URL }}
           VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
           VITE_STRIPE_SK: ${{ secrets.VITE_STRIPE_SK }}
+          VITE_DROPLET_ORIGIN: ${{ vars.VITE_DROPLET_ORIGIN }}
 
         run: npm run build
 

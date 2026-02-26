@@ -9,6 +9,7 @@ export default defineConfig({
       "/staging/backend": {
         target: "http://www.germany-assist.com",
         changeOrigin: true,
+        ws: true,
       },
     },
   },
