@@ -11,10 +11,3 @@ export const API_URL =
     : NODE_ENV === "staging"
       ? `${STAGING_BACKEND_URL}/api`
       : `${LOCAL_BACKEND_URL}/api`;
-
-export const SOCKET_URL =
-  NODE_ENV === "production"
-    ? `${DROPLET_BACKEND_URL}`
-    : NODE_ENV === "staging"
-      ? `${STAGING_BACKEND_URL}`
-      : `${LOCAL_BACKEND_URL}`;
