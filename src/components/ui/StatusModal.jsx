@@ -6,6 +6,7 @@ import {
   Info,
   Trash2,
   MessageSquare,
+  Shield,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
@@ -31,7 +32,7 @@ const STYLES = {
     title: "Information",
   },
   operation: {
-    icon: <Trash2 size={48} className="animate-pulse" />,
+    icon: <Shield size={48} className="animate-pulse" />,
     bgIcon: "bg-red-500/10 text-red-600",
     title: "Confirm Operation",
   },

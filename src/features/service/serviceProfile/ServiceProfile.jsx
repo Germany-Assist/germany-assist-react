@@ -50,7 +50,6 @@ const ServiceProfile = ({ previewData = null }) => {
         setData(res);
       } catch (err) {
         // setError(err.response?.data?.message);
-        console.log(err.response?.data?.message);
         setError(err.response?.data?.message || "ops something went wrong");
       } finally {
         setLoading(false);

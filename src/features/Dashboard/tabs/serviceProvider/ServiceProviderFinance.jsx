@@ -115,7 +115,6 @@ const ServiceProviderFinance = () => {
       header: "Action",
       align: "right",
       render: (row) => {
-        console.log(row);
         return (
           <ActionGroup
             actions={[

@@ -15,7 +15,6 @@ function ClientFavorite() {
   const [tableLoading, setTableLoading] = useState(null);
   const [statusModalCon, setStatusModalCon] = useState(null);
   const navigate = useNavigate(null);
-  console.log(profile.favorites);
 
   async function handleRemoveFromFavorite(service) {
     await toggleFavorite(service);

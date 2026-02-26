@@ -43,8 +43,6 @@ const TimelinePage = () => {
     setFetchingMore(true);
     try {
       const response = await fetchTimelineApi(timelineId, page);
-      console.log(page);
-      console.log(response);
 
       const newPosts = response?.posts?.posts || [];
       if (newPosts.length > 0) {
