@@ -11,6 +11,7 @@ import {
   removeFromFavoriteApi,
 } from "../api/profile";
 import { useAuth } from "./AuthContext";
+import axios from "axios";
 
 const ProfileContext = createContext(null);
 

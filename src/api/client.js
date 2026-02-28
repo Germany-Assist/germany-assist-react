@@ -25,13 +25,20 @@ export const setupInterceptors = ({
   api.interceptors.request.clear();
   api.interceptors.response.clear();
 
+  // api.interceptors.request.use((config) => {
+  //   const token = getAccessToken();
+  //   if (token) {
+  //     config.headers.Authorization = `Bearer ${token}`;
+  //   }
+  //   return config;
+  // });
   api.interceptors.request.use((config) => {
-    const token = getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
+  const token = localStorage.getItem("accessToken"); // ← access token not refresh
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
   api.interceptors.response.use(
     (res) => res,
