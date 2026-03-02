@@ -36,7 +36,9 @@ createRoot(document.getElementById("root")).render(
           <SocketProvider>
             <ProfileProvider>
               <BootstrapGate>
-                <App />
+                {/* <NotificationProvider> */}
+                  <App />
+                {/* </NotificationProvider> */}
               </BootstrapGate>
             </ProfileProvider>
           </SocketProvider>

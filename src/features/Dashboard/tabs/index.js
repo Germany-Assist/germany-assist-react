@@ -22,7 +22,7 @@ import ClientDisputes from "./client/ClientDisputes";
 import ClientFavorite from "./client/ClientFavorite";
 import ProviderVerification from "./serviceProvider/ProviderVerification";
 import AdminVerificationRequests from "./admin/AdminVerificationRequests";
-
+import SPNotifications from "./serviceProvider/SPNotifications";
 import {
   LayoutDashboard,
   Users,
@@ -175,6 +175,11 @@ export default {
         { label: "Manage Timelines", component: SPManageTimelines },
         { label: "Create New Service", component: SPCreateService },
       ],
+    },
+     Notifications: {
+      label: "Notifications",
+      icon: MessageSquare,
+      component: SPNotifications,
     },
     Finance: {
       label: "Finance",

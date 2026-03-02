@@ -62,20 +62,20 @@ export default function DashboardSideBar({
                     if (hasChildren) toggleMenu(label);
                     setActiveSection(item);
                   }}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 group
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 group 
                     ${
                       isActive
                         ? "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-xl shadow-black/10 scale-[1.02]"
                         : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5"
                     }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 ">
                     <span
                       className={`text-lg transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`}
                     >
                       {item.icon ? <item.icon /> : <FiGrid />}
                     </span>
-                    <span className="text-sm font-semibold tracking-tight">
+                    <span className="text-sm font-semibold tracking-tight ">
                       {label}
                     </span>
                   </div>
@@ -88,12 +88,12 @@ export default function DashboardSideBar({
                 </button>
 
                 {hasChildren && isExpanded && (
-                  <div className="ml-9 border-l border-zinc-200 dark:border-white/10 space-y-1 mt-1">
+                  <div className="ml-9 border-l border-zinc-200 dark:border-white/10 space-y-1 mt-1 ">
                     {item.children.map((child, childIdx) => (
                       <button
                         key={childIdx}
                         onClick={() => setActiveSection(child)}
-                        className={`w-full flex items-center gap-3 px-4 py-2 text-xs font-medium rounded-xl transition-all
+                        className={`w-full flex items-center gap-3 px-4 py-2 text-xs font-medium rounded-xl transition-all 
                           ${
                             activeSection === child.label
                               ? "text-blue-600 dark:text-blue-400"
