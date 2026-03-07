@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useProfile } from "../../contexts/ProfileContext";
 import { useNavigate } from "react-router-dom";
+import { useNotifications } from "../../contexts/NotificationContext";
 
-export default function ProfileAvatar({ navDir, className }) {
+export default function ProfileAvatar({ navDir, className, showBadge = false }) {
   const [imageUrl, setImageUrl] = useState("");
   const [imageError, setImageError] = useState(false);
 
-  const [notificationCount, setNotificationCount] = useState(0);
-
+  //const [notificationCount, setNotificationCount] = useState(0);
+  const { unreadCount } = useNotifications();
   const { profile } = useProfile();
   const navigate = useNavigate();
 
@@ -31,9 +32,9 @@ export default function ProfileAvatar({ navDir, className }) {
         }`}
       >
         {/* Notification Badge */}
-        {notificationCount > 0 && (
-          <div className="absolute -top-1 -right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 dark:bg-accent text-[10px] font-black text-white dark:text-black shadow-lg shadow-blue-500/40 ring-2 ring-white dark:ring-dark-900 animate-in zoom-in duration-300">
-            {notificationCount > 9 ? "9+" : notificationCount}
+        {showBadge && unreadCount  > 0 && (
+          <div className="absolute -top-1 -right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-red-600  text-[10px] font-bold text-white text-xs shadow-lg  ring-2 ring-white dark:ring-dark-900 animate-in zoom-in duration-300">
+            {unreadCount  > 9 ? "9+" : unreadCount }
           </div>
         )}
 

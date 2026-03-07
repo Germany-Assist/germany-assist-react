@@ -9,60 +9,64 @@ export default function NotificationsTable({
   onMarkAsRead,
   onView,
 }) {
+// update the date
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const now = new Date();
 
+  const isToday =
+    date.toDateString() === now.toDateString();
 
+  const yesterday = new Date();
+  yesterday.setDate(now.getDate() - 1);
+
+  const isYesterday =
+    date.toDateString() === yesterday.toDateString();
+
+  if (isToday) {
+    return `Today ${date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
+  }
+
+  if (isYesterday) {
+    return `Yesterday ${date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
+  }
+
+  return date.toLocaleDateString([], {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
   const columns = [
     {
       header: "Message",
       key: "message",
     },
     {
-      header: "Type",
-      key: "type",
-      render: (row) => (
-        <span className="px-3 py-1 text-xs rounded-full bg-zinc-100 dark:bg-white/10">
-          {row.type}
-        </span>
-      ),
-    },
-    {
       header: "Date",
       key: "createdAt",
-      render: (row) =>
-        new Date(row.createdAt).toLocaleString(),
-    },
-    {
-      header: "Status",
-      key: "status",
-      render: (row) =>
-        row.is_read ? (
-          <span className="text-green-500 font-semibold">
-            Read
-          </span>
-        ) : (
-          <span className="text-red-500 font-semibold">
-            Unread
-          </span>
-        ),
+      render: (row) =>(
+        <span className="whitespace-nowrap">
+          {formatDate(row.createdAt)}
+        </span>
+      ),  
     },
     {
       header: "Action",
       key: "action",
       align: "right",
       render: (row) => (
-        <div className="flex justify-end gap-2">
-          {!row.is_read && (
-            <button
-              onClick={() => onMarkAsRead(row)}
-              className="px-3 py-1 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              Mark as Read
-            </button>
-          )}
+        <div className="">
 
           <button
             onClick={() => onView(row)}
-            className="px-3 py-1 text-xs border rounded-lg hover:bg-zinc-100 dark:hover:bg-white/10 transition"
+            className="px-4 py-2 text-xs border rounded-lg hover:bg-zinc-100 dark:hover:bg-white/10 transition bg-blue-600"
           >
             View
           </button>
@@ -110,7 +114,7 @@ export default function NotificationsTable({
                 <tr
                   key={row.id}
                   className={`group transition-colors duration-200 hover:bg-blue-500/[0.02] ${
-                    !row.is_read ? "bg-blue-50/30" : ""
+                    !row.isRead ? "bg-gray-800" : "bg-blue-500/[0.02]"
                   }`}
                 >
                   {columns.map((col, index) => (
@@ -120,6 +124,7 @@ export default function NotificationsTable({
                         col.align === "right" ? "text-right" : ""
                       }`}
                     >
+                      
                       {col.render
                         ? col.render(row)
                         : row[col.key]}

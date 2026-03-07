@@ -3,20 +3,58 @@ import { useProfile } from "../contexts/ProfileContext";
 import DashboardSideBar from "../features/Dashboard/DashboardSideBar";
 import DashboardMap from "../features/Dashboard/tabs/index";
 import { Loader2 } from "lucide-react";
+import { useLocation,useNavigate } from "react-router-dom";
 
 export default function DashboardPage() {
   const { profile } = useProfile();
+   const location = useLocation();
+   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState(null);
   const [Component, setComponent] = useState(null);
+ ;
 
-  useEffect(() => {
-    const roleData = DashboardMap[profile?.role];
-    if (activeSection?.component) {
-      setComponent(() => activeSection.component);
-    } else if (roleData?.General) {
-      setComponent(() => roleData.General.component);
+  // useEffect(() => {
+  //   const roleData = DashboardMap[profile?.role];
+  //   if (activeSection?.component) {
+  //     setComponent(() => activeSection.component);
+  //   } else if (roleData?.General) {
+  //     setComponent(() => roleData.General.component);
+  //   }
+  // }, [activeSection, profile]);
+
+useEffect(() => {
+
+  const roleData = DashboardMap[profile?.role];
+  if (!roleData) return;
+
+  if (location.state?.section) {
+
+    const targetSection = Object.values(roleData).find(
+      (item) => item.label === location.state.section
+    );
+
+    if (targetSection) {
+
+      setActiveSection(targetSection);
+      setComponent(() => targetSection.component);
+
+      
+      navigate("/dashboard", { replace: true });
+
+      return;
     }
-  }, [activeSection, profile]);
+  }
+
+  if (activeSection?.component) {
+    setComponent(() => activeSection.component);
+  }
+
+  else if (roleData?.General) {
+    setActiveSection(roleData.General);
+    setComponent(() => roleData.General.component);
+  }
+
+}, [profile, activeSection]);
 
   if (!profile?.role)
     return (

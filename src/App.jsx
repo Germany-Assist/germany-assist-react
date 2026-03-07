@@ -10,6 +10,7 @@ import TimelinePage from "./pages/TimelinePage.jsx";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import JobsPage from "./pages/JobsPage.jsx";
+import SPNotifications from "./features/Dashboard/tabs/serviceProvider/SPNotifications.jsx";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/jobs" element={<JobsPage />} />
         <Route path="/auth" element={<AuthPortal />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/notifications" element={<SPNotifications/>} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/service/:serviceId" element={<ServiceProfile />} />
         <Route path="/timeline/:timelineId" element={<TimelinePage />} />

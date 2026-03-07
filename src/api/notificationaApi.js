@@ -1,13 +1,20 @@
-import axios from "@/lib/axios";
+import { api } from "./client";
 
-
+// Get notifications
 export const getNotifications = async (params) => {
-  const { data } = await axios.get("/notification", { params });
+  const { data } = await api.get("/notification", {
+    params: {
+      ...params,
+      _t: Date.now(), // Cache is prohibited
+    },
+  });
+
   return data;
 };
 
-//Function to mark notifications as read
+// Mark notification as read
 export const markNotificationAsRead = async (id) => {
-  const { data } = await axios.patch(`/notification/${id}/read`);
+  const { data } = await api.put(`/notification/${id}`);
   return data;
 };
+

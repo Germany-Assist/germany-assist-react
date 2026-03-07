@@ -37,6 +37,7 @@ export default function DashboardSideBar({
             <ProfileAvatar
               navDir={"/"}
               className="relative w-20 h-20 ring-4 ring-white dark:ring-zinc-800 rounded-full object-cover shadow-2xl"
+              showBadge={true}
             />
           </div>
           <span className="mt-4 text-[10px] uppercase tracking-[0.4em] font-black text-blue-600 dark:text-blue-400">
