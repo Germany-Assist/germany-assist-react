@@ -110,6 +110,24 @@ export const getOrderById = async (orderId) => {
   const res = await api.get(`/order/admin/${orderId}`);
   return res.data;
 };
+
+// get all disputes (admin)
+export const getAllDisputes = async (params = {}) => {
+  const res = await api.get("/dispute", { params });
+  return res.data; // سيعيد { meta, data }
+};
+
+// update  dispute status to in-review
+export const markDisputeInReview = async (id) => {
+  const res = await api.patch(`/dispute/${id}/in-review`);
+  return res.data;
+};
+
+// solve dispute with resolution
+export const resolveDispute = async (id, resolution) => {
+  const res = await api.patch(`/dispute/${id}/resolve`, { resolution });
+  return res.data;
+};
 /* ---------------------- service provider ---------------------- */
 export const createServiceProvider = async (payload = {}) => {
   const res = await api.post("/serviceProvider", payload);
@@ -131,6 +149,7 @@ const adminApis = {
   getOrderById,
   updateRequest,
   getAllOrders,
+  getAllDisputes,
   getAllRequests,
   deleteAsset,
   getAllAssets,

@@ -8,7 +8,6 @@ import {
   Filter,
   Gavel,
   LayoutGrid,
-  Loader2,
   History,
 } from "lucide-react";
 import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
@@ -18,16 +17,17 @@ import OrderStatusBadge from "../../../../components/ui/dashboard/OrderStatusBad
 import DisputeModal from "../../../../components/ui/dashboard/DisputeModal";
 import StatusModal from "../../../../components/ui/StatusModal";
 import { getErrorMessage } from "../../../../api/errorMessages";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader";
 import LoadingIcon from "../../../../components/ui/LoadingIcon";
+
 export default function ClientOrders() {
   const [orders, setOrders] = useState([]);
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 });
   const [tableLoading, setTableLoading] = useState(false);
   const [disputeOrderId, setDisputeOrderId] = useState(null);
   const [statusModalCon, setStatusModalCon] = useState(null);
-  const navigate = useNavigate(null);
+  const navigate = useNavigate();
 
   const [filters, setFilters] = useState({
     page: 1,
@@ -37,9 +37,20 @@ export default function ClientOrders() {
     onlyDisputed: false,
   });
 
+  // --- دالة التحقق من شرط الـ 14 يوم ---
+  const canDispute = (order) => {
+    if (order.status !== 'completed') return false; 
+    if (!order.completedAt) return false;
+    
+    const diffTime = Math.abs(new Date() - new Date(order.completedAt));
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays <= 14;
+  };
+
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
   };
+
   const fetchFilteredData = useCallback(async () => {
     setTableLoading(true);
     try {
@@ -61,13 +72,17 @@ export default function ClientOrders() {
   }, [filters]);
 
   useEffect(() => {
-    fetchFilteredData(filters);
-  }, [filters]);
+    fetchFilteredData();
+  }, [fetchFilteredData]);
 
   const handleDispute = async (data) => {
     try {
       const payload = { ...data, orderId: disputeOrderId };
       const res = await openNewDispute(payload);
+      
+      setDisputeOrderId(null); // إغلاق المودال
+      fetchFilteredData(); // تحديث الجدول فوراً
+      
       setStatusModalCon({
         isOpen: true,
         message: res.message || "Dispute is now open",
@@ -83,12 +98,12 @@ export default function ClientOrders() {
       });
     }
   };
-  // flag i stopped here im to sleepy i need to fix this
+
   const columns = [
     {
       header: "Transaction",
       render: (order) => {
-        const isDisputed = order.dispute !== null;
+        const isDisputed = order.dispute !== null && order.dispute !== undefined;
         return (
           <TransactionCell
             title={order.serviceTitle}
@@ -111,24 +126,16 @@ export default function ClientOrders() {
           actions={[
             {
               label: "Open Dispute",
-              show:
-                (row.status === "pending_completion" ||
-                  row.status === "active") &&
-                !row.dispute,
+              // الشرط المدمج: إما قيد التنفيذ أو مكتمل ضمن 14 يوم ولم يفتح نزاع مسبقاً
+              show: (row.status === "pending_completion" || row.status === "active" || canDispute(row)) && !row.dispute,
               onClick: () => setDisputeOrderId(row.orderId),
               variant: "danger",
             },
             {
               label: "Go To Dispute Center",
               show: Boolean(row.dispute),
-              onClick: () => console.log(row.dispute.id),
+              onClick: () => navigate(`/disputes/${row.dispute.id}`),
               variant: "danger",
-            },
-            {
-              label: "Go To Conversation",
-              show: row.serviceType === "oneTime",
-              onClick: () => console.log(row),
-              variant: "secondary",
             },
             {
               label: "Go To Timeline",
@@ -141,32 +148,32 @@ export default function ClientOrders() {
       ),
     },
   ];
+
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-6">
+      {/* مودال النزاع */}
       <DisputeModal
-        isOpen={disputeOrderId}
+        isOpen={!!disputeOrderId}
         onClose={() => setDisputeOrderId(null)}
-        itemName={`Order id ${disputeOrderId}`}
+        itemName={`Order #${disputeOrderId}`}
         onSubmit={handleDispute}
       />
+      
       <StatusModal {...statusModalCon} />
-      <div className="max-w-6xl mx-auto space-y-8">
-        <DashboardHeader
-          title={"Orders Console"}
-          subtitle={"Client Order Control center"}
-        />
-      </div>
-      {/* TODO i should create reuseable component */}
+
+      <DashboardHeader
+        title={"Orders Console"}
+        subtitle={"Client Order Control center"}
+      />
+
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        {/* فلاتر البحث */}
         <div className="relative group col-span-1">
-          <Filter
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"
-            size={14}
-          />
+          <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
           <select
             value={filters.status}
             onChange={(e) => handleFilterChange("status", e.target.value)}
-            className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 pl-10 pr-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest appearance-none focus:ring-2 ring-blue-500/20 transition-all outline-none"
+            className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 pl-10 pr-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest appearance-none outline-none focus:ring-2 ring-blue-500/20 transition-all"
           >
             <option value="">All Statuses</option>
             <option value="active">Active</option>
@@ -176,10 +183,7 @@ export default function ClientOrders() {
         </div>
 
         <div className="relative group col-span-1">
-          <LayoutGrid
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"
-            size={14}
-          />
+          <LayoutGrid className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
           <select
             value={filters.type}
             onChange={(e) => handleFilterChange("type", e.target.value)}
@@ -192,30 +196,29 @@ export default function ClientOrders() {
         </div>
 
         <button
-          onClick={() =>
-            handleFilterChange("onlyDisputed", !filters.onlyDisputed)
-          }
+          onClick={() => handleFilterChange("onlyDisputed", !filters.onlyDisputed)}
           className={`flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
             filters.onlyDisputed
               ? "bg-red-500 border-red-500 text-white shadow-lg shadow-red-500/20"
-              : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/5 text-zinc-500 hover:border-red-500/50"
+              : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-white/5 text-zinc-500"
           }`}
         >
           <AlertTriangle size={14} /> Only Disputed
         </button>
       </div>
-      {tableLoading && <LoadingIcon />}
-      <div className="overflow-x-auto">
-        <MultiUseTable
-          columns={columns}
-          data={orders}
-          loading={tableLoading}
-          pagination={meta}
-          onPageChange={(newPage) =>
-            setFilters((f) => ({ ...f, page: newPage }))
-          }
-        />
-      </div>
+
+      {tableLoading ? (
+        <div className="flex justify-center py-20"><LoadingIcon /></div>
+      ) : (
+        <div className="overflow-x-auto">
+          <MultiUseTable
+            columns={columns}
+            data={orders}
+            pagination={meta}
+            onPageChange={(newPage) => handleFilterChange("page", newPage)}
+          />
+        </div>
+      )}
     </div>
   );
 }
