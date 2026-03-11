@@ -11,13 +11,13 @@ export default function AdminDisputes() {
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState({ active: 0, pending: 0 });
 
+  // function to load data
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const response = await adminApis.getAllDisputes();
       const data = response.data || [];
       setDisputes(data);
-      // Derive simple metrics for the header
       setMetrics({
         active: data.filter(d => d.status === 'in_review').length,
         pending: data.filter(d => d.status === 'open').length
@@ -31,6 +31,20 @@ export default function AdminDisputes() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  // to handle actions , refresh data after action
+  const handleAction = async (apiCall) => {
+    try {
+      setLoading(true);
+      await apiCall;  //perform api'
+      await loadData(); //update table after sucss 
+    } catch (error) {
+      console.error("Action failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // initialize columns and use handleAction
   const columns = [
     {
       header: "Dispute Details",
@@ -64,19 +78,19 @@ export default function AdminDisputes() {
             {
               label: "Start Review",
               show: row.status === 'open',
-              onClick: () => adminApis.markDisputeInReview(row.id).then(loadData),
+              onClick: () => handleAction(adminApis.markDisputeInReview(row.id)),
               variant: "secondary",
             },
             {
               label: "Refund Buyer",
               show: row.status === 'in_review',
-              onClick: () => adminApis.resolveDispute(row.id, "buyer_won").then(loadData),
+              onClick: () => handleAction(adminApis.resolveDispute(row.id, "buyer_won")),
               variant: "danger",
             },
             {
               label: "Release to Provider",
               show: row.status === 'in_review',
-              onClick: () => adminApis.resolveDispute(row.id, "provider_won").then(loadData),
+              onClick: () => handleAction(adminApis.resolveDispute(row.id, "provider_won")),
               variant: "primary",
             },
           ]}
