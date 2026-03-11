@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Loader2,
 } from "lucide-react";
+import { fetchCommentsForPost, sendCommentApi } from "../../api/clientUserApis";
 
 // --- ATTACHMENT COMPONENT ---
 const PostContent = ({ post }) => (
@@ -42,11 +43,68 @@ const PostContent = ({ post }) => (
 
 const TimelineView = ({ data, loadMore, hasMore, isFetching }) => {
   const [selectedPost, setSelectedPost] = useState(null);
-  const observerTarget = useRef(null);
+  const [comments, setComments] = useState([]);
+  const [isFetchingComments, setIsFetchingComments] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [commentText, setCommentText] = useState("");
 
-  const mainPosts = data?.posts?.posts || [];
-  const pinnedPosts = data?.pinnedPosts?.posts || [];
-  const timelineId = data?.posts?.id || "N/A";
+  const observerTarget = useRef(null);
+  const scrollRef = useRef(null);
+
+  // Auto-scroll sidebar to bottom when comments update
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [comments]);
+
+  const handleSelectPost = async (post) => {
+    setSelectedPost(post);
+    setIsFetchingComments(true);
+    setComments([]);
+    try {
+      const res = await fetchCommentsForPost(post.id);
+      setComments(Array.isArray(res) ? res : []);
+    } catch (error) {
+      console.error("Failed to fetch comments:", error);
+    } finally {
+      setIsFetchingComments(false);
+    }
+  };
+
+  const handleSendComment = async (e) => {
+    if (e) e.preventDefault();
+    const text = commentText.trim();
+    if (!text || isSending) return;
+
+    setIsSending(true);
+    try {
+      const response = await sendCommentApi({
+        postId: selectedPost.id,
+        commentBody: text,
+      });
+
+      // NORMALIZE: Ensure the new comment matches the GET structure
+      // We check if the server returned 'commentBody' or just 'body'
+      const newComment = {
+        ...response,
+        commentBody: response.commentBody || response.body || text,
+        user: response.user || { firstName: "You", lastName: "" },
+        createdAt: response.createdAt || new Date().toISOString(),
+      };
+
+      setComments((prev) => [...prev, newComment]);
+      setCommentText("");
+    } catch (error) {
+      // Axios error handling
+      console.error(
+        "Failed to send comment:",
+        error.response?.data || error.message,
+      );
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   // --- INFINITE SCROLL LOGIC ---
   useEffect(() => {
@@ -58,13 +116,12 @@ const TimelineView = ({ data, loadMore, hasMore, isFetching }) => {
       },
       { threshold: 0.1 },
     );
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
+    if (observerTarget.current) observer.observe(observerTarget.current);
     return () => observer.disconnect();
   }, [hasMore, isFetching, loadMore]);
+
+  const mainPosts = data?.posts?.posts || [];
+  const pinnedPosts = data?.pinnedPosts?.posts || [];
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -77,18 +134,13 @@ const TimelineView = ({ data, loadMore, hasMore, isFetching }) => {
           {pinnedPosts.map((post) => (
             <div
               key={post.id}
-              className="bg-light-800 dark:bg-white/[0.03] border border-light-700 dark:border-white/10 p-6 rounded-[2rem] shadow-sm hover:border-accent/30 transition-colors"
+              className="bg-light-800 dark:bg-white/[0.03] border border-light-700 dark:border-white/10 p-6 rounded-[2rem] shadow-sm"
             >
               <p className="text-sm italic text-slate-500 dark:text-slate-400 leading-relaxed font-light">
                 "{post.description}"
               </p>
             </div>
           ))}
-          {pinnedPosts.length === 0 && (
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest px-6 opacity-40">
-              No pinned items
-            </p>
-          )}
         </aside>
 
         {/* Main Feed */}
@@ -102,25 +154,19 @@ const TimelineView = ({ data, loadMore, hasMore, isFetching }) => {
               className="mb-16 ml-8 relative group"
             >
               <div className="absolute -left-[41px] top-2 w-4 h-4 rounded-full bg-light-950 dark:bg-dark-950 border-2 border-accent shadow-[0_0_10px_rgba(34,211,238,0.3)]" />
-
               <div className="space-y-4">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
                   Update 0{idx + 1}
                 </span>
-
                 <div className="bg-light-800 dark:bg-white/[0.03] border border-light-700 dark:border-white/10 rounded-[2.5rem] p-8 hover:border-accent/40 transition-all shadow-xl">
                   <PostContent post={post} />
                 </div>
-
                 <button
-                  onClick={() => setSelectedPost(post)}
+                  onClick={() => handleSelectPost(post)}
                   className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-accent transition-colors group/btn"
                 >
-                  <MessageSquare
-                    size={14}
-                    className="group-hover/btn:scale-110 transition-transform"
-                  />
-                  {post.comments?.length || 0} Comments
+                  <MessageSquare size={14} />
+                  {post.commentsCount || 0} Comments
                   <ChevronRight
                     size={12}
                     className="opacity-0 group-hover:opacity-100 transition-all"
@@ -129,24 +175,10 @@ const TimelineView = ({ data, loadMore, hasMore, isFetching }) => {
               </div>
             </motion.div>
           ))}
-
-          {/* Load More Sentinel */}
-          <div
-            ref={observerTarget}
-            className="py-12 flex flex-col items-center justify-center"
-          >
-            {isFetching ? (
-              <div className="flex flex-col items-center gap-3">
-                <Loader2 className="w-6 h-6 text-accent animate-spin" />
-                <span className="text-[10px] uppercase font-black tracking-widest text-slate-500">
-                  Fetching Updates
-                </span>
-              </div>
-            ) : !hasMore && mainPosts.length > 0 ? (
-              <span className="text-[10px] uppercase font-black tracking-widest text-slate-400 opacity-60">
-                End of roadmap
-              </span>
-            ) : null}
+          <div ref={observerTarget} className="py-12 flex justify-center">
+            {isFetching && (
+              <Loader2 className="w-6 h-6 text-accent animate-spin" />
+            )}
           </div>
         </div>
       </div>
@@ -170,14 +202,9 @@ const TimelineView = ({ data, loadMore, hasMore, isFetching }) => {
               className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-dark-950 z-[110] shadow-2xl flex flex-col border-l dark:border-white/10"
             >
               <div className="p-8 border-b dark:border-white/10 flex justify-between items-center">
-                <div className="space-y-1">
-                  <h3 className="font-black uppercase italic dark:text-white">
-                    Discussion
-                  </h3>
-                  <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">
-                    Post ID: {selectedPost.id}
-                  </p>
-                </div>
+                <h3 className="font-black uppercase italic dark:text-white">
+                  Discussion
+                </h3>
                 <button
                   onClick={() => setSelectedPost(null)}
                   className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full"
@@ -186,16 +213,27 @@ const TimelineView = ({ data, loadMore, hasMore, isFetching }) => {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-8 space-y-6">
-                {selectedPost.comments?.length > 0 ? (
-                  selectedPost.comments.map((c, i) => (
-                    <div
-                      key={i}
-                      className="bg-light-900 dark:bg-white/5 p-5 rounded-2xl rounded-tl-none border border-light-700 dark:border-white/5"
-                    >
-                      <p className="text-sm font-light leading-relaxed dark:text-slate-300">
-                        {c.body}
-                      </p>
+              <div
+                ref={scrollRef}
+                className="flex-1 overflow-y-auto p-8 space-y-6"
+              >
+                {isFetchingComments ? (
+                  <div className="h-full flex flex-col items-center justify-center opacity-50">
+                    <Loader2 className="w-8 h-8 text-accent animate-spin mb-2" />
+                  </div>
+                ) : comments.length > 0 ? (
+                  comments.map((c, i) => (
+                    <div key={c.id || i} className="space-y-1">
+                      <div className="flex justify-between px-1">
+                        <span className="text-[10px] font-bold text-accent uppercase">
+                          {c.user?.firstName} {c.user?.lastName}
+                        </span>
+                      </div>
+                      <div className="bg-light-900 dark:bg-white/5 p-4 rounded-2xl rounded-tl-none border border-light-700 dark:border-white/5">
+                        <p className="text-sm font-light leading-relaxed dark:text-slate-300">
+                          {c.commentBody}
+                        </p>
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -208,18 +246,40 @@ const TimelineView = ({ data, loadMore, hasMore, isFetching }) => {
                 )}
               </div>
 
-              <div className="p-6 border-t dark:border-white/10 bg-light-800/50 dark:bg-black/20">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendComment();
+                }}
+                className="p-6 border-t dark:border-white/10 bg-light-800/50 dark:bg-black/20"
+              >
                 <div className="relative">
                   <textarea
                     placeholder="Type a message..."
                     rows={1}
+                    value={commentText}
                     className="w-full bg-white dark:bg-white/5 border border-light-700 dark:border-white/10 rounded-2xl p-4 pr-14 text-sm focus:outline-none focus:border-accent dark:text-white resize-none"
+                    onChange={(e) => setCommentText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendComment();
+                      }
+                    }}
                   />
-                  <button className="absolute right-2 top-2 p-2.5 bg-accent text-white rounded-xl shadow-lg">
-                    <Send size={18} />
+                  <button
+                    type="submit"
+                    disabled={isSending || !commentText.trim()}
+                    className="absolute right-2 top-2 p-2.5 bg-accent text-white rounded-xl shadow-lg disabled:opacity-50"
+                  >
+                    {isSending ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <Send size={18} />
+                    )}
                   </button>
                 </div>
-              </div>
+              </form>
             </motion.div>
           </>
         )}
