@@ -2,7 +2,7 @@ import ClientGeneral from "./client/ClientGeneral";
 import ClientServices from "./client/ClientServices";
 import ClientOrders from "./client/ClientOrders";
 import ClientProfile from "./client/ClientProfile";
-
+import AdminDisputes from  "./admin/AdminDisputes";
 import AdminGeneral from "./admin/AdminGeneral";
 import AdminServices from "./admin/AdminServices";
 import AdminOrders from "./admin/AdminOrders";
@@ -42,90 +42,32 @@ import {
 
 export default {
   admin: {
-    General: {
-      label: "General",
-      icon: LayoutDashboard,
-      component: AdminGeneral,
-    },
-    Users: {
-      label: "Users",
-      icon: Users,
-      component: AdminUsers,
-      children: [{ label: "Create New Admin", component: AdminGeneral }],
-    },
-    Services: {
-      label: "Service",
-      icon: Briefcase,
-      component: AdminServices,
-    },
-    Orders: {
-      label: "Orders",
-      icon: ShoppingBag,
-      component: AdminOrders,
-    },
-    Finance: {
-      label: "Finance",
-      icon: Wallet,
-      component: AdminFinance,
-    },
-    ServiceProvider: {
-      label: "Service Providers",
-      icon: Users,
-      component: AdminServiceProviders,
-      children: [
-        { label: "Create New Service Provider", component: CreateNewSP },
-      ],
-    },
-    Profile: {
-      label: "Profile",
-      icon: UserCircle,
-      component: AdminProfile,
-    },
+    General: { label: "General", icon: LayoutDashboard, component: AdminGeneral },
+    Users: { label: "Users", icon: Users, component: AdminUsers },
+    Services: { label: "Service", icon: Briefcase, component: AdminServices },
+    Orders: { label: "Orders", icon: ShoppingBag, component: AdminOrders },
+    Finance: { label: "Finance", icon: Wallet, component: AdminFinance },
+    Disputes: { label: "Disputes", icon: AlertCircle, component: AdminDisputes }, // مضاف هنا
+    ServiceProvider: { label: "Service Providers", icon: Users, component: AdminServiceProviders },
+    Profile: { label: "Profile", icon: UserCircle, component: AdminProfile },
   },
   super_admin: {
-    General: {
-      label: "General",
-      icon: LayoutDashboard,
-      component: AdminGeneral,
-    },
-    Users: {
-      label: "Users",
-      icon: Users,
-      component: AdminUsers,
-      children: [{ label: "Create New Admin", component: AdminGeneral }],
-    },
-    Services: {
-      label: "Service",
-      icon: Briefcase,
-      component: AdminServices,
-    },
-    Orders: {
-      label: "Orders",
-      icon: ShoppingBag,
-      component: AdminOrders,
-    },
-    Finance: {
-      label: "Finance",
-      icon: Wallet,
-      component: AdminFinance,
-    },
+    General: { label: "General", icon: LayoutDashboard, component: AdminGeneral },
+    Users: { label: "Users", icon: Users, component: AdminUsers },
+    Services: { label: "Service", icon: Briefcase, component: AdminServices },
+    Orders: { label: "Orders", icon: ShoppingBag, component: AdminOrders },
+    Finance: { label: "Finance", icon: Wallet, component: AdminFinance },
+    Disputes: { label: "Disputes", icon: AlertCircle, component: AdminDisputes }, // مضاف هنا
     ServiceProvider: {
       label: "Service Providers",
       icon: Users,
       component: AdminServiceProviders,
       children: [
         { label: "New Service Provider", component: CreateNewSP },
-        {
-          label: "Verification Requests",
-          component: AdminVerificationRequests,
-        },
+        { label: "Verification Requests", component: AdminVerificationRequests },
       ],
     },
-    Profile: {
-      label: "Profile",
-      icon: UserCircle,
-      component: AdminProfile,
-    },
+    Profile: { label: "Profile", icon: UserCircle, component: AdminProfile },
   },
   client: {
     General: {

@@ -9,57 +9,23 @@ export default function AdminOrders() {
     window.open(url, "_blank");
   };
   const [data, setData] = useState(null);
-  useEffect(() => {
-    (async () => {
-      const res = await adminApis.getAllOrders();
-      if (!res.length) return;
-      const columns = Object.keys(res[0])
-        .filter((key) => key !== "dob")
-        .map((key) => ({
-          key,
-          label: key.charAt(0).toUpperCase() + key.slice(1),
-          render: (row) =>
-            typeof row[key] == "boolean" ? (
-              row[key] == true ? (
-                <div className="flex items-center justify-center">
-                  <FcCheckmark size={"24px"} />
-                </div>
-              ) : (
-                <div className="flex items-center justify-center">
-                  <ImCross />
-                </div>
-              )
-            ) : (
-              row[key]
-            ),
-          sortable: true,
-        }));
-      columns.push({
-        key: "actions",
-        label: "",
-        render: (row) => (
-          <ActionMenu
-            actions={[
-              {
-                label: "View User",
-                onClick: () => openNewTab(`user/${row.id}`),
-              },
-              {
-                label: "View Service",
-                onClick: () => openNewTab(`service/${row.id}`),
-              },
-              {
-                label: "View Timeline",
-                onClick: () => openNewTab(`timeline/${row.id}`),
-              },
-            ]}
-          />
-        ),
-      });
-      setData({ columns, data: res });
-    })();
-  }, []);
-
+ useEffect(() => {
+  const fetchOrders = async () => {
+    const res = await adminApis.getAllOrders();
+    if (res && res.length > 0) {
+      // بناء الأعمدة فقط إذا وجدت بيانات
+      const dynamicColumns = Object.keys(res[0]).map(key => ({
+        header: key.toUpperCase(),
+        key: key,
+        render: (row) => row[key]?.toString() 
+      }));
+      setData({ columns: dynamicColumns, data: res });
+    } else {
+      setData({ columns: [], data: [] }); // تجنب الـ Loading اللانهائي
+    }
+  };
+  fetchOrders();
+}, []);
   return (
     <div>
       <h1 className="text-3xl antialiased mb-4">Orders</h1>
