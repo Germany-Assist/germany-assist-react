@@ -1,42 +1,23 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useSocket } from "./SocketContext";
-import { getNotifications } from "../api/notificationaApi"; 
+import { useProfile } from "./ProfileContext";
 
 const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
   const socket = useSocket();
-  const [unreadCount, setUnreadCount] = useState(0);
+  const { profile, fetchProfile } = useProfile();
   const [latestNotification, setLatestNotification] = useState(null);
-
+  const unreadCount = profile?.unReadNotifications || 0;
   
-  useEffect(() => {
-    const fetchUnreadCount = async () => {
-      try {
-        const res = await getNotifications({
-          page: 1,
-          limit: 100,
-        });
-
-       
-        const unread = res.notifications.filter(n => !n.isRead).length;
-
-        setUnreadCount(unread);
-      } catch (error) {
-        console.error("Error fetching unread count:", error);
-      }
-    };
-
-    fetchUnreadCount();
-  }, []);
-
   
   useEffect(() => {
     if (!socket) return;
 
     const handleNotification = (data) => {
-      setUnreadCount((prev) => prev + 1);
       setLatestNotification(data);
+      //update the number from server
+      fetchProfile();
     };
 
     socket.on("notification", handleNotification);
@@ -44,13 +25,12 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       socket.off("notification", handleNotification);
     };
-  }, [socket]);
+  }, [socket, fetchProfile]);
 
   return (
     <NotificationContext.Provider
       value={{
         unreadCount,
-        setUnreadCount,
         latestNotification,
       }}
     >

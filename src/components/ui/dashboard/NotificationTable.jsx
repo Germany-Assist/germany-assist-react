@@ -8,6 +8,9 @@ export default function NotificationsTable({
   onPageChange,
   onMarkAsRead,
   onView,
+  selectedIds,
+  toggleSelectNotification,
+  toggleSelectAll
 }) {
 // update the date
 const formatDate = (dateString) => {
@@ -44,6 +47,20 @@ const formatDate = (dateString) => {
   });
 };
   const columns = [
+      {
+      header: "",
+      key: "select",
+      render: (row) => (
+        <div className="flex items-center justify-center">
+          <input
+            type="checkbox"
+            checked={selectedIds?.includes(row.id)}
+            onChange={() => toggleSelectNotification(row.id)}
+            className="w-4 h-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+          />
+        </div>
+      )
+    },
     {
       header: "Message",
       key: "message",
@@ -97,13 +114,25 @@ const formatDate = (dateString) => {
             <tr className="border-b border-zinc-100 dark:border-white/5 bg-zinc-50/50 dark:bg-white/[0.02]">
               {columns.map((col, index) => (
                 <th
-                  key={index}
-                  className={`px-10 py-7 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 ${
-                    col.align === "right" ? "text-right" : ""
-                  }`}
-                >
-                  {col.header}
-                </th>
+                key={index}
+                className={`px-10 py-7 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400 ${
+                  col.align === "right" ? "text-right" : ""
+                }`}
+              >
+                {col.key === "select" ? (
+                  <input
+                    type="checkbox"
+                    checked={
+                      notifications.length > 0 &&
+                      notifications.every(n => selectedIds.includes(n.id))
+                    }
+                    onChange={(e) => toggleSelectAll(e.target.checked)}
+                    className="w-4 h-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
+                  />
+                ) : (
+                  col.header
+                )}
+              </th>
               ))}
             </tr>
           </thead>
@@ -121,8 +150,10 @@ const formatDate = (dateString) => {
                     <td
                       key={index}
                       className={`px-10 py-7 text-sm font-medium text-zinc-600 dark:text-zinc-300 ${
-                        col.align === "right" ? "text-right" : ""
-                      }`}
+                          col.key === "select" ? "text-center" : ""
+                        } ${
+                          col.align === "right" ? "text-right" : ""
+                        }`}
                     >
                       
                       {col.render

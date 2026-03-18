@@ -34,15 +34,15 @@ createRoot(document.getElementById("root")).render(
     <MetaContextProvider>
       <BrowserRouter>
         <AuthProvider>
-          <SocketProvider>
-            <NotificationProvider>
-              <ProfileProvider>
+          <ProfileProvider>
+            <SocketProvider>
+              <NotificationProvider>
                 <BootstrapGate>
                     <App />
                 </BootstrapGate>
-              </ProfileProvider>
-            </NotificationProvider>
-          </SocketProvider>
+              </NotificationProvider>
+            </SocketProvider>
+          </ProfileProvider>   
         </AuthProvider>
       </BrowserRouter>
     </MetaContextProvider>

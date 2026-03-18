@@ -37,6 +37,8 @@ import {
   PlusCircle,
   Settings,
 } from "lucide-react";
+import AdminNotifications from "./admin/AdminNotifications";
+import ClientNotifications from "./client/ClientNotifications";
 
 // ... existing component imports ...
 
@@ -104,6 +106,11 @@ export default {
       icon: ShoppingBag,
       component: AdminOrders,
     },
+         Notifications: {
+      label: "Notifications",
+      icon: MessageSquare,
+      component: AdminNotifications,
+    },
     Finance: {
       label: "Finance",
       icon: Wallet,
@@ -137,6 +144,11 @@ export default {
       label: "Orders",
       icon: ShoppingBag,
       component: ClientOrders,
+    },
+    Notifications: {
+      label: "Notifications",
+      icon: MessageSquare,
+      component: ClientNotifications,
     },
     Favorite: {
       label: "Favorite",
