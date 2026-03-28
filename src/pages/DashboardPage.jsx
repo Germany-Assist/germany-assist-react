@@ -4,58 +4,41 @@ import DashboardSideBar from "../features/Dashboard/DashboardSideBar";
 import DashboardMap from "../features/Dashboard/tabs/index";
 import { Loader2 } from "lucide-react";
 import { useLocation,useNavigate } from "react-router-dom";
+import { Outlet, NavLink  } from "react-router-dom";
 
 export default function DashboardPage() {
   const { profile } = useProfile();
-   const location = useLocation();
-   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState(null);
-  const [Component, setComponent] = useState(null);
- ;
+  const location = useLocation();
+  const role = profile?.role;
+  
+  const getTitle = () => {
+  const currentPath = location.pathname.replace("/dashboard/", "");
+  const items = Object.values(DashboardMap[role]);
 
-  // useEffect(() => {
-  //   const roleData = DashboardMap[profile?.role];
-  //   if (activeSection?.component) {
-  //     setComponent(() => activeSection.component);
-  //   } else if (roleData?.General) {
-  //     setComponent(() => roleData.General.component);
-  //   }
-  // }, [activeSection, profile]);
+  for (const item of items) {
+    // parent
+    if (item.path === currentPath) {
+      return item.label;
+    }
 
-useEffect(() => {
+    if (item.path === "" && currentPath === "") {
+      return item.label;
+    }
 
-  const roleData = DashboardMap[profile?.role];
-  if (!roleData) return;
+    // parent and children
+    if (item.children) {
+      for (const child of item.children) {
+        const fullPath = `${item.path}/${child.path}`;
 
-  if (location.state?.section) {
-
-    const targetSection = Object.values(roleData).find(
-      (item) => item.label === location.state.section
-    );
-
-    if (targetSection) {
-
-      setActiveSection(targetSection);
-      setComponent(() => targetSection.component);
-
-      
-      navigate("/dashboard", { replace: true });
-
-      return;
+        if (currentPath === fullPath) {
+          return child.label;
+        }
+      }
     }
   }
-
-  if (activeSection?.component) {
-    setComponent(() => activeSection.component);
-  }
-
-  else if (roleData?.General) {
-    setActiveSection(roleData.General);
-    setComponent(() => roleData.General.component);
-  }
-
-}, [profile, activeSection]);
-
+  return "General";
+};
+ 
   if (!profile?.role)
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center">
@@ -70,9 +53,7 @@ useEffect(() => {
     <div className="flex h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 transition-colors duration-700 overflow-hidden">
       {/* Sidebar - Floating Pod */}
       <DashboardSideBar
-        navElements={Object.values(DashboardMap[profile.role])}
-        setActiveSection={setActiveSection}
-        activeSection={activeSection?.label || "General"}
+        navElements={Object.values(DashboardMap[profile.role])}   
       />
 
       {/* Main Viewport */}
@@ -84,31 +65,23 @@ useEffect(() => {
         {/* The Main Glass Pod */}
         <main className="relative z-10 flex-1 bg-white/40 dark:bg-zinc-900/40 backdrop-blur-2xl border border-zinc-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col">
           <div className="flex-1 overflow-y-auto custom-scrollbar p-8 lg:p-12">
-            {Component ? (
+            
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
                 {/* Section Header */}
                 <header className="mb-10">
+
                   <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
-                    {activeSection?.label || "Dashboard"}
+                    {getTitle()}
                   </h1>
                   <p className="text-zinc-500 dark:text-zinc-400 mt-2 font-medium">
-                    Workspace / {activeSection?.label || "General"}
+                    Workspace / {getTitle()}
                   </p>
                 </header>
 
                 {/* The Active View (e.g., ServiceWizard) */}
-                <Component />
+                <Outlet />
               </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full">
-                <div className="w-16 h-16 rounded-3xl bg-white dark:bg-zinc-800 shadow-xl flex items-center justify-center border border-zinc-200 dark:border-white/10 mb-4">
-                  <div className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
-                </div>
-                <p className="text-zinc-400 font-bold tracking-widest uppercase text-xs">
-                  Initializing Module
-                </p>
-              </div>
-            )}
+
           </div>
         </main>
       </div>

@@ -5,21 +5,21 @@ import { FiGrid, FiLogOut, FiHome, FiChevronDown } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "../../contexts/ProfileContext";
 import ThemeSwitch from "../../components/ui/ThemeSwitch";
+import { NavLink,useLocation } from "react-router-dom";
+
 
 export default function DashboardSideBar({
   navElements,
-  setActiveSection,
-  activeSection,
 }) {
   const { logOut } = useAuth();
   const navigate = useNavigate();
   const [expandedMenus, setExpandedMenus] = useState({});
   const { profile } = useProfile();
-
+  const location = useLocation();
   const toggleMenu = (label) => {
     setExpandedMenus((prev) => ({ ...prev, [label]: !prev[label] }));
   };
-
+  
   return (
     <div className="p-4 h-screen bg-light-50 dark:bg-black transition-colors duration-500">
       {/* Main Container with your requested styling */}
@@ -51,59 +51,68 @@ export default function DashboardSideBar({
         {/* Navigation */}
         <nav className="relative z-10 flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar">
           {navElements.map((item, index) => {
-            const label = item.label;
-            const hasChildren = item.children && item.children.length > 0;
-            const isExpanded = expandedMenus[label];
-            const isActive = activeSection === label;
+            const hasChildren = item.children?.length > 0;
+
+            const basePath = item.path? `/dashboard/${item.path}`: "/dashboard";
+
+            const isExpanded =
+              expandedMenus[item.label] ||
+              location.pathname.startsWith(basePath); 
+
+            const isActive = item.path === ""
+          ? location.pathname === "/dashboard"
+          : location.pathname.startsWith(basePath);
 
             return (
               <div key={index} className="space-y-1">
-                <button
-                  onClick={() => {
-                    if (hasChildren) toggleMenu(label);
-                    setActiveSection(item);
-                  }}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 group 
+                
+                {/*  Parent */}
+                <div
+                  onClick={() => hasChildren && toggleMenu(item.label)}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 group cursor-pointer
                     ${
                       isActive
                         ? "bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 shadow-xl shadow-black/10 scale-[1.02]"
                         : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5"
                     }`}
                 >
-                  <div className="flex items-center gap-3 ">
-                    <span
-                      className={`text-lg transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`}
-                    >
-                      {item.icon ? <item.icon /> : <FiGrid />}
-                    </span>
-                    <span className="text-sm font-semibold tracking-tight ">
-                      {label}
-                    </span>
-                  </div>
+                  <NavLink to={basePath} className="flex items-center gap-3 w-full">
+                    {item.icon && <item.icon />}
+                    <span>{item.label}</span>
+                  </NavLink>
+
                   {hasChildren && (
                     <FiChevronDown
-                      size={14}
-                      className={`transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+                      className={`cursor-pointer transition-transform ${
+                        isExpanded ? "rotate-180" : ""
+                      }`}
                     />
                   )}
-                </button>
+                </div>
 
+                {/*  Children */}
                 {hasChildren && isExpanded && (
-                  <div className="ml-9 border-l border-zinc-200 dark:border-white/10 space-y-1 mt-1 ">
-                    {item.children.map((child, childIdx) => (
-                      <button
-                        key={childIdx}
-                        onClick={() => setActiveSection(child)}
-                        className={`w-full flex items-center gap-3 px-4 py-2 text-xs font-medium rounded-xl transition-all 
-                          ${
-                            activeSection === child.label
-                              ? "text-blue-600 dark:text-blue-400"
-                              : "text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
-                          }`}
-                      >
-                        {child.label}
-                      </button>
-                    ))}
+                  <div className="ml-9 border-l border-zinc-200 dark:border-white/10 space-y-1 mt-1">
+                    {item.children.map((child, idx) => {
+                      const childPath = `${basePath}/${child.path}`; // ✅ مهم
+
+                      const isChildActive = location.pathname.startsWith(childPath);
+
+                      return (
+                        <NavLink
+                          key={idx}
+                          to={childPath}
+                          className={`block px-4 py-2 text-xs rounded-xl transition
+                            ${
+                              isChildActive
+                                ? "text-blue-600"
+                                : "text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
+                            }`}
+                        >
+                          {child.label}
+                        </NavLink>
+                      );
+                    })}
                   </div>
                 )}
               </div>

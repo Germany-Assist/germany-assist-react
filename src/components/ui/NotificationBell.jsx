@@ -6,9 +6,9 @@ import { useNotifications } from "../../contexts/NotificationContext";
 const NotificationBell = ({ className }) => {
   const navigate = useNavigate();
   const { unreadCount } = useNotifications();
-
+  const notificationsPath = "/dashboard/notifications";
   const handleClick = () => {
-    navigate("/dashboard", { state: { section: "Notifications" } });
+    navigate(notificationsPath);
   };
 
   return (

@@ -2,7 +2,6 @@ import { api } from "./client";
 
 // Get notifications
 export const getNotifications = async (params) => {
-  //const { data } = await api.get("/notification?isRead=true");
   const { data } = await api.get("/notification", {
     params
   });
@@ -18,6 +17,15 @@ export const markNotifications = async (notificationIds,markAs = "read") => {
   });
 
   return data;
+};
+// Mark notification as read || unread
+export const toggleNotificationsStatus = async (ids, markAs) => {
+
+  return api.put("/notification/updateRead", {
+    notificationIds: ids,
+    markAs,
+  });
+
 };
 
 // read all Notification

@@ -114,6 +114,7 @@ export const ProfileProvider = ({ children }) => {
         loading,
         error,
         fetchProfile,
+        setProfile,
       }}
     >
       {children}
