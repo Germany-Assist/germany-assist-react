@@ -19,24 +19,14 @@ function App() {
   
   return (
     <ErrorBoundary>
-      {/* <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/jobs" element={<JobsPage />} />
-        <Route path="/auth" element={<AuthPortal />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/notifications" element={<SPNotifications/>} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/service/:serviceId" element={<ServiceProfile />} />
-        <Route path="/timeline/:timelineId" element={<TimelinePage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes> */}
-
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/jobs" element={<JobsPage />} />
         <Route path="/auth" element={<AuthPortal />} />
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/service/:serviceId" element={<ServiceProfile />} />
+        <Route path="/timeline/:timelineId" element={<TimelinePage />} />
 
         {/*  Dashboard Layout */}
         <Route path="/dashboard" element={<DashboardPage />}>

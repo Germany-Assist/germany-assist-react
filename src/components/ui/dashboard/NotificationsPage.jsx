@@ -87,7 +87,7 @@ const NotificationsPage = ({role}) => {
               )
             );
 
-             //await fetchProfile();
+          
               setProfile(prev => ({
                 ...prev,
                 unReadNotifications: Math.max(0, prev.unReadNotifications - 1)
@@ -118,7 +118,7 @@ const NotificationsPage = ({role}) => {
           ...prev,
           unReadNotifications: 0
         }));
-        //await fetchProfile();
+      
       } catch (error) {
         showError(error);
       }
