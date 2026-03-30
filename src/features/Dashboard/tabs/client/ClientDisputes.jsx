@@ -1,93 +1,81 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getMyDisputes, cancelMyDispute } from "../../../../api/clientUserApis";
-import DynamicTable from "../../DynamicTable";
-import ActionMenu from "../../ActionMenu";
+import { useNavigate } from "react-router-dom";
+import { ShieldAlert, CheckCircle2, RefreshCw, Clock } from "lucide-react";
+import MetricCard from  "../../../../components/ui/dashboard/MetricCard";
+import DisputesTable from "../../DisputesTable";
 
 export default function ClientDisputes() {
   const [disputes, setDisputes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const fetchDisputes = async () => {
-    setLoading(true);
-    try {
-      const res = await getMyDisputes();
-      // الوصول للمصفوفة داخل res.data حسب الـ Swagger
-      // documentation says the array is inside res.data according to Swagger
-      setDisputes(res.data || []);
-    } catch (err) {
-      console.error("Failed to load your disputes");
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchDisputes = useCallback(async () => {
+  setLoading(true);
+  try {
+    const res = await getMyDisputes();
+    const data = res.data?.data || res.data || res; 
+    setDisputes(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error("Failed to load your disputes", err);
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   useEffect(() => {
     fetchDisputes();
-  }, []);
+  }, [fetchDisputes]);
 
   const handleCancel = async (id) => {
     if (window.confirm("Are you sure you want to cancel this dispute?")) {
-      await cancelMyDispute(id);
-      fetchDisputes(); // تحديث الجدول
+      try {
+        await cancelMyDispute(id);
+        fetchDisputes();
+      } catch (err) {
+        alert("Action failed");
+      }
     }
   };
 
-  const columns = [
-    { key: "id", label: "Dispute ID" },
-    { key: "orderId", label: "Order ID" },
-    { key: "reason", label: "Reason" },
-    { 
-      key: "status", 
-      label: "Status",
-      render: (row) => (
-        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-          row.status === 'open' ? 'bg-yellow-100 text-yellow-700' : 
-          row.status === 'cancelled' ? 'bg-gray-100 text-gray-600' : 'bg-green-100 text-green-700'
-        }`}>
-          {row.status}
-        </span>
-      )
-    },
-    {
-      key: "actions",
-      label: "Options",
-      render: (row) => (
-        <ActionMenu
-          actions={[
-            { label: "View Progress", onClick: () => console.log("Details for", row.id) },
-            // الزر يظهر فقط إذا كان النزاع لا يزال مفتوحاً
-            ...(row.status === 'open' ? [{ 
-              label: "Cancel Dispute", 
-              danger: true, 
-              onClick: () => handleCancel(row.id) 
-            }] : []),
-          ]}
-        />
-      ),
-    },
-  ];
+  const stats = {
+    total: disputes.length,
+    open: disputes.filter(d => d.status === 'open').length,
+    resolved: disputes.filter(d => d.status === 'resolved').length
+  };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <header className="mb-8">
-        <h1 className="text-2xl font-extrabold text-slate-900">My Disputes</h1>
-        <p className="text-slate-500">Track and manage your submitted claims.</p>
-      </header>
+    <div className="max-w-7xl mx-auto space-y-8 p-6">
+      {/* Header */}
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-5xl font-black italic tracking-tighter uppercase dark:text-white">MY DISPUTES</h1>
+          <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em]">Track your support tickets</p>
+        </div>
+        <button onClick={fetchDisputes} className="p-3 bg-zinc-900 rounded-xl hover:bg-zinc-800 transition-colors">
+          <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
+        </button>
+      </div>
 
-      {loading ? (
-        <div className="flex flex-col items-center justify-center h-64 space-y-4">
-           <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-           <p className="text-slate-400 font-medium">Loading your records...</p>
-        </div>
-      ) : disputes.length > 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-          <DynamicTable columns={columns} data={disputes} />
-        </div>
-      ) : (
-        <div className="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-          <p className="text-slate-400 italic">You haven't opened any disputes yet.</p>
-        </div>
-      )}
+      {/* Metric Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <MetricCard title="Active Disputes" amount={stats.open} icon={Clock} variant="blue" isCount />
+        <MetricCard title="Resolved" amount={stats.resolved} icon={CheckCircle2} variant="green" isCount />
+        <MetricCard title="Total Filed" amount={stats.total} icon={ShieldAlert} isCount />
+      </div>
+
+      {/* The Unified Table */}
+      <DisputesTable 
+      data={disputes} 
+      loading={loading} 
+      onRefresh={fetchDisputes} 
+      role="client"
+      onCustomAction={(type, id) => {
+        if (type === 'view') navigate(`/disputes/${id}`);
+        if (type === 'cancel') handleCancel(id);
+        if (type === 'respond') navigate(`/disputes/respond/${id}`);
+      }}
+    />
     </div>
   );
 }

@@ -7,9 +7,13 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext.jsx";
 import { ProfileProvider } from "./contexts/ProfileContext.jsx";
 import { MetaContextProvider } from "./contexts/MetadataContext.jsx";
 import { SocketProvider } from "./contexts/SocketContext.jsx";
+
+window.sendClickEvent = window.sendClickEvent || function() { console.log("Click tracked"); };
+
 export const BootstrapGate = ({ children }) => {
   const { refreshAccessToken } = useAuth();
   const [bootstrapped, setBootstrapped] = useState(false);
+
 
   useEffect(() => {
     const bootstrap = async () => {
@@ -33,13 +37,13 @@ createRoot(document.getElementById("root")).render(
     <MetaContextProvider>
       <BrowserRouter>
         <AuthProvider>
-          <SocketProvider>
-            <ProfileProvider>
-              <BootstrapGate>
+          <BootstrapGate> 
+            <SocketProvider>
+              <ProfileProvider>
                 <App />
-              </BootstrapGate>
-            </ProfileProvider>
-          </SocketProvider>
+              </ProfileProvider>
+            </SocketProvider>
+          </BootstrapGate>
         </AuthProvider>
       </BrowserRouter>
     </MetaContextProvider>

@@ -94,18 +94,25 @@ export const ProfileProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    if (accessToken) {
-      if (!profile) {
-        fetchProfile();
-      }
-    } else {
-      setProfile(null);
-      setError(null);
-    }
-  }, [accessToken, fetchProfile]);
+  // const isInFavorite = (id) => {
+  // return profile?.favorites?.some((i) => i.service.id === id) ?? false;
+  // };
+  
 
-  return (
+
+useEffect(() => {
+  if (!accessToken) {
+    setProfile(null);
+    setError(null);
+    return;
+  }
+
+  fetchProfile();
+
+}, [accessToken]);
+
+
+return (
     <ProfileContext.Provider
       value={{
         isInFavorite,
@@ -117,6 +124,8 @@ export const ProfileProvider = ({ children }) => {
       }}
     >
       {children}
+
+
     </ProfileContext.Provider>
   );
 };

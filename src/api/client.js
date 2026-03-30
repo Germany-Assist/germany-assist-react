@@ -26,7 +26,8 @@ export const setupInterceptors = ({
   api.interceptors.response.clear();
 
   api.interceptors.request.use((config) => {
-    const token = getAccessToken();
+    const token = localStorage.getItem("accessToken");
+    // const token = getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

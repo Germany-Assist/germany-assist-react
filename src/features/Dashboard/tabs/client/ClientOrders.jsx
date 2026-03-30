@@ -15,12 +15,13 @@ import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
 import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
 import OrderStatusBadge from "../../../../components/ui/dashboard/OrderStatusBadge";
 import DisputeModal from "../../../../components/ui/dashboard/DisputeModal";
+import ClientDisputes from "./ClientDisputes";
 import StatusModal from "../../../../components/ui/StatusModal";
 import { getErrorMessage } from "../../../../api/errorMessages";
 import { useNavigate } from "react-router-dom";
 import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader";
 import LoadingIcon from "../../../../components/ui/LoadingIcon";
-
+ 
 export default function ClientOrders() {
   const [orders, setOrders] = useState([]);
   const [meta, setMeta] = useState({ page: 1, totalPages: 1, total: 0 });
@@ -134,7 +135,7 @@ export default function ClientOrders() {
             {
               label: "Go To Dispute Center",
               show: Boolean(row.dispute),
-              onClick: () => navigate(`/disputes/${row.dispute.id}`),
+              onClick: () => navigate(`/disputes`),
               variant: "danger",
             },
             {
