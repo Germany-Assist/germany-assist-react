@@ -3,7 +3,8 @@ import { useProfile } from "../../contexts/ProfileContext";
 import ProfileAvatar from "./ProfileAvatar";
 import logo from "../../assets/brand/logo.png";
 import ThemeSwitch from "./ThemeSwitch";
-import { useState } from "react";
+import NotificationBell from "./NotificationBell";
+
 const NavigationBar = () => {
   const { profile } = useProfile();
   const location = useLocation();
@@ -77,63 +78,22 @@ const NavigationBar = () => {
             </span>
           </Link>
 
-          <Link
-            to="/about"
-            className={`${getLinkStyles("/about")} focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent`}
-            aria-current={isActivePath("/about") ? "page" : undefined}
-          >
-            About
-          </Link>
-        </nav>
-
-        {/* Right Side */}
-        <div className="flex items-center gap-3">
-
-          <ThemeSwitch aria-label="Toggle theme" />
-
-          <div
-            className="h-6 w-[1px] bg-light-700 dark:bg-white/10 mx-1"
-            aria-hidden="true"
-          />
-
-          {profile ? (
-            <ProfileAvatar
-              navDir={"/dashboard"}
-              className={"relative w-14 h-14 max-w-14"}
-            />
-          ) : (
-            <Link
-              to="/auth"
-              className="bg-accent text-black text-sm font-bold px-6 py-2 rounded-full transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-            >
-              Log In
-            </Link>
-          )}
-
-          {/* Mobile Menu Button */}
-          <button
-            type="button"
-            className="lg:hidden p-2 text-slate-500 dark:text-gray-400 bg-light-900 dark:bg-white/5 rounded-xl border border-light-700 dark:border-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-            aria-label="Toggle mobile menu"
-            aria-expanded={isMobileMenuOpen}
-            aria-controls="mobile-menu"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <svg
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
+              {/* Auth Section */}
+              {profile ? (
+                <div className="flex items-center gap-4">
+                <NotificationBell/>
+                <ProfileAvatar
+                  navDir={"/dashboard"}
+                  className={"relative w-14 h-14 max-w-14"}
+                />
+               </div>
+              ) : (
+                <Link to="/auth">
+                  <button className="bg-accent text-black text-sm font-bold px-6 py-2 rounded-full transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-95">
+                    Log In
+                  </button>
+                </Link>
+              )}
 
         </div>
       </div>

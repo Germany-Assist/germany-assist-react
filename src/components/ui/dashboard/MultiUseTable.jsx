@@ -8,6 +8,7 @@ const MultiUseTable = ({
   pagination,
   onPageChange,
   emptyMessage = "No records found",
+  rowClassName
 }) => {
   return (
     /* 1. THE MAIN WRAPPER: Handles the roundness and the vibrant background */
@@ -47,7 +48,11 @@ const MultiUseTable = ({
               data.map((row, rowIndex) => (
                 <tr
                   key={row.id || rowIndex}
-                  className="group transition-colors duration-200 hover:bg-blue-500/[0.02] dark:hover:bg-blue-400/[0.02]"
+                  className={`
+                    group transition-colors duration-200 
+                    hover:bg-blue-500/[0.02] dark:hover:bg-blue-400/[0.02]
+                    ${rowClassName ? rowClassName(row) : ""}
+                    `}                  
                 >
                   {columns.map((col, colIndex) => (
                     <td

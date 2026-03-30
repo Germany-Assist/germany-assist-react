@@ -264,7 +264,7 @@ const SPDisputes = () => {
             </div>
           )}
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto ">
             <MultiUseTable
               columns={columns}
               data={orders}
