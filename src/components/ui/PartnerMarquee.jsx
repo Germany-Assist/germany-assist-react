@@ -11,22 +11,26 @@ export default function PartnerMarquee() {
   ];
 
   return (
-    <div className="py-10 bg-dark-950 overflow-hidden">
-      <div className="flex whitespace-nowrap overflow-hidden">
-        {/* We use three groups to ensure no "end" is ever visible */}
+    <section
+      aria-label="Partner companies marquee"
+      className="py-10 bg-dark-950 overflow-hidden"
+    >
+      <ul className="flex whitespace-nowrap overflow-hidden">
         {[1, 2, 3].map((group) => (
           <div key={group} className="flex animate-marquee shrink-0">
             {partners.map((brand, idx) => (
-              <span
+              <li
                 key={`${group}-${idx}`}
                 className="text-2xl font-bold text-gray-600 px-12 hover:text-accent transition-colors"
+                aria-label={`Partner company: ${brand}`}
+                role="listitem"
               >
                 {brand}
-              </span>
+              </li>
             ))}
           </div>
         ))}
-      </div>
-    </div>
+      </ul>
+    </section>
   );
 }
