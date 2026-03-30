@@ -118,5 +118,5 @@ const NavigationBar = () => {
     </header>
   );
 };
-
+// testing if the bar is ok
 export default NavigationBar;
