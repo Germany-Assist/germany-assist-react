@@ -25,6 +25,8 @@ const NavigationBar = () => {
   //   }
   // }, [isDark]);
 
+  //testing
+
   const isActivePath = (path) => {
     if (path === "/") return location.pathname === "/";
     return location.pathname.startsWith(path);
@@ -39,6 +41,7 @@ const NavigationBar = () => {
     return `${baseStyles} text-slate-600 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5`;
   };
 
+  //testing
   return (
     <header className="pt-7 z-50 w-full px-4">
       <div className="max-w-7xl mx-auto">
@@ -118,5 +121,5 @@ const NavigationBar = () => {
     </header>
   );
 };
-// testing if the bar is ok
+// testing if the bar is ok 123
 export default NavigationBar;
