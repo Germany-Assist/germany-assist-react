@@ -1,12 +1,21 @@
 import React from "react";
-import { Gavel, Eye, MessageSquare, ShieldAlert } from "lucide-react";
+import { Gavel, Eye, MessageSquare, Sparkles, BrainCircuit } from "lucide-react";
 import MultiUseTable from "../../components/ui/dashboard/MultiUseTable";
 import ActionGroup from "../Dashboard/ActionMenu"; 
 import TransactionCell from "../../components/ui/dashboard/TransactionCell";
 import adminApis from "../../api/adminApis";
 
+/**
+ * DisputesTable Component
+ * Renders a data table for managing order disputes with role-specific actions.
+ * Supports Admin, Client, and Provider perspectives.
+ */
 const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomAction }) => {
   
+  /**
+   * Universal handler for API-based actions.
+   * Executes the call and triggers a data refresh on success.
+   */
   const handleAction = async (apiCall) => {
     try {
       await apiCall;
@@ -29,6 +38,28 @@ const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomActio
         />
       ),
     },
+    /**
+     * AI-Powered Insights Column
+     * Displays automated analysis from the AI Agent to assist decision making.
+     */
+    {
+      header: "AI Insight",
+      render: (row) => (
+        <div className="flex flex-col gap-1 max-w-[200px]">
+          <div className="flex items-center gap-1.5 text-[10px] font-bold text-purple-500 uppercase tracking-tight">
+            <BrainCircuit size={14} />
+            Agent Analysis
+          </div>
+          <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-tight">
+            {row.aiSummary || "Analyzing dispute patterns..."}
+          </p>
+        </div>
+      ),
+    },
+    /**
+     * Dynamic Status Badge
+     * Maps status keys to specific Tailwind CSS styles.
+     */
     {
       header: "Status",
       render: (row) => {
@@ -46,64 +77,70 @@ const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomActio
         );
       },
     },
-  {
-  header: "Action",
-  align: "right",
-  render: (row) => {
-    const status = row.status?.toLowerCase();
-    const actions =  role === "admin" 
-        ? [
-            {
-              label: "Start Review",
-            show: row.status?.toLowerCase() === 'open',              onClick: () => handleAction(adminApis.markDisputeInReview(row.id)),
-              variant: "secondary",
-            },
-            {
-              label: "Refund Buyer",
-              show: row.status === 'in_review',
-              onClick: () => handleAction(adminApis.resolveDispute(row.id, "buyer_won")),
-              variant: "danger",
-            },
-            {
-              label: "Release to Provider",
-              show: row.status === 'in_review',
-              onClick: () => handleAction(adminApis.resolveDispute(row.id, "provider_won")),
-              variant: "primary",
-            },
-          ]
-        : role === "client" 
-          ? [
-              {
-                label: "View Details",
-                icon: Eye,
-                onClick: () => onCustomAction('view', row.id),
-                variant: "secondary",
-              },
-              {
-                label: "Cancel Dispute",
-                // نستخدم ShieldAlert أو أي أيقونة مناسبة
-              show: row.status?.toLowerCase() === 'open',                onClick: () => onCustomAction('cancel', row.id),
-                variant: "danger",
-              }
-            ]
-          : [ // حالة الـ Provider
-              {
-                label: "View Details",
-                icon: Eye,
-                onClick: () => onCustomAction('view', row.id),
-                variant: "secondary",
-              },
-              {
-                label: "Submit Response",
-                icon: MessageSquare,
-                show: row.status?.toLowerCase() === 'open',                onClick: () => onCustomAction('respond', row.id),
-                variant: "primary",
-              }
-            ];
+    /**
+     * Contextual Actions
+     * Determines available buttons based on the user's role and record status.
+     */
+    {
+      header: "Action",
+      align: "right",
+      render: (row) => {
+        const actions = role === "admin" 
+            ? [
+                {
+                  label: "Start Review",
+                  show: row.status === 'open',
+                  onClick: () => handleAction(adminApis.markDisputeInReview(row.id)),
+                  variant: "secondary",
+                },
+                {
+                  label: "Refund Buyer",
+                  icon: Sparkles, 
+                  show: row.status === 'in_review',
+                  onClick: () => handleAction(adminApis.resolveDispute(row.id, "buyer_won")),
+                  variant: "danger",
+                },
+                {
+                  label: "Release to Provider",
+                  show: row.status === 'in_review',
+                  onClick: () => handleAction(adminApis.resolveDispute(row.id, "provider_won")),
+                  variant: "primary",
+                },
+              ]
+            : role === "client" 
+              ? [
+                  {
+                    label: "View Details",
+                    icon: Eye,
+                    onClick: () => onCustomAction('view', row.id),
+                    variant: "secondary",
+                  },
+                  {
+                    label: "Cancel Dispute",
+                    show: row.status === 'open',
+                    onClick: () => onCustomAction('cancel', row.id),
+                    variant: "danger",
+                  }
+                ]
+              : [
+                  {
+                    label: "View Details",
+                    icon: Eye,
+                    onClick: () => onCustomAction('view', row.id),
+                    variant: "secondary",
+                  },
+                  {
+                    label: "Submit Response",
+                    icon: MessageSquare,
+                    show: row.status === 'open',
+                    onClick: () => onCustomAction('respond', row.id),
+                    variant: "primary",
+                  }
+                ];
 
-    return <ActionGroup actions={actions} />;
-  },
-},
+        return <ActionGroup actions={actions} />;
+      },
+    },
   ];
 
   return (
