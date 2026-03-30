@@ -3,6 +3,7 @@ import { useProfile } from "../../contexts/ProfileContext";
 import ProfileAvatar from "./ProfileAvatar";
 import logo from "../../assets/brand/logo.png";
 import ThemeSwitch from "./ThemeSwitch";
+import NotificationBell from "./NotificationBell";
 
 const NavigationBar = () => {
   const { profile } = useProfile();
@@ -79,10 +80,13 @@ const NavigationBar = () => {
 
               {/* Auth Section */}
               {profile ? (
+                <div className="flex items-center gap-4">
+                <NotificationBell/>
                 <ProfileAvatar
                   navDir={"/dashboard"}
                   className={"relative w-14 h-14 max-w-14"}
                 />
+               </div>
               ) : (
                 <Link to="/auth">
                   <button className="bg-accent text-black text-sm font-bold px-6 py-2 rounded-full transition-all hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] active:scale-95">
