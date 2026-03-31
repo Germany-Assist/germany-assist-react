@@ -4,7 +4,6 @@ import { api } from "../../../../api/client";
 import { ArrowLeft, Gavel, Calendar, Hash } from "lucide-react";
 import LoadingIcon from "../../../../components/ui/LoadingIcon";
 import { getErrorMessage } from "../../../../api/errorMessages";
-import DashboardLayout from "../../../../components/ui/dashboard/DashboardLayout";
 
 export default function DisputeDetails() {
     const { id } = useParams();
@@ -58,10 +57,6 @@ export default function DisputeDetails() {
     if (!dispute) return <div className="p-10 text-center text-red-500 font-bold">Dispute Not Found</div>;
 
    return (
-    <DashboardLayout>
-
-  
-
     <div className="max-w-5xl mx-auto p-6 space-y-6">
       <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-500 hover:text-black transition-all font-bold uppercase text-[10px] tracking-widest">
         <ArrowLeft size={14} /> Back to Center
@@ -130,7 +125,6 @@ export default function DisputeDetails() {
         </div>
       </div>
     </div>
-        </DashboardLayout>
 
   );
 }
