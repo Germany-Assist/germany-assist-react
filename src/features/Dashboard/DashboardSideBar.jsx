@@ -65,7 +65,7 @@ export default function DashboardSideBar({
 
         {/* روابط التنقل */}
         <nav className="relative z-10 flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar">
-          {navElements.map((item, index) => {
+          {navElements?.map((item, index) => {
             const label = item.label;
             const hasChildren = item.children && item.children.length > 0;
             const isExpanded = expandedMenus[label];
