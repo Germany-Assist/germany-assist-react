@@ -1,4 +1,4 @@
-name: Deploy Frontend App
+name: Deploy Staging Frontend App
 
 on:
   push:
@@ -40,4 +40,4 @@ jobs:
           username: deploy
           key: ${{ secrets.DEPLOY_KEY }}
           source: "dist/*"
-          target: "/var/www/germany-assist-frontend/"
+          target: "/var/www/germany-assist-frontend-staging/"
