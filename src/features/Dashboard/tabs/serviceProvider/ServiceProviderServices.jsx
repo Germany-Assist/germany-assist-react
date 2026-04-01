@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   CheckCircle2,
   AlertCircle,
@@ -14,22 +14,34 @@ import FilterContainer, {
   FilterToggle,
 } from "../../../../components/ui/dashboard/FilterContainer";
 import StatusModal from "../../../../components/ui/StatusModal";
-import serviceProviderApis, {
-  publishService,
-  unpublishService,
-} from "../../../../api/serviceProviderApis";
+import serviceProviderApis from "../../../../api/serviceProviderApis";
 import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader";
 import { getErrorMessage } from "../../../../api/errorMessages";
 import { useNavigate } from "react-router-dom";
 
 // TODO move this to component
 const getServiceStatus = (service) => {
-  if (service.rejected)
+  const status = service.status; // can be pending, approved, rejected, draft
+  if (status === "rejected")
     return {
       label: "Rejected",
       color: "text-red-500",
       dot: "bg-red-500",
       icon: AlertCircle,
+    };
+  if (status === "active")
+    return {
+      label: "Live",
+      color: "text-emerald-500",
+      dot: "bg-emerald-500 animate-pulse",
+      icon: CheckCircle2,
+    };
+  if (status === "pending")
+    return {
+      label: "Pending",
+      color: "text-zinc-400",
+      dot: "bg-zinc-300",
+      icon: Clock,
     };
   if (service.published && service.approved)
     return {
@@ -73,12 +85,8 @@ export default function ServiceProviderServices() {
     order: "dec",
     sort: "price",
     type: undefined,
-    published: undefined,
-    approved: undefined,
-    rejected: undefined,
   });
   const navigate = useNavigate();
-
   const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
@@ -119,24 +127,25 @@ export default function ServiceProviderServices() {
     }));
   };
 
-  const handleTogglePublish = async (id, currentlyPublished) => {
+  const handleTogglePause = async (id, currentIsPaused) => {
     const previousState = [...services];
-    const targetStatus = !currentlyPublished;
+    let targetStatus;
+    if (currentIsPaused) {
+      targetStatus = "resume";
+    } else {
+      targetStatus = "pause";
+    }
     setServices((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, published: targetStatus } : s)),
+      prev.map((s) => (s.id === id ? { ...s, isPaused: !currentIsPaused } : s)),
     );
     try {
-      if (currentlyPublished) {
-        await unpublishService(id);
-      } else {
-        await publishService(id);
-      }
+      await serviceProviderApis.pauseResumeService(id, targetStatus);
     } catch (error) {
       setServices(previousState);
       setStatusModalCon({
         isOpen: true,
         type: "error",
-        message: `Failed to ${targetStatus ? "publish" : "unpublish"} service. ${getErrorMessage(error)}.`,
+        message: `Failed to ${targetStatus ? "pause" : "resume"} service. ${getErrorMessage(error)}.`,
       });
     }
   };
@@ -154,11 +163,11 @@ export default function ServiceProviderServices() {
       ),
     },
     {
-      header: "Delivery Type",
+      header: "Service Type",
       render: (service) => (
         <div className="flex flex-col gap-1">
           <span className="text-[11px] font-black uppercase px-2.5 py-1 bg-zinc-100 dark:bg-white/5 rounded-lg border border-zinc-200 dark:border-white/5 w-fit">
-            {service.type === "oneTime" ? "One-Time Payment" : "Timeline Based"}
+            {service.type === "oneTime" ? "Service" : "Course"}
           </span>
         </div>
       ),
@@ -206,10 +215,9 @@ export default function ServiceProviderServices() {
         <ActionGroup
           actions={[
             {
-              label: service.published ? "Unpublish" : "Publish",
-              show: !service.rejected,
-              onClick: () => handleTogglePublish(service.id, service.published),
-              variant: service.published ? "danger" : "success",
+              label: service.isPaused ? "Resume" : "Pause",
+              onClick: () => handleTogglePause(service.id, service.isPaused),
+              variant: service.isPaused ? "success" : "danger",
             },
             {
               label: "VIEW",

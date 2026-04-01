@@ -11,16 +11,13 @@ export const createNewService = async (payload) => {
   const res = await api.post("/service/provider", payload);
   return res;
 };
-export const publishService = async (serviceId) => {
-  const res = await api.get(`/service/provider/services/publish/${serviceId}`);
+export const pauseResumeService = async (serviceId, action) => {
+  const res = await api.put(`/service/provider/services/${serviceId}/status`, {
+    action,
+  });
   return res;
 };
-export const unpublishService = async (serviceId) => {
-  const res = await api.get(
-    `/service/provider/services/unpublish/${serviceId}`,
-  );
-  return res;
-};
+
 export const serviceProfilePageSP = async (serviceId) => {
   const res = await api.get(`/service/provider/services/${serviceId}`);
   return res.data;
@@ -88,11 +85,10 @@ export const serviceProviderGetVerificationStatus = async () => {
 };
 
 const serviceProviderApis = {
-  publishService,
-  unpublishService,
   serviceProviderGetVerificationStatus,
   serviceProviderReSubmitVerification,
   serviceProviderSubmitVerification,
   getAllServices,
+  pauseResumeService,
 };
 export default serviceProviderApis;

@@ -51,8 +51,7 @@ const ServiceWizard = () => {
     setIsSubmitting(true);
     const sendData = new FormData();
     sendData.append("title", formData.title);
-    sendData.append("category", formData.category);
-    sendData.append("subcategory", formData.subcategory);
+    sendData.append("subcategoryId", formData.subcategory);
     sendData.append("description", formData.description);
     sendData.append("type", formData.type);
     sendData.append("variants", JSON.stringify(formData.variants));
