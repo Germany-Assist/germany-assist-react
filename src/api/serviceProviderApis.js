@@ -83,12 +83,21 @@ export const serviceProviderGetVerificationStatus = async () => {
   const res = await api.get(`/requests/provider/profile`);
   return res.data;
 };
-
+export const requestApproval = async (id) => {
+  const res = await api.put(`service/provider/services/${id}/requestApproval`);
+  return res.data;
+};
+export const providerPrivateView = async (id) => {
+  const res = await api.get(`/service/provider/services/${id}`);
+  return res.data;
+};
 const serviceProviderApis = {
+  requestApproval,
   serviceProviderGetVerificationStatus,
   serviceProviderReSubmitVerification,
   serviceProviderSubmitVerification,
   getAllServices,
   pauseResumeService,
+  providerPrivateView,
 };
 export default serviceProviderApis;
