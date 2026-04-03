@@ -1,3 +1,4 @@
+import { update } from "lodash";
 import { api } from "./client";
 
 export const getAllServices = async (params) => {
@@ -91,6 +92,10 @@ export const providerPrivateView = async (id) => {
   const res = await api.get(`/service/provider/services/${id}`);
   return res.data;
 };
+export const updateService = async (id, payload) => {
+  const res = await api.put(`/service/provider/services/${id}`, payload);
+  return res.data;
+};
 const serviceProviderApis = {
   requestApproval,
   serviceProviderGetVerificationStatus,
@@ -98,6 +103,8 @@ const serviceProviderApis = {
   serviceProviderSubmitVerification,
   getAllServices,
   pauseResumeService,
+  serviceProfilePageSP,
   providerPrivateView,
+  updateService,
 };
 export default serviceProviderApis;

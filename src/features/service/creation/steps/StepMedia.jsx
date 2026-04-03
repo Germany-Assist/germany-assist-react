@@ -1,21 +1,27 @@
-import {
-  Upload,
-  X,
-  Image as ImageIcon,
-  CheckCircle,
-  ChevronLeft,
-} from "lucide-react";
+import React from "react";
+import { Upload, X, CheckCircle, ChevronLeft } from "lucide-react";
 
 const StepMedia = ({ data, onUpdate, onBack, onComplete }) => {
   const handleFileChange = (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
+
     const newAsset = {
       file: file,
       url: URL.createObjectURL(file),
       key: type,
+      isExisting: false, // Mark as new for the backend
     };
-    onUpdate({ assets: [...data.assets, newAsset] });
+
+    // If it's a profile image, replace the old one; otherwise add to gallery
+    if (type === "serviceProfileImage") {
+      const filteredAssets = data.assets.filter(
+        (a) => a.key !== "serviceProfileImage",
+      );
+      onUpdate({ assets: [...filteredAssets, newAsset] });
+    } else {
+      onUpdate({ assets: [...data.assets, newAsset] });
+    }
   };
 
   const removeAsset = (url) => {
@@ -27,7 +33,7 @@ const StepMedia = ({ data, onUpdate, onBack, onComplete }) => {
     (a) => a.key === "serviceProfileGalleryImage",
   );
 
-  // Validation: Main image is required
+  // Validation: Main image is mandatory
   const isInvalid = !profileImg;
 
   return (
@@ -37,11 +43,11 @@ const StepMedia = ({ data, onUpdate, onBack, onComplete }) => {
           Visuals matter
         </h1>
         <p className="text-slate-500 dark:text-slate-400 mt-3 text-lg">
-          Upload a profile and up to 5 gallery images.
+          Upload a profile photo and up to 5 gallery images.
         </p>
       </div>
 
-      {/* Main Profile Image Upload */}
+      {/* Main Profile Image */}
       <div className="space-y-4">
         <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
           Main Photo <span className="text-red-500">*</span>
@@ -77,7 +83,7 @@ const StepMedia = ({ data, onUpdate, onBack, onComplete }) => {
         )}
       </div>
 
-      {/* Gallery Images Upload */}
+      {/* Gallery Images */}
       <div className="space-y-4">
         <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
           Gallery (Optional)
@@ -102,7 +108,7 @@ const StepMedia = ({ data, onUpdate, onBack, onComplete }) => {
               </button>
             </div>
           ))}
-          {galleryImgs.length < 3 && (
+          {galleryImgs.length < 5 && (
             <label className="aspect-square border-2 border-dashed border-light-700 dark:border-white/10 rounded-xl flex items-center justify-center cursor-pointer hover:bg-light-900 dark:hover:bg-white/5 hover:border-accent transition-all">
               <Upload className="text-slate-400" size={20} />
               <input
@@ -118,7 +124,7 @@ const StepMedia = ({ data, onUpdate, onBack, onComplete }) => {
         </div>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex gap-4 pt-6">
         <button
           type="button"
           onClick={onBack}

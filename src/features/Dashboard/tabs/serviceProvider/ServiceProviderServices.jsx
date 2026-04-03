@@ -245,7 +245,7 @@ export default function ServiceProviderServices() {
                 label: "Edit",
                 show: true,
                 onClick: () =>
-                  navigate(`/dashboard/services/edit/${service.id}`),
+                  navigate(`/dashboard/services/create?id=${service.id}`),
                 variant: "outline",
               },
             ]}
