@@ -5,6 +5,7 @@ import {markAllNotificationsAsRead} from "../../../api/notificationaApi";
 import { useProfile } from "../../../contexts/ProfileContext";
 import { Filter ,MailCheck,Check} from "lucide-react";
 import StatusModal from "../StatusModal";
+import { useSocket } from "../../../contexts/SocketContext";
 const NotificationsPage = ({role}) => {
 
     const { profile, fetchProfile, setProfile } = useProfile();  
@@ -18,6 +19,7 @@ const NotificationsPage = ({role}) => {
     limit: 10,
     readStatus: "" 
     });
+    const socket = useSocket();
     const [selectedIds, setSelectedIds] = useState([]);
     const [open, setOpen] = useState(false);
     const [statusModal, setStatusModal] = useState(null);
@@ -31,6 +33,7 @@ const NotificationsPage = ({role}) => {
       },
     });
     };
+
       const fetchNotifications = useCallback(async () => {
       try {
         setLoading(true);
@@ -60,7 +63,32 @@ const NotificationsPage = ({role}) => {
     useEffect(() => {
       fetchNotifications();
     }, [filters,fetchNotifications]);
-    
+  // append the new notification in the table directly after access the notification
+    useEffect(() => {
+      const handleNewNotification = (data) => {
+
+        setNotifications((prev) => [
+          {
+            id: data.id,
+            message: data.message,
+            isRead: false,
+            createdAt: new Date().toISOString(),
+          },
+          ...prev,
+        ]);
+
+          fetchNotifications();
+       
+      };
+
+      socket.on("notification", handleNewNotification);
+
+      return () => {
+        socket.off("notification", handleNewNotification);
+      };
+    }, [socket, fetchNotifications]);
+
+
       const handlePageChange = (newPage) => {
         setSelectedIds([]); // reset selection
         setFilters((prev) => ({
