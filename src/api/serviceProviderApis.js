@@ -93,8 +93,8 @@ export const providerPrivateView = async (id) => {
   return res.data;
 };
 export const updateService = async (id, payload) => {
-  const res = await api.put(`/service/provider/services/${id}`, payload);
-  return res.data;
+  const res = await api.put(`/service/provider/services/update/${id}`, payload);
+  return res;
 };
 const serviceProviderApis = {
   requestApproval,
