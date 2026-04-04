@@ -230,8 +230,7 @@ export default function ServiceProviderServices() {
               },
               {
                 label: "View Reason",
-                show:
-                  service.status === "rejected" && !!service.rejectionReason,
+                show: !!service.rejectionReason,
                 onClick: () => handleViewRejection(service.rejectionReason),
                 variant: "outline",
               },
@@ -243,9 +242,18 @@ export default function ServiceProviderServices() {
               },
               {
                 label: "Edit",
-                show: true,
+                show:
+                  service.status === "draft" || service.status === "rejected",
                 onClick: () =>
                   navigate(`/dashboard/services/create?id=${service.id}`),
+                variant: "outline",
+              },
+              {
+                // providerPrivateView
+                label: "View",
+                show:
+                  service.status === "draft" || service.status === "rejected",
+                onClick: () => navigate(`/provider/service/${service.id}`),
                 variant: "outline",
               },
             ]}

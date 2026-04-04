@@ -14,6 +14,7 @@ import SPNotifications from "./features/Dashboard/tabs/serviceProvider/SPNotific
 import DashboardMap from "./features/Dashboard/tabs/index.js";
 import { useProfile } from "./contexts/ProfileContext.jsx";
 import ServiceProfileAdmin from "./features/service/serviceProfile/ServiceProfileAdmin.jsx";
+import ServiceViewProvider from "./features/service/serviceProfile/ServiceViewProvider.jsx";
 function App() {
   const { profile } = useProfile();
   const role = profile?.role;
@@ -28,6 +29,7 @@ function App() {
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/service/:serviceId" element={<ServiceProfile />} />
         <Route path="/admin/service/:id" element={<ServiceProfileAdmin />} />
+        <Route path="/provider/service/:id" element={<ServiceViewProvider />} />
         <Route path="/timeline/:timelineId" element={<TimelinePage />} />
 
         {/*  Dashboard Layout */}

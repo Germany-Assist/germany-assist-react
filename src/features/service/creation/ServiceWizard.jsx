@@ -141,7 +141,6 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
     formData.assets.forEach((asset) => {
       if (asset.file) {
         sendData.append("images", asset.file);
-        // Use the uploadIndex, not the loop index
         sendData.append(`imageKeys[${uploadIndex}]`, asset.key);
         uploadIndex++;
       }
