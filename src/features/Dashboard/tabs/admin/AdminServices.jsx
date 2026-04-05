@@ -320,7 +320,7 @@ export default function AdminServices() {
                 label: "View",
                 show: true,
                 onClick: () =>
-                  window.open(`admin/service/${service.id}`, "_blank"),
+                  window.open(`/admin/service/${service.id}`, "_blank"),
                 variant: "outline",
               },
             ]}

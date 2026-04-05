@@ -153,7 +153,7 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
 
       if (response.status === 201 || response.status === 200) {
         setIsSubmitting(false);
-        setSuccessServiceId(initialData?.id);
+        setSuccessServiceId(initialData?.id || response.data.data.id);
         nextStep();
       }
     } catch (error) {
