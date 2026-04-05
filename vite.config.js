@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [react(), svgr()],
   server: {
     proxy: {
-      "/staging/backend": {
-        target: "http://www.germany-assist.com",
+      "/backend": {
+        target: "http://staging.germany-assist.com",
         changeOrigin: true,
         ws: true,
       },
