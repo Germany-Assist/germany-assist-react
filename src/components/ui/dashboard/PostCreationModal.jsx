@@ -9,9 +9,9 @@ function PostCreationModal({ isOpen, onClose, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ 
-      description: description.trim(), 
-      isPinned 
+    onSubmit({
+      description: description.trim(),
+      isPinned,
     });
     setDescription("");
     setIsPinned(false);
@@ -71,29 +71,41 @@ function PostCreationModal({ isOpen, onClose, onSubmit }) {
           </div>
 
           {/* Settings / Pinned State */}
-          <div 
+          <div
             onClick={() => setIsPinned(!isPinned)}
             className={`group flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer mb-8 ${
-              isPinned 
-              ? "border-amber-500/50 bg-amber-500/5" 
-              : "border-slate-100 dark:border-zinc-800 bg-transparent hover:border-slate-200 dark:hover:border-zinc-700"
+              isPinned
+                ? "border-amber-500/50 bg-amber-500/5"
+                : "border-slate-100 dark:border-zinc-800 bg-transparent hover:border-slate-200 dark:hover:border-zinc-700"
             }`}
           >
             <div className="flex items-center gap-4">
-              <div className={`p-2.5 rounded-xl transition-all ${
-                isPinned ? "bg-amber-500 text-white" : "bg-slate-100 dark:bg-zinc-800 text-slate-400 group-hover:text-slate-600"
-              }`}>
+              <div
+                className={`p-2.5 rounded-xl transition-all ${
+                  isPinned
+                    ? "bg-amber-500 text-white"
+                    : "bg-slate-100 dark:bg-zinc-800 text-slate-400 group-hover:text-slate-600"
+                }`}
+              >
                 <Pin size={20} className={isPinned ? "rotate-45" : ""} />
               </div>
               <div>
-                <p className="font-bold text-slate-900 dark:text-white">Pin this post</p>
-                <p className="text-xs text-slate-500">Feature it at the top of your feed</p>
+                <p className="font-bold text-slate-900 dark:text-white">
+                  Pin this post
+                </p>
+                <p className="text-xs text-slate-500">
+                  Feature it at the top of your feed
+                </p>
               </div>
             </div>
-            
+
             {/* Custom Toggle UI */}
-            <div className={`w-12 h-6 rounded-full transition-colors relative ${isPinned ? 'bg-amber-500' : 'bg-slate-200 dark:bg-zinc-700'}`}>
-              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isPinned ? 'left-7' : 'left-1'}`} />
+            <div
+              className={`w-12 h-6 rounded-full transition-colors relative ${isPinned ? "bg-amber-500" : "bg-slate-200 dark:bg-zinc-700"}`}
+            >
+              <div
+                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${isPinned ? "left-7" : "left-1"}`}
+              />
             </div>
           </div>
 
@@ -102,8 +114,11 @@ function PostCreationModal({ isOpen, onClose, onSubmit }) {
             type="submit"
             className="w-full group flex items-center justify-center gap-3 bg-slate-900 dark:bg-white text-white dark:text-black py-5 rounded-[20px] font-black uppercase tracking-widest text-xs hover:opacity-90 transition-all active:scale-[0.97] shadow-xl"
           >
-            Share to Timeline 
-            <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+            Share to Timeline
+            <Send
+              size={18}
+              className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"
+            />
           </button>
         </form>
       </div>

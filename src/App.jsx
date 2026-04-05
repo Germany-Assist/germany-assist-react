@@ -15,6 +15,7 @@ import DashboardMap from "./features/Dashboard/tabs/index.js";
 import { useProfile } from "./contexts/ProfileContext.jsx";
 import ServiceProfileAdmin from "./features/service/serviceProfile/ServiceProfileAdmin.jsx";
 import ServiceViewProvider from "./features/service/serviceProfile/ServiceViewProvider.jsx";
+import ProviderTimeline from "./pages/ProviderTimelinePage.jsx";
 function App() {
   const { profile } = useProfile();
   const role = profile?.role;
@@ -31,6 +32,7 @@ function App() {
         <Route path="/admin/service/:id" element={<ServiceProfileAdmin />} />
         <Route path="/provider/service/:id" element={<ServiceViewProvider />} />
         <Route path="/timeline/:timelineId" element={<TimelinePage />} />
+        <Route path="/provider/timeline/:id" element={<ProviderTimeline />} />
 
         {/*  Dashboard Layout */}
         <Route path="/dashboard" element={<DashboardPage />}>

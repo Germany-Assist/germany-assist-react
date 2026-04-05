@@ -59,6 +59,10 @@ export const createNewTimeline = async (payload) => {
   );
   return res.data;
 };
+export const viewTimeline = async (timelineId) => {
+  const res = await api.get(`/service/timeline/provider/view/${timelineId}`);
+  return res.data;
+};
 export const archiveVariant = async (variantId) => {
   const res = await api.put(
     `/service/variant/provider/archiveVariant/${variantId}`,
@@ -106,5 +110,6 @@ const serviceProviderApis = {
   serviceProfilePageSP,
   providerPrivateView,
   updateService,
+  viewTimeline,
 };
 export default serviceProviderApis;
