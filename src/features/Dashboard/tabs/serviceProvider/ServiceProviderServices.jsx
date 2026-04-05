@@ -105,7 +105,14 @@ export default function ServiceProviderServices() {
         });
       }
     } catch (err) {
-      console.error(err);
+      const message = getErrorMessage(err);
+      setStatusModalCon({
+        isOpen: true,
+        type: "error",
+        onClose: () => setStatusModalCon(null),
+        message: message,
+        buttonText: "Retry",
+      });
     } finally {
       setLoading(false);
     }
@@ -127,10 +134,13 @@ export default function ServiceProviderServices() {
         ),
       );
     } catch (error) {
+      const message = getErrorMessage(error);
       setStatusModalCon({
         isOpen: true,
         type: "error",
-        message: `Failed to ${targetAction} service: ${getErrorMessage(error)}`,
+        onClose: () => setStatusModalCon(null),
+        message: message,
+        buttonText: "Retry",
       });
     }
   };
@@ -150,10 +160,13 @@ export default function ServiceProviderServices() {
         message: "Service submitted for admin review.",
       });
     } catch (error) {
+      const message = getErrorMessage(error);
       setStatusModalCon({
         isOpen: true,
         type: "error",
-        message: getErrorMessage(error),
+        onClose: () => setStatusModalCon(null),
+        message: message,
+        buttonText: "Retry",
       });
     }
   };

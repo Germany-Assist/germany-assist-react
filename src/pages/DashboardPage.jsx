@@ -66,14 +66,6 @@ export default function DashboardPage() {
         <main className="relative z-10 flex-1 bg-white/40 dark:bg-zinc-900/40 backdrop-blur-2xl border border-zinc-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col">
           <div className="flex-1 overflow-y-auto custom-scrollbar p-8 lg:p-12">
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
-              {/* Section Header */}
-              <header className="mb-10">
-                <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
-                  {getTitle()}
-                </h1>
-              </header>
-
-              {/* The Active View (e.g., ServiceWizard) */}
               <Outlet />
             </div>
           </div>
