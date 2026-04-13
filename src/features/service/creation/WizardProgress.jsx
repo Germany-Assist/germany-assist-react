@@ -1,8 +1,7 @@
 import React from "react";
 
 const WizardProgress = ({ currentStep }) => {
-  const steps = ["Basics", "Pricing", "Media"];
-
+  const steps = ["Basics", "Pricing", "Media", "Status"];
   return (
     <nav className="relative py-6 transition-colors duration-700">
       <div className="flex items-center justify-center">

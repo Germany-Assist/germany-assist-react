@@ -18,7 +18,7 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
       (!data.variants ||
         data.variants.length === 0 ||
         data.variants.some(
-          (v) => !v.label || v.price <= 0 || !v.deliveryTime,
+          (v) => !v.label || v.price <= 0 || v.deliveryTime < 0,
         ))) ||
     (data.type === "timeline" &&
       (!data.timelines ||
@@ -148,6 +148,7 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
                         className="absolute left-2 top-3 text-slate-400"
                       />
                       <input
+                        type="number"
                         placeholder="Delivery Time in Days (e.g. 3) leave zero for unknown delivery times"
                         className="w-full pl-8 p-2 text-sm border border-light-700 dark:border-white/10 rounded-lg bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
                         value={variant.deliveryTime}
