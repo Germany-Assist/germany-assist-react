@@ -306,7 +306,7 @@ export default function AdminServices() {
               },
               {
                 label: "Reject",
-                show: service.status === "pending",
+                show: service.status !== "draft",
                 onClick: () => handleServiceRejection(service.id),
                 variant: "outline",
               },

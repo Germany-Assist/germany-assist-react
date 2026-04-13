@@ -1,12 +1,18 @@
 import React from "react";
-import { Upload, X, CheckCircle, ChevronLeft } from "lucide-react";
+import {
+  Upload,
+  X,
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 const StepMedia = ({
   data,
   onUpdate,
   onAssetDeleted,
   onBack,
-  onComplete,
+  onNext,
   isEditMode,
 }) => {
   const handleFileChange = (e, type) => {
@@ -148,11 +154,10 @@ const StepMedia = ({
         <button
           type="button"
           disabled={!profileImg}
-          onClick={onComplete}
+          onClick={onNext}
           className="flex-1 flex items-center justify-center gap-2 bg-slate-900 dark:bg-white disabled:opacity-20 text-white dark:text-black font-bold py-4 rounded-2xl shadow-xl transition-all active:scale-95"
         >
-          <CheckCircle size={18} />{" "}
-          {isEditMode ? "Update Service" : "Finish & Publish"}
+          Next: Status And Review <ChevronRight size={18} />
         </button>
       </div>
     </div>

@@ -5,12 +5,12 @@ import StepBasics from "./steps/StepBasics";
 import LivePreview from "./steps/LivePreview";
 import StepMedia from "./steps/StepMedia";
 import StepTypeAndPricing from "./steps/StepTypeAndPricing";
+import StepReviewChoice from "./steps/StepReviewChoice"; // Import the new step
 import {
   createNewService,
   updateService,
 } from "../../../api/serviceProviderApis";
 import CreationSuccess from "./CreationSuccess";
-import ServiceProfile from "../serviceProfile/ServiceProfile";
 import { useMeta } from "../../../contexts/MetadataContext";
 import StatusModal from "../../../components/ui/StatusModal";
 import { getErrorMessage } from "../../../api/errorMessages";
@@ -21,7 +21,7 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
   const [successServiceId, setSuccessServiceId] = useState(null);
   const [statusModalCon, setStatusModalCon] = useState(null);
   const [subcategories, setSubcategories] = useState([]);
-  const [deletedAssets, setDeletedAssets] = useState([]); // TRACK UUIDs FOR DELETE
+  const [deletedAssets, setDeletedAssets] = useState([]);
   const { categories } = useMeta();
 
   const [formData, setFormData] = useState({
@@ -31,6 +31,7 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
     description: "",
     requirements: [""],
     limitToPause: 0,
+    requestedStatus: "draft",
     assets: [],
     variants: [],
     timelines: [],
@@ -72,6 +73,7 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
         subcategory: subcategoryId,
         requirements: requirementsArray.length > 0 ? requirementsArray : [""],
         limitToPause: initialData.limitToPause || 0,
+        requestedStatus: initialData.status || "draft",
         variants: (initialData.variants || []).map((v) => ({
           label: v.label || "",
           price: v.price || 0,
@@ -90,7 +92,7 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
           .map((asset) => ({
             ...asset,
             isExisting: true,
-            name: asset.name, // The UUID we need for deletion
+            name: asset.name,
           })),
       });
     }
@@ -117,6 +119,7 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
   const nextStep = () => setCurrentStep((prev) => prev + 1);
   const prevStep = () => setCurrentStep((prev) => prev - 1);
 
+  // Updated handleSubmit to accept the final status (draft/review)
   const handleSubmit = async () => {
     setIsSubmitting(true);
     const sendData = new FormData();
@@ -126,6 +129,9 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
     sendData.append("description", formData.description);
     sendData.append("type", formData.type);
     sendData.append("limitToPause", formData.limitToPause);
+    // Append the status chosen in StepReviewChoice
+    sendData.append("status", formData.requestedStatus);
+
     sendData.append(
       "requirements",
       JSON.stringify(formData.requirements.filter((r) => r.trim() !== "")),
@@ -133,10 +139,10 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
     sendData.append("variants", JSON.stringify(formData.variants));
     sendData.append("timelines", JSON.stringify(formData.timelines));
 
-    // Send the list of UUIDs to be deleted
     if (isEditMode && deletedAssets.length > 0) {
       sendData.append("deletedAssets", JSON.stringify(deletedAssets));
     }
+
     let uploadIndex = 0;
     formData.assets.forEach((asset) => {
       if (asset.file) {
@@ -145,12 +151,10 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
         uploadIndex++;
       }
     });
-
     try {
       const response = isEditMode
         ? await updateService(initialData.id, sendData)
         : await createNewService(sendData);
-
       if (response.status === 201 || response.status === 200) {
         setIsSubmitting(false);
         setSuccessServiceId(initialData?.id || response.data.data.id);
@@ -173,7 +177,7 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
     <div className="relative w-full px-4 md:px-0 max-w-7xl mx-auto">
       <StatusModal {...statusModalCon} />
 
-      {isEditMode && initialData?.rejectionReason && currentStep < 4 && (
+      {isEditMode && initialData?.rejectionReason && currentStep < 5 && (
         <div className="mb-6 md:mb-10 bg-red-50 dark:bg-red-500/5 border-2 border-red-500/30 rounded-[1.5rem] md:rounded-[2.5rem] p-4 md:p-6 flex flex-col md:flex-row items-center gap-4 md:gap-6 shadow-xl shadow-red-500/10 animate-in slide-in-from-top-10 duration-700">
           <div className="w-12 h-12 md:w-16 md:h-16 bg-red-500 rounded-xl md:rounded-[1.5rem] flex items-center justify-center text-white animate-pulse shrink-0">
             <ShieldAlert size={28} />
@@ -198,7 +202,7 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
           </div>
         </div>
         <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-          Progress: Step {currentStep} / 3
+          Progress: Step {currentStep} / 4
         </div>
       </div>
 
@@ -234,14 +238,24 @@ const ServiceWizard = ({ initialData = null, isEditMode = false }) => {
               onUpdate={updateFormData}
               onAssetDeleted={trackDeletedAsset}
               onBack={prevStep}
-              onComplete={handleSubmit}
+              onNext={nextStep}
               isEditMode={isEditMode}
             />
           )}
           {currentStep === 4 && (
+            <StepReviewChoice
+              data={formData}
+              onBack={prevStep}
+              onUpdate={updateFormData}
+              onComplete={handleSubmit}
+              isEditMode={isEditMode}
+            />
+          )}
+          {currentStep === 5 && (
             <CreationSuccess
               serviceId={successServiceId}
               isEditMode={isEditMode}
+              status={formData.requestedStatus}
             />
           )}
         </div>

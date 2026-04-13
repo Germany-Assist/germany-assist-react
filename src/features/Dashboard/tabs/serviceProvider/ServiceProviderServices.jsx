@@ -262,10 +262,7 @@ export default function ServiceProviderServices() {
                 variant: "outline",
               },
               {
-                // providerPrivateView
                 label: "View",
-                show:
-                  service.status === "draft" || service.status === "rejected",
                 onClick: () => navigate(`/provider/service/${service.id}`),
                 variant: "outline",
               },
