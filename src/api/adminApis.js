@@ -60,8 +60,8 @@ export const getAllFinanceStatistical = async () => {
 };
 
 // Approve or reject a service
-export const updateServiceStatus = async (payload) => {
-  const res = await api.put("/service/admin/services/status", payload);
+export const updateServiceStatus = async (id, payload) => {
+  const res = await api.put(`/service/admin/services/status/${id}`, payload);
   return res.data;
 };
 
@@ -127,7 +127,12 @@ export const updateRequest = async (id, payload = {}) => {
   const res = await api.put(`/requests/admin/${id}`, payload);
   return res.data;
 };
+export const getServiceProfile = async (id) => {
+  const res = await api.get(`/service/admin/services/${id}`);
+  return res.data;
+};
 const adminApis = {
+  getServiceProfile,
   getOrderById,
   updateRequest,
   getAllOrders,

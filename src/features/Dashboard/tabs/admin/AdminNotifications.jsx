@@ -3,7 +3,7 @@ import NotificationsPage from '../../../../components/ui/dashboard/Notifications
 
 const AdminNotifications = () => {
   return (
-    <NotificationsPage role="admin"/>
+    <NotificationsPage role="super_admin"/>
   )
 }
 

@@ -5,8 +5,11 @@ import {markAllNotificationsAsRead} from "../../../api/notificationaApi";
 import { useProfile } from "../../../contexts/ProfileContext";
 import { Filter ,MailCheck,Check} from "lucide-react";
 import StatusModal from "../StatusModal";
-const NotificationsPage = ({role}) => {
+import {useSocket} from "../../../contexts/SocketContext";
 
+const NotificationsPage = ({role}) => {
+const isAdminFilter = role === "super_admin";
+const socket = useSocket();
     const { profile, fetchProfile, setProfile } = useProfile();  
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -16,7 +19,9 @@ const NotificationsPage = ({role}) => {
     const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
-    readStatus: "" 
+    readStatus: "" ,
+         isAdmin: role === "super_admin" ? "" : false 
+
     });
     const [selectedIds, setSelectedIds] = useState([]);
     const [open, setOpen] = useState(false);
@@ -41,6 +46,10 @@ const NotificationsPage = ({role}) => {
           ...(filters.readStatus === "read" && { isRead: true }),
           ...(filters.readStatus === "unread" && { isRead: false }),
           ...(filters.readStatus === "all" && { isRead: "all" }),
+
+           ...(filters.isAdmin !== "" && {
+            isAdmin: filters.isAdmin === true 
+          }),
         };
 
         const res = await getNotifications(params);
@@ -57,10 +66,11 @@ const NotificationsPage = ({role}) => {
       }
       }, [filters]);
   
+
     useEffect(() => {
-      fetchNotifications();
-    }, [filters,fetchNotifications]);
-    
+  fetchNotifications();
+}, [filters, role]);
+
       const handlePageChange = (newPage) => {
         setSelectedIds([]); // reset selection
         setFilters((prev) => ({
@@ -69,6 +79,30 @@ const NotificationsPage = ({role}) => {
         }));
       };
     
+          useEffect(() => {
+          const handleNewNotification = (data) => {
+
+          setNotifications((prev) => [
+            {
+              id: data.id,
+              message: data.message,
+              isRead: false,
+              createdAt: new Date().toISOString(),
+            },
+            ...prev,
+          ]);
+              fetchNotifications();
+
+  };
+
+  socket.on("notification", handleNewNotification);
+
+  return () => {
+    socket.off("notification", handleNewNotification);
+  };
+}, [socket, fetchNotifications]);
+
+
       // Full modification: View opens Modal + makes the message read
       const handleView = async (notification) => {
         setSelectedNotification(notification);
@@ -208,7 +242,32 @@ const NotificationsPage = ({role}) => {
           {/* <option value="unread">Unread</option> */}
         </select>
         </div>
-
+        {/* Admin filter */}
+        {role === "super_admin" &&  (<div className="relative group min-w-[160px]">
+        <Filter
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none"
+            size={14}
+        />
+          <select
+            value={filters.isAdmin}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                isAdmin:
+                e.target.value === ""
+                  ? ""
+                  : e.target.value === "true" ? true : false,
+                page: 1,
+              }))
+            }
+            className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 pl-10 pr-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest appearance-none focus:ring-2 ring-blue-500/20 transition-all outline-none cursor-pointer"
+          >
+            <option value="">All</option>
+            <option value="true">Admin Only</option>
+            <option value="false">User Only</option>
+          </select>
+        
+        </div>)}
         
         <div className="relative group">
 

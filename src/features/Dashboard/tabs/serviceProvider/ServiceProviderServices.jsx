@@ -3,61 +3,75 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
-  Globe,
   Eye,
   Box,
+  Search,
+  PauseCircle,
+  PlayCircle,
+  FileEdit,
 } from "lucide-react";
 import MultiUseTable from "../../../../components/ui/dashboard/MultiUseTable";
 import TransactionCell from "../../../../components/ui/dashboard/TransactionCell";
 import ActionGroup from "../../../../components/ui/dashboard/ActionGroup";
-import FilterContainer, {
-  FilterToggle,
-} from "../../../../components/ui/dashboard/FilterContainer";
 import StatusModal from "../../../../components/ui/StatusModal";
-import serviceProviderApis, {
-  publishService,
-  unpublishService,
-} from "../../../../api/serviceProviderApis";
+import serviceProviderApis from "../../../../api/serviceProviderApis";
 import DashboardHeader from "../../../../components/ui/dashboard/DashboardHeader";
 import { getErrorMessage } from "../../../../api/errorMessages";
 import { useNavigate } from "react-router-dom";
 
-// TODO move this to component
+/**
+ * Standardized Status Helper
+ * Matches Admin logic for visual consistency
+ */
 const getServiceStatus = (service) => {
-  if (service.rejected)
+  const { status, isPaused } = service;
+
+  if (isPaused) {
     return {
-      label: "Rejected",
-      color: "text-red-500",
-      dot: "bg-red-500",
-      icon: AlertCircle,
-    };
-  if (service.published && service.approved)
-    return {
-      label: "Live",
-      color: "text-emerald-500",
-      dot: "bg-emerald-500 animate-pulse",
-      icon: CheckCircle2,
-    };
-  if (service.published && !service.approved)
-    return {
-      label: "Pending Approval",
-      color: "text-amber-500",
+      label: "Paused",
+      color: "text-amber-500 bg-amber-500/10 border-amber-500/20",
       dot: "bg-amber-500",
-      icon: Clock,
+      icon: PauseCircle,
     };
-  if (service.approved && !service.published)
-    return {
-      label: "Pending Publish",
-      color: "text-blue-500",
-      dot: "bg-blue-500",
-      icon: Globe,
-    };
-  return {
-    label: "Pending",
-    color: "text-zinc-400",
-    dot: "bg-zinc-300",
-    icon: Clock,
-  };
+  }
+
+  switch (status) {
+    case "approved":
+      return {
+        label: "Live",
+        color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+        dot: "bg-emerald-500 animate-pulse",
+        icon: CheckCircle2,
+      };
+    case "pending":
+      return {
+        label: "Pending Review",
+        color: "text-amber-500 bg-amber-500/10 border-amber-500/20",
+        dot: "bg-amber-500",
+        icon: Clock,
+      };
+    case "rejected":
+      return {
+        label: "Rejected",
+        color: "text-red-500 bg-red-500/10 border-red-500/20",
+        dot: "bg-red-500",
+        icon: AlertCircle,
+      };
+    case "draft":
+      return {
+        label: "Draft",
+        color: "text-zinc-400 bg-zinc-400/10 border-zinc-400/20",
+        dot: "bg-zinc-400",
+        icon: FileEdit,
+      };
+    default:
+      return {
+        label: "Unknown",
+        color: "text-zinc-300 bg-zinc-300/10 border-zinc-300/20",
+        dot: "bg-zinc-300",
+        icon: Clock,
+      };
+  }
 };
 
 export default function ServiceProviderServices() {
@@ -69,14 +83,10 @@ export default function ServiceProviderServices() {
     page: 1,
     limit: 10,
     title: "",
-    category: "",
-    order: "dec",
-    sort: "price",
-    type: undefined,
-    published: undefined,
-    approved: undefined,
-    rejected: undefined,
+    status: undefined,
+    isPaused: undefined,
   });
+
   const navigate = useNavigate();
 
   const fetchServices = useCallback(async () => {
@@ -85,7 +95,6 @@ export default function ServiceProviderServices() {
       const cleanParams = Object.fromEntries(
         Object.entries(filters).filter(([_, v]) => v !== undefined && v !== ""),
       );
-
       const response = await serviceProviderApis.getAllServices(cleanParams);
       if (response) {
         setServices(response.data || []);
@@ -96,12 +105,7 @@ export default function ServiceProviderServices() {
         });
       }
     } catch (err) {
-      setStatusModalCon({
-        isOpen: true,
-        onClose: () => setStatusModalCon(null),
-        message: getErrorMessage(err),
-        type: "error",
-      });
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -111,62 +115,93 @@ export default function ServiceProviderServices() {
     fetchServices();
   }, [fetchServices]);
 
-  const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value,
-      page: key === "page" ? value : 1,
-    }));
-  };
-
-  const handleTogglePublish = async (id, currentlyPublished) => {
-    const previousState = [...services];
-    const targetStatus = !currentlyPublished;
-    setServices((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, published: targetStatus } : s)),
-    );
+  const handleTogglePause = async (id, currentIsPaused) => {
+    const targetAction = currentIsPaused ? "resume" : "pause";
     try {
-      if (currentlyPublished) {
-        await unpublishService(id);
-      } else {
-        await publishService(id);
-      }
+      await serviceProviderApis.pauseResumeService(id, targetAction);
+
+      // OPTIMISTIC STATE PATCH
+      setServices((prev) =>
+        prev.map((s) =>
+          s.id === id ? { ...s, isPaused: !currentIsPaused } : s,
+        ),
+      );
     } catch (error) {
-      setServices(previousState);
       setStatusModalCon({
         isOpen: true,
         type: "error",
-        message: `Failed to ${targetStatus ? "publish" : "unpublish"} service. ${getErrorMessage(error)}.`,
+        message: `Failed to ${targetAction} service: ${getErrorMessage(error)}`,
       });
     }
   };
 
-  const serviceColumns = [
-    {
-      header: "Service",
-      render: (service) => (
-        <TransactionCell
-          title={service.title}
-          subtext={`ID: ${service.id} • ${service.category}`}
-          icon={Box}
-          variant={service.rejected ? "danger" : "default"}
-        />
-      ),
-    },
-    {
-      header: "Delivery Type",
-      render: (service) => (
-        <div className="flex flex-col gap-1">
-          <span className="text-[11px] font-black uppercase px-2.5 py-1 bg-zinc-100 dark:bg-white/5 rounded-lg border border-zinc-200 dark:border-white/5 w-fit">
-            {service.type === "oneTime" ? "One-Time Payment" : "Timeline Based"}
-          </span>
-        </div>
-      ),
-    },
-    {
-      header: "Performance",
-      render: (service) => (
-        <div className="flex items-center gap-4">
+  const handleRequestApproval = async (id) => {
+    try {
+      await serviceProviderApis.requestApproval(id);
+
+      // OPTIMISTIC STATE PATCH
+      setServices((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, status: "pending" } : s)),
+      );
+
+      setStatusModalCon({
+        isOpen: true,
+        type: "success",
+        message: "Service submitted for admin review.",
+      });
+    } catch (error) {
+      setStatusModalCon({
+        isOpen: true,
+        type: "error",
+        message: getErrorMessage(error),
+      });
+    }
+  };
+
+  const handleViewRejection = (reason) => {
+    setStatusModalCon({
+      isOpen: true,
+      type: "info",
+      title: "Rejection Details",
+      message: reason || "No specific reason provided by the administrator.",
+      buttonText: "Understood",
+      onClose: () => setStatusModalCon(null),
+    });
+  };
+
+  const serviceColumns = useMemo(
+    () => [
+      {
+        header: "Service",
+        render: (service) => (
+          <TransactionCell
+            title={service.title}
+            subtext={`${service.category || "Service"} • ID: ${service.id}`}
+            icon={Box}
+          />
+        ),
+      },
+      {
+        header: "Platform Status",
+        render: (service) => {
+          const status = getServiceStatus(service);
+          return (
+            <div className="flex flex-col gap-1">
+              <div
+                className={`flex items-center gap-2 px-3 py-1 rounded-full border w-fit ${status.color}`}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
+                <span className="text-[10px] font-black uppercase tracking-tight">
+                  {status.label}
+                </span>
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        header: "Performance",
+        render: (service) => (
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5 text-sm font-black italic">
               <Eye size={12} className="text-zinc-400" />
@@ -178,128 +213,149 @@ export default function ServiceProviderServices() {
               <span>{service.totalReviews || 0} Reviews</span>
             </div>
           </div>
-        </div>
-      ),
-    },
-    {
-      header: "Platform Status",
-      render: (service) => {
-        const status = getServiceStatus(service);
-        return (
-          <div className="flex flex-col gap-1.5">
-            <div
-              className={`flex items-center gap-2 px-3 py-1 rounded-full border border-current bg-transparent w-fit ${status.color} opacity-90`}
-            >
-              <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
-              <span className="text-[10px] font-black uppercase tracking-tight">
-                {status.label}
-              </span>
-            </div>
-          </div>
-        );
+        ),
       },
-    },
-    {
-      header: "Action",
-      align: "right",
-      render: (service) => (
-        <ActionGroup
-          actions={[
-            {
-              label: service.published ? "Unpublish" : "Publish",
-              show: !service.rejected,
-              onClick: () => handleTogglePublish(service.id, service.published),
-              variant: service.published ? "danger" : "success",
-            },
-            {
-              label: "VIEW",
-              show: true,
-              onClick: () => navigate(`/admin/service/${service.id}`),
-              variant: "success",
-            },
-            {
-              label: "Edit",
-              show: true,
-              onClick: () =>
-                setStatusModalCon({
-                  isOpen: true,
-                  type: "warning",
-                  message:
-                    "Please note that update is not allowed at this moment. We will discuss this in a meeting with the core team.",
-                }),
-              variant: "alert",
-            },
-          ]}
-        />
-      ),
-    },
-  ];
+      {
+        header: "Action",
+        align: "right",
+        render: (service) => (
+          <ActionGroup
+            actions={[
+              {
+                label: "Request Approval",
+                show:
+                  service.status === "draft" || service.status === "rejected",
+                onClick: () => handleRequestApproval(service.id),
+                variant: "emerald",
+              },
+              {
+                label: "View Reason",
+                show: !!service.rejectionReason,
+                onClick: () => handleViewRejection(service.rejectionReason),
+                variant: "outline",
+              },
+              {
+                label: service.isPaused ? "Resume" : "Pause",
+                show: service.status === "approved",
+                onClick: () => handleTogglePause(service.id, service.isPaused),
+                variant: service.isPaused ? "success" : "danger",
+              },
+              {
+                label: "Edit",
+                show:
+                  service.status === "draft" || service.status === "rejected",
+                onClick: () =>
+                  navigate(`/dashboard/services/create?id=${service.id}`),
+                variant: "outline",
+              },
+              {
+                // providerPrivateView
+                label: "View",
+                show:
+                  service.status === "draft" || service.status === "rejected",
+                onClick: () => navigate(`/provider/service/${service.id}`),
+                variant: "outline",
+              },
+            ]}
+          />
+        ),
+      },
+    ],
+    [navigate, services],
+  );
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-6">
-      <DashboardHeader title={"Services"} subtitle={"manage your services"} />
-
-      {/* FILTERS */}
-      <FilterContainer
-        searchValue={filters.title}
-        onSearchChange={(val) => handleFilterChange("title", val)}
-        placeholder="Filter by title..."
-      >
-        <select
-          value={filters.category || ""}
-          onChange={(e) =>
-            handleFilterChange("category", e.target.value || undefined)
-          }
-          className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 px-4 py-3 rounded-2xl text-[10px] font-black uppercase outline-none focus:ring-2 ring-blue-500/20"
-        >
-          <option value="">All Categories</option>
-          <option value="visa-paperwork">Visa Paperwork</option>
-        </select>
-
-        <div className="flex flex-wrap gap-2 col-span-full pt-2">
-          <FilterToggle
-            label="Published"
-            active={filters.published === true}
-            variant="emerald"
-            onClick={() =>
-              handleFilterChange(
-                "published",
-                filters.published === true ? undefined : true,
-              )
-            }
-          />
-          <FilterToggle
-            label="Approved"
-            active={filters.approved === true}
-            variant="emerald"
-            onClick={() =>
-              handleFilterChange(
-                "approved",
-                filters.approved === true ? undefined : true,
-              )
-            }
-          />
-          <FilterToggle
-            label="Rejected"
-            active={filters.rejected === true}
-            variant="red"
-            onClick={() =>
-              handleFilterChange(
-                "rejected",
-                filters.rejected === true ? undefined : true,
-              )
-            }
-          />
-        </div>
-      </FilterContainer>
-
-      <MultiUseTable
-        columns={serviceColumns}
-        data={services}
-        loading={loading}
-        pagination={meta}
-        onPageChange={(newPage) => handleFilterChange("page", newPage)}
+      <DashboardHeader
+        title={"My Services"}
+        subtitle={"Manage your catalog and track performance"}
       />
+
+      <div className="bg-white dark:bg-zinc-950 p-4 rounded-3xl border border-zinc-100 dark:border-white/5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"
+              size={16}
+            />
+            <input
+              type="text"
+              placeholder="Search by title..."
+              className="w-full pl-11 pr-4 py-2.5 bg-zinc-50 dark:bg-white/5 border-none rounded-2xl text-sm focus:ring-2 ring-blue-500/20 transition-all"
+              value={filters.title}
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, title: e.target.value, page: 1 }))
+              }
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <FilterToggleChip
+              label="All"
+              active={filters.status === undefined}
+              onClick={() =>
+                setFilters((p) => ({ ...p, status: undefined, page: 1 }))
+              }
+            />
+            <FilterToggleChip
+              label="Live"
+              variant="emerald"
+              active={filters.status === "approved"}
+              onClick={() =>
+                setFilters((p) => ({ ...p, status: "approved", page: 1 }))
+              }
+            />
+            <FilterToggleChip
+              label="Pending"
+              variant="amber"
+              active={filters.status === "pending"}
+              onClick={() =>
+                setFilters((p) => ({ ...p, status: "pending", page: 1 }))
+              }
+            />
+            <FilterToggleChip
+              label="Rejected"
+              variant="red"
+              active={filters.status === "rejected"}
+              onClick={() =>
+                setFilters((p) => ({ ...p, status: "rejected", page: 1 }))
+              }
+            />
+            <FilterToggleChip
+              label="Drafts"
+              active={filters.status === "draft"}
+              onClick={() =>
+                setFilters((p) => ({ ...p, status: "draft", page: 1 }))
+              }
+            />
+
+            <div className="w-[1px] h-6 bg-zinc-200 dark:bg-white/10 mx-1 hidden md:block" />
+
+            <FilterToggleChip
+              label="Paused"
+              variant="amber"
+              active={filters.isPaused === true}
+              onClick={() =>
+                setFilters((p) => ({
+                  ...p,
+                  isPaused: p.isPaused === true ? undefined : true,
+                  page: 1,
+                }))
+              }
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white dark:bg-zinc-950 rounded-3xl border border-zinc-100 dark:border-white/5 overflow-hidden">
+        <MultiUseTable
+          columns={serviceColumns}
+          data={services}
+          loading={loading}
+          pagination={meta}
+          onPageChange={(p) => setFilters((prev) => ({ ...prev, page: p }))}
+        />
+      </div>
 
       <StatusModal
         {...statusModalCon}
@@ -308,3 +364,29 @@ export default function ServiceProviderServices() {
     </div>
   );
 }
+
+const FilterToggleChip = ({ label, active, onClick, variant = "default" }) => {
+  const variants = {
+    default: active
+      ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
+      : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/5",
+    emerald: active
+      ? "bg-emerald-500 text-white border-emerald-500"
+      : "text-zinc-500 hover:border-emerald-500/50",
+    amber: active
+      ? "bg-amber-500 text-white border-amber-500"
+      : "text-zinc-500 hover:border-amber-500/50",
+    red: active
+      ? "bg-red-500 text-white border-red-500"
+      : "text-zinc-500 hover:border-red-500/50",
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase border border-transparent transition-all duration-200 ${variants[variant] || variants.default} ${!active && "border-zinc-100 dark:border-white/5"}`}
+    >
+      {label}
+    </button>
+  );
+};

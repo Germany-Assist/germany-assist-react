@@ -10,7 +10,7 @@ if (NODE_ENV === "production") {
   SOCKET_PATH = "/backend/socket.io";
 } else if (NODE_ENV === "staging") {
   SOCKET_ORIGIN = DROPLET_ORIGIN;
-  SOCKET_PATH = "/staging/backend/socket.io";
+  SOCKET_PATH = "/backend/socket.io";
 } else {
   SOCKET_ORIGIN = LOCAL_BACKEND_URL;
   SOCKET_PATH = "/socket.io";
