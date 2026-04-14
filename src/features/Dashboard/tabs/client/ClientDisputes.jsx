@@ -60,7 +60,9 @@ export default function ClientDisputes() {
   const stats = {
     total: disputes.length,
     open: disputes.filter(d => d.status === 'open').length,
-    resolved: disputes.filter(d => d.status === 'resolved').length
+    resolved: disputes.filter(d =>
+
+      d.status === 'resolved').length
   };
 
   return (

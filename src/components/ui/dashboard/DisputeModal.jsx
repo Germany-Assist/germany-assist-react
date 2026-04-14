@@ -7,6 +7,7 @@ import {
   Send,
 } from "lucide-react";
 import React, { useState } from "react";
+import { openNewDispute } from "../../../api/clientUserApis";
 //TODO
 // im gonna fetch this later on from the backend
 const DISPUTE_REASONS = [
@@ -19,22 +20,38 @@ const DISPUTE_REASONS = [
 function DisputeModal({ isOpen, onClose, onSubmit, itemName = "this post" }) {
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({
-      reason,
-      description: description.trim(),
-      timestamp: new Date().toISOString(),
-    });
-    // Reset and close
-    setReason("");
-    setDescription("");
-    onClose();
-  };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
+  if (!reason || !description.trim()) {
+    setError("Please fill all fields");
+    return;
+  }
+
+  setLoading(true);
+  setError("");
+
+  try {
+    await openNewDispute({
+      orderId: order.id, // importanat add order
+      reason,
+      description,
+    });
+
+    onClose();
+  } catch (err) {  
+    setError(
+      err?.response?.data?.message ||
+      "Failed to open dispute. Please try again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
@@ -129,14 +146,21 @@ function DisputeModal({ isOpen, onClose, onSubmit, itemName = "this post" }) {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="flex items-center justify-center gap-2 bg-amber-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-amber-600 transition-all active:scale-[0.97] shadow-lg shadow-amber-500/20"
-            >
-              Submit <Send size={16} />
-            </button>
+           <button
+          type="submit"
+          disabled={loading}
+          className="flex items-center justify-center gap-2 bg-amber-500 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-amber-600 transition-all disabled:opacity-50"
+        >
+          {loading ? "Submitting..." : "Submit"} <Send size={16} />
+        </button>
           </div>
         </form>
+
+        {error && (
+          <p className="text-red-500 text-xs mt-2 text-center">
+            {error}
+          </p>
+        )}
       </div>
     </div>
   );

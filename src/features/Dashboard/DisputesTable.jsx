@@ -1,17 +1,20 @@
-import React from "react";
-import { Gavel, Eye, MessageSquare, Sparkles, BrainCircuit } from "lucide-react";
+import React, { useState } from "react";
+import { Gavel, Eye, MessageSquare, Sparkles } from "lucide-react";
 import MultiUseTable from "../../components/ui/dashboard/MultiUseTable";
-import ActionGroup from "../Dashboard/ActionMenu"; 
+import ActionGroup from "../Dashboard/ActionMenu";
 import TransactionCell from "../../components/ui/dashboard/TransactionCell";
 import adminApis from "../../api/adminApis";
-
+import DisputeModal from "../../components/ui/dashboard/DisputeModal"
 /**
  * DisputesTable Component
  * Renders a data table for managing order disputes with role-specific actions.
  * Supports Admin, Client, and Provider perspectives.
  */
 const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomAction }) => {
-  
+
+  const [actionType, setActionType] = useState(null);
+  const [selectedDispute, setSelectedDispute] = React.useState(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   /**
    * Universal handler for API-based actions.
    * Executes the call and triggers a data refresh on success.
@@ -19,13 +22,14 @@ const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomActio
   const handleAction = async (apiCall) => {
     try {
       await apiCall;
-      onRefresh(); 
+      onRefresh();
     } catch (error) {
       console.error("Action failed:", error);
     }
   };
 
   const columns = [
+
     {
       header: "Dispute Details",
       render: (row) => (
@@ -36,24 +40,6 @@ const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomActio
           icon={Gavel}
           variant={row.status === 'open' ? "danger" : "default"}
         />
-      ),
-    },
-    /**
-     * AI-Powered Insights Column
-     * Displays automated analysis from the AI Agent to assist decision making.
-     */
-    {
-      header: "AI Insight",
-      render: (row) => (
-        <div className="flex flex-col gap-1 max-w-[200px]">
-          <div className="flex items-center gap-1.5 text-[10px] font-bold text-purple-500 uppercase tracking-tight">
-            <BrainCircuit size={14} />
-            Agent Analysis
-          </div>
-          <p className="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-tight">
-            {row.aiSummary || "Analyzing dispute patterns..."}
-          </p>
-        </div>
       ),
     },
     /**
@@ -85,58 +71,72 @@ const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomActio
       header: "Action",
       align: "right",
       render: (row) => {
-        const actions = role === "admin" 
+        const actions = role === "admin"
+          ? [
+            {
+  label: "Start Review",
+  show: row.status === 'open',
+  onClick: () => handleAction(adminApis.markDisputeInReview(row.id)),
+},
+            {
+              label: "Refund Buyer",
+              icon: Sparkles,
+              show: row.status === 'in_review',
+              onClick: () => handleAction(adminApis.resolveDispute(row.id, "buyer_won")),
+              variant: "danger",
+            },
+            {
+              label: "Release to Provider",
+              show: row.status === 'in_review',
+              onClick: () => handleAction(adminApis.resolveDispute(row.id, "provider_won")),
+              variant: "primary",
+            },
+          ]
+          : role === "client"
             ? [
-                {
-                  label: "Start Review",
-                  show: row.status === 'open',
-                  onClick: () => handleAction(adminApis.markDisputeInReview(row.id)),
-                  variant: "secondary",
-                },
-                {
-                  label: "Refund Buyer",
-                  icon: Sparkles, 
-                  show: row.status === 'in_review',
-                  onClick: () => handleAction(adminApis.resolveDispute(row.id, "buyer_won")),
-                  variant: "danger",
-                },
-                {
-                  label: "Release to Provider",
-                  show: row.status === 'in_review',
-                  onClick: () => handleAction(adminApis.resolveDispute(row.id, "provider_won")),
-                  variant: "primary",
-                },
-              ]
-            : role === "client" 
-              ? [
-                  {
-                    label: "View Details",
-                    icon: Eye,
-                    onClick: () => onCustomAction('view', row.id),
-                    variant: "secondary",
-                  },
-                  {
-                    label: "Cancel Dispute",
-                    show: row.status === 'open',
-                    onClick: () => onCustomAction('cancel', row.id),
-                    variant: "danger",
-                  }
-                ]
-              : [
-                  {
-                    label: "View Details",
-                    icon: Eye,
-                    onClick: () => onCustomAction('view', row.id),
-                    variant: "secondary",
-                  },
-                  {
-                    label: "Submit Response",
-                    icon: MessageSquare,
-                    show: row.status === 'open',
-                    onClick: () => onCustomAction('respond', row.id),
-                    variant: "primary",
-                  }
-                ];
+
+            {
+            label: "View Details",
+            icon: Eye,
+            onClick: () => {
+              setActionType("view");
+              setSelectedDispute(row);
+              setIsModalOpen(true);
+            },
+          },
+          {
+            label: "Cancel Dispute",
+            show: row.status === 'open',
+            onClick: () => {
+              setActionType("cancel");
+              setSelectedDispute(row);
+              setIsModalOpen(true);
+            },
+          }
+
+
+            ]
+            : [
+              {
+              label: "View Details",
+              icon: Eye,
+              onClick: () => {
+                setActionType("view");
+                setSelectedDispute(row);
+                setIsModalOpen(true);
+              },
+            },
+            {
+              label: "Submit Response",
+              icon: MessageSquare,
+              show: row.status === 'open',
+              onClick: () => {
+                setActionType("respond");
+                setSelectedDispute(row);
+                setIsModalOpen(true);
+              },
+            }
+            ];
 
         return <ActionGroup actions={actions} />;
       },
@@ -146,6 +146,16 @@ const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomActio
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-white/5 overflow-hidden">
       <MultiUseTable columns={columns} data={data} loading={loading} />
+
+
+      <DisputeModal
+        isOpen={isModalOpen}
+  order={{ id: selectedDispute?.orderId }}
+  dispute={selectedDispute}
+  actionType={actionType}
+  onClose={() => setIsModalOpen(false)}
+  onSuccess={onRefresh}
+      />
     </div>
   );
 };

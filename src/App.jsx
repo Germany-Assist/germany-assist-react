@@ -14,7 +14,6 @@ import ClientDisputes from "./features/Dashboard/tabs/client/ClientDisputes.jsx"
 import SPDisputes from "./features/Dashboard/tabs/serviceProvider/SPDisputes"; 
 import DisputeDetails from "./features/Dashboard/tabs/serviceProvider/DisputeDetails.jsx";
 import SPDisputeResponse from "./features/Dashboard/tabs/serviceProvider/SPDisputeResponse.jsx";
-import DashboardLayout from "./components/ui/dashboard/DashboardLayout.jsx";
 function App() {
  return (
     <ErrorBoundary>
@@ -27,13 +26,11 @@ function App() {
         <Route path="/service/:serviceId" element={<ServiceProfile />} />
         <Route path="/timeline/:timelineId" element={<TimelinePage />} />
 
-        <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route index element={<DashboardPage />} /> 
-          
-          <Route path="disputes" element={<SPDisputes />} />
-          <Route path="disputes/:id" element={<DisputeDetails />} />
-          <Route path="disputes/respond/:id" element={<SPDisputeResponse />} />
-        </Route>
+        <Route path="/dashboard" element={<DashboardPage />} />          
+        <Route path="disputes" element={<SPDisputes />} />
+        <Route path="disputes/:id" element={<DisputeDetails />} />
+        <Route path="disputes/respond/:id" element={<SPDisputeResponse />} />
+  
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

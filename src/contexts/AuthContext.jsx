@@ -51,19 +51,20 @@ export const AuthProvider = ({ children }) => {
   }, [clearAuthState]);
 
   // 3. Logout Logic
-  const logOut = useCallback(
-    async (goHome) => {
-      try {
-        await logoutRequest();
-      } catch (err) {
-        console.warn("Server logout failed, clearing local state.");
-      } finally {
-        clearAuthState();
-        if (goHome) navigate("/");
-      }
-    },
-    [clearAuthState, navigate],
-  );
+ const logOut = useCallback(
+  async (goHome) => {
+    try {
+      await logoutRequest();
+    } catch (err) {
+      console.warn("Server logout failed, clearing local state.");
+    } finally {
+      localStorage.removeItem("accessToken");
+      clearAuthState();
+      if (goHome) navigate("/");
+    }
+  },
+  [clearAuthState, navigate],
+);
 
   // 4. JWT Schedule Logic
   const scheduleRefresh = (token) => {
@@ -96,13 +97,16 @@ export const AuthProvider = ({ children }) => {
   }, [accessToken, refreshAccessToken, logOut]);
 
   // 6. Auth Actions
-  const login = async (credentials) => {
-    const { user, accessToken } = await loginRequest(credentials);
-    setUser(user);
-    setAccessToken(accessToken);
-    scheduleRefresh(accessToken);
-    return { user, accessToken };
-  };
+ const login = async (credentials) => {
+  const { user, accessToken } = await loginRequest(credentials);
+
+  localStorage.setItem("accessToken", accessToken);
+  setUser(user);
+  setAccessToken(accessToken);
+  scheduleRefresh(accessToken);
+
+  return { user, accessToken };
+};
 
   const signUp = async (data) => {
     const { user, accessToken } = await signUpRequest(data);

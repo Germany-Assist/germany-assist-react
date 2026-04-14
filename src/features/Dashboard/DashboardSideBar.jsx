@@ -6,13 +6,14 @@ import { useNavigate } from "react-router-dom";
 import { useProfile } from "../../contexts/ProfileContext";
 import ThemeSwitch from "../../components/ui/ThemeSwitch";
 
-// خريطة أيقونات ذكية بناءً على نص الـ Label إذا لم تتوفر أيقونة مريرة
+// if icon not available use FiGrid
 const ICON_MAP = {
   Finance: FiDollarSign,
   Orders: FiShoppingBag,
   Disputes: FiAlertCircle,
   General: FiGrid,
 };
+
 
 export default function DashboardSideBar({
   navElements,
@@ -28,25 +29,25 @@ export default function DashboardSideBar({
     setExpandedMenus((prev) => ({ ...prev, [label]: !prev[label] }));
   };
 
-  // وظيفة للتأكد من هوية القسم النشط سواء كان كائن أو نص
+  // if activeSection is string return it else return activeSection.label
   const checkActive = (itemLabel) => {
     const currentActiveLabel = typeof activeSection === 'string' 
       ? activeSection 
       : activeSection?.label;
     return currentActiveLabel === itemLabel;
   };
-
+if (!profile) return null;
   return (
     <div className="p-4 h-screen bg-light-50 dark:bg-black transition-colors duration-500">
       <div className="relative h-full w-72 flex flex-col rounded-[2.5rem] border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden">
         
-        {/* تأثيرات الإضاءة الخلفية */}
+        {/* effects for background */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/10 dark:bg-blue-400/10 blur-[100px]" />
           <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-400/10 blur-[100px]" />
         </div>
 
-        {/* رأس القائمة الجانبية - معلومات المستخدم */}
+        {/* info user - header */}
         <div className="relative z-10 p-8 flex flex-col items-center border-b border-zinc-100 dark:border-white/5">
           <div className="relative group">
             <div className="absolute -inset-1.5 bg-gradient-to-tr from-blue-600 to-indigo-400 rounded-full blur opacity-30 group-hover:opacity-60 transition duration-1000"></div>
@@ -56,14 +57,15 @@ export default function DashboardSideBar({
             />
           </div>
           <span className="mt-4 text-[10px] uppercase tracking-[0.4em] font-black text-blue-600 dark:text-blue-400">
-            {profile.role?.replace('_', ' ') || "SUPER ADMIN"}
+            {profile?.role || "Member"}
+            {profile?.role?.replace('_', ' ') || "SUPER ADMIN"}
           </span>
           <div className="mt-4 bg-zinc-100 dark:bg-white/5 p-1 rounded-full scale-90">
             <ThemeSwitch />
           </div>
         </div>
 
-        {/* روابط التنقل */}
+        {/* link to pages */}
         <nav className="relative z-10 flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar">
           {navElements?.map((item, index) => {
             const label = item.label;
@@ -71,7 +73,7 @@ export default function DashboardSideBar({
             const isExpanded = expandedMenus[label];
             const isActive = checkActive(label);
             
-            // اختيار الأيقونة: الممررة أولاً، ثم الخريطة، ثم الافتراضية
+          // icon component  
             const IconComponent = item.icon || ICON_MAP[label] || FiGrid;
 
             return (
@@ -107,7 +109,7 @@ export default function DashboardSideBar({
                   )}
                 </button>
 
-                {/* القوائم الفرعية */}
+               {/* sub menus */}
                 {hasChildren && isExpanded && (
                   <div className="ml-9 border-l border-zinc-200 dark:border-white/10 space-y-1 mt-1">
                     {item.children.map((child, childIdx) => (
@@ -131,7 +133,7 @@ export default function DashboardSideBar({
           })}
         </nav>
 
-        {/* تذييل القائمة الجانبية */}
+        {/* footer */}
         <div className="relative z-10 p-4 bg-zinc-50/50 dark:bg-white/5 border-t border-zinc-100 dark:border-white/5 rounded-b-[2.5rem]">
           <button
             onClick={() => navigate("/")}
@@ -152,4 +154,5 @@ export default function DashboardSideBar({
       </div>
     </div>
   );
+
 }

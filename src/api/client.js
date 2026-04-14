@@ -26,13 +26,14 @@ export const setupInterceptors = ({
   api.interceptors.response.clear();
 
   api.interceptors.request.use((config) => {
-    const token = localStorage.getItem("accessToken");
-    // const token = getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
+  const token = getAccessToken() || localStorage.getItem("accessToken");
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+   });
 
   api.interceptors.response.use(
     (res) => res,
@@ -47,8 +48,8 @@ export const setupInterceptors = ({
           return new Promise((resolve, reject) => {
             queue.push({
               resolve: (token) => {
-                original.headers.Authorization = `Bearer ${token}`;
-                resolve(api(original));
+            original.headers.Authorization = `Bearer ${token}`;    
+               resolve(api(original));
               },
               reject,
             });

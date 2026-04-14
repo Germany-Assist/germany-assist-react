@@ -94,25 +94,13 @@ export const ProfileProvider = ({ children }) => {
     }
   };
 
-  // const isInFavorite = (id) => {
-  // return profile?.favorites?.some((i) => i.service.id === id) ?? false;
-  // };
-  
-
-
-useEffect(() => {
-  if (!accessToken) {
-    setProfile(null);
-    setError(null);
-    return;
+  useEffect(() => {
+  if (accessToken) {
+    fetchProfile();
   }
-
-  fetchProfile();
-
-}, [accessToken]);
-
-
-return (
+}, [accessToken, fetchProfile]);
+ 
+  return (
     <ProfileContext.Provider
       value={{
         isInFavorite,
@@ -121,11 +109,10 @@ return (
         loading,
         error,
         fetchProfile,
+        setProfile,
       }}
     >
       {children}
-
-
     </ProfileContext.Provider>
   );
 };

@@ -1,3 +1,5 @@
+window.sendClickEvent = window.sendClickEvent || function() { console.log("Click tracked"); };
+
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import React, { useEffect, useState } from "react";
@@ -8,7 +10,6 @@ import { ProfileProvider } from "./contexts/ProfileContext.jsx";
 import { MetaContextProvider } from "./contexts/MetadataContext.jsx";
 import { SocketProvider } from "./contexts/SocketContext.jsx";
 
-window.sendClickEvent = window.sendClickEvent || function() { console.log("Click tracked"); };
 
 export const BootstrapGate = ({ children }) => {
   const { refreshAccessToken } = useAuth();
@@ -34,18 +35,18 @@ export const BootstrapGate = ({ children }) => {
 };
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <MetaContextProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <BootstrapGate> 
-            <SocketProvider>
-              <ProfileProvider>
-                <App />
-              </ProfileProvider>
-            </SocketProvider>
-          </BootstrapGate>
-        </AuthProvider>
-      </BrowserRouter>
-    </MetaContextProvider>
-  </React.StrictMode>,
+   <MetaContextProvider>
+  <BrowserRouter>
+    <AuthProvider>
+      <BootstrapGate>
+        <SocketProvider>
+          <ProfileProvider>
+            <App />
+          </ProfileProvider>
+        </SocketProvider>
+      </BootstrapGate>
+    </AuthProvider>
+  </BrowserRouter>
+  </MetaContextProvider>
+  </React.StrictMode>
 );

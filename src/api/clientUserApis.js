@@ -8,22 +8,23 @@ export async function fetchClientOrders(params) {
 }
 
 export async function checkIfBoughtClientApi(serviceId) {
+  if (!serviceId) throw new Error("serviceId is required");
   const res = await api.get(`/order/client/checkIfBought/${serviceId}`);
   return res.data;
 }
-
 export async function openNewDispute(payload) {
   const res = await api.post(`/dispute/create`, payload);
   return res.data;
 }
 
-// أضف هذه الدوال الآن لكي يعمل ملف ClientDisputes.jsx
+// add client dispute endpoints for ClientDisputes.jsx
 export async function getMyDisputes() {
-  const res = await api.get("/dispute"); // المسار حسب الـ Swagger
+  const res = await api.get("/dispute"); 
   return res.data;
 }
 
 export async function cancelMyDispute(id) {
+  if (!id) throw new Error("id is required");
   const res = await api.patch(`/dispute/${id}/cancel`);
   return res.data;
 }
