@@ -95,10 +95,12 @@ export const ProfileProvider = ({ children }) => {
   };
 
   useEffect(() => {
-  if (accessToken) {
-    fetchProfile();
-  }
-}, [accessToken, fetchProfile]);
+    if (accessToken) {
+      fetchProfile();
+    } else {
+      setProfile(null);
+    }
+  }, [accessToken, fetchProfile]);
  
   return (
     <ProfileContext.Provider
