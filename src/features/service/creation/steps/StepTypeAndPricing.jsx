@@ -15,7 +15,7 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
     (data.type === "oneTime" &&
       (!data.variants ||
         data.variants.length === 0 ||
-        data.variants.some((v) => !v.label || v.price <= 0))) ||
+        data.variants.some((v) => !v.label || !v.deliveryTime || v.deliveryTime < 1 || v.price <= 0))) ||
     (data.type === "timeline" &&
       (!data.timelines ||
         data.timelines.length === 0 ||
@@ -24,7 +24,7 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
   // Helper to add new items
   const addItem = () => {
     if (data.type === "oneTime") {
-      const newVariants = [...(data.variants || []), { label: "", price: "" }];
+      const newVariants = [...(data.variants || []), { label: "", deliveryTime: 1, price: "" }];
       onUpdate({ variants: newVariants });
     } else {
       const newTimelines = [
@@ -110,10 +110,10 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
               Service Variants
             </label>
             {(data.variants || []).map((variant, idx) => (
-              <div key={idx} className="flex gap-3 items-center">
+              <div key={idx} className="flex gap-3 items-center flex-wrap">
                 <input
                   placeholder="Variant (e.g. Standard)"
-                  className="flex-1 p-3 border border-light-700 dark:border-white/10 rounded-xl bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
+                  className="flex-[2] p-3 border border-light-700 dark:border-white/10 rounded-xl bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
                   value={variant.label}
                   onChange={(e) => {
                     const v = [...data.variants];
@@ -122,9 +122,21 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
                   }}
                 />
                 <input
+                  placeholder="Days"
+                  type="number"
+                  min="1"
+                  className="w-[12%] p-3 border border-light-700 dark:border-white/10 rounded-xl bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
+                  value={variant.deliveryTime || ""}
+                  onChange={(e) => {
+                    const v = [...data.variants];
+                    v[idx].deliveryTime = parseInt(e.target.value) || 0;
+                    onUpdate({ variants: v });
+                  }}
+                />
+                <input
                   placeholder="Limit"
                   type="text"
-                  className="w-[15%] p-3  border border-light-700 dark:border-white/10 rounded-xl bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
+                  className="w-[12%] p-3 border border-light-700 dark:border-white/10 rounded-xl bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
                   value={variant.limit}
                   onChange={(e) => {
                     const v = [...data.variants];
@@ -135,7 +147,7 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
                 <input
                   type="text"
                   placeholder="Price"
-                  className="w-[15%] p-3 border border-light-700 dark:border-white/10 rounded-xl bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
+                  className="w-[12%] p-3 border border-light-700 dark:border-white/10 rounded-xl bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
                   value={variant.price}
                   onChange={(e) => {
                     const v = [...data.variants];

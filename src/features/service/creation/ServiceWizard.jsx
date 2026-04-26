@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import WizardProgress from "./WizardProgress";
 import StepBasics from "./steps/StepBasics";
 import LivePreview from "./steps/LivePreview";
@@ -10,6 +10,8 @@ import ServiceProfile from "../serviceProfile/ServiceProfile";
 import { useMeta } from "../../../contexts/MetadataContext";
 import StatusModal from "../../../components/ui/StatusModal";
 import { getErrorMessage } from "../../../api/errorMessages";
+
+const STORAGE_KEY = "service_wizard_data";
 
 const ServiceWizard = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -29,6 +31,29 @@ const ServiceWizard = () => {
     variants: [],
     timelines: [],
   });
+
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return;
+    try {
+      const parsed = JSON.parse(stored);
+      if (!parsed.category || !parsed.title) return;
+      const mainCat = categories.find((c) => c.id === parsed.category);
+      if (mainCat) {
+        setSubcategories(mainCat.subcategories || []);
+        const validSub = mainCat.subcategories?.find((s) => s.id === parsed.subcategory);
+        if (!validSub) {
+          setFormData({ ...parsed, subcategory: "" });
+        } else {
+          setFormData(parsed);
+        }
+      }
+    } catch {}
+  }, [categories]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  }, [formData]);
 
   const updateCategory = (categoryData) => {
     const mainCat = categories.find((i) => i.id === categoryData.category);
@@ -67,6 +92,7 @@ const ServiceWizard = () => {
     try {
       const response = await createNewService(sendData);
       if (response.status === 201) {
+        localStorage.removeItem(STORAGE_KEY);
         setIsSubmitting(false);
         setSuccessServiceId(response.data.data.id);
         nextStep();
