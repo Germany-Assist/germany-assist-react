@@ -12,6 +12,7 @@ export async function checkIfBoughtClientApi(serviceId) {
   const res = await api.get(`/order/client/checkIfBought/${serviceId}`);
   return res.data;
 }
+
 export async function openNewDispute(payload) {
   const res = await api.post(`/dispute/create`, payload);
   return res.data;

@@ -10,6 +10,7 @@ export default function DashboardPage() {
 
   const roleData = profile?.role ? DashboardMap[profile.role] : {}; // ✅ هون الحل
 
+  
   useEffect(() => {
     if (!profile?.role) return;
 
