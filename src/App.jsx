@@ -7,6 +7,7 @@ import ServiceProfile from "./features/service/serviceProfile/ServiceProfile.jsx
 import AuthPortal from "./features/auth/AuthPortal.jsx";
 import ServicesPage from "./pages/ServicesPage.jsx";
 import TimelinePage from "./pages/TimelinePage.jsx";
+
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import JobsPage from "./pages/JobsPage.jsx";

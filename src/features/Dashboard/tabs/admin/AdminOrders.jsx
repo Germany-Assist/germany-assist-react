@@ -26,6 +26,7 @@ export default function AdminOrders() {
   };
   fetchOrders();
 }, []);
+
   return (
     <div>
       <h1 className="text-3xl antialiased mb-4">Orders</h1>
