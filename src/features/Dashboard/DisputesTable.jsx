@@ -1,20 +1,18 @@
 import React, { useState } from "react";
 import { Gavel, Eye, MessageSquare, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import MultiUseTable from "../../components/ui/dashboard/MultiUseTable";
 import ActionGroup from "../Dashboard/ActionMenu";
 import TransactionCell from "../../components/ui/dashboard/TransactionCell";
 import adminApis from "../../api/adminApis";
-import DisputeModal from "../../components/ui/dashboard/DisputeModal"
+import { cancelMyDispute } from "../../api/clientUserApis";
 /**
  * DisputesTable Component
  * Renders a data table for managing order disputes with role-specific actions.
  * Supports Admin, Client, and Provider perspectives.
  */
 const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomAction }) => {
-
-  const [actionType, setActionType] = useState(null);
-  const [selectedDispute, setSelectedDispute] = React.useState(null);
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const navigate = useNavigate();
   /**
    * Universal handler for API-based actions.
    * Executes the call and triggers a data refresh on success.
@@ -94,24 +92,15 @@ const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomActio
           ]
           : role === "client"
             ? [
-
-            {
-            label: "View Details",
-            icon: Eye,
-            onClick: () => {
-              setActionType("view");
-              setSelectedDispute(row);
-              setIsModalOpen(true);
+              {
+              label: "View Details",
+              icon: Eye,
+              onClick: () => navigate(`/dashboard/disputes/${row.id}`),
             },
-          },
           {
             label: "Cancel Dispute",
             show: row.status === 'open',
-            onClick: () => {
-              setActionType("cancel");
-              setSelectedDispute(row);
-              setIsModalOpen(true);
-            },
+            onClick: () => handleAction(cancelMyDispute(row.id)),
           }
 
 
@@ -120,21 +109,13 @@ const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomActio
               {
               label: "View Details",
               icon: Eye,
-              onClick: () => {
-                setActionType("view");
-                setSelectedDispute(row);
-                setIsModalOpen(true);
-              },
+              onClick: () => navigate(`/disputes/${row.id}`),
             },
             {
               label: "Submit Response",
               icon: MessageSquare,
               show: row.status === 'open',
-              onClick: () => {
-                setActionType("respond");
-                setSelectedDispute(row);
-                setIsModalOpen(true);
-              },
+              onClick: () => navigate(`/disputes/respond/${row.id}`),
             }
             ];
 
@@ -143,19 +124,9 @@ const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomActio
     },
   ];
 
-  return (
+return (
     <div className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-zinc-200 dark:border-white/5 overflow-hidden">
       <MultiUseTable columns={columns} data={data} loading={loading} />
-
-
-      <DisputeModal
-        isOpen={isModalOpen}
-  order={{ id: selectedDispute?.orderId }}
-  dispute={selectedDispute}
-  actionType={actionType}
-  onClose={() => setIsModalOpen(false)}
-  onSuccess={onRefresh}
-      />
     </div>
   );
 };
