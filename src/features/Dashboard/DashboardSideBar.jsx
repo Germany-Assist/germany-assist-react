@@ -5,6 +5,7 @@ import { FiGrid, FiLogOut, FiHome, FiChevronDown, FiDollarSign, FiShoppingBag, F
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "../../contexts/ProfileContext";
 import ThemeSwitch from "../../components/ui/ThemeSwitch";
+import { Loader2 } from "lucide-react";
 
 // if icon not available use FiGrid
 const ICON_MAP = {
@@ -36,7 +37,11 @@ export default function DashboardSideBar({
       : activeSection?.label;
     return currentActiveLabel === itemLabel;
   };
-if (!profile) return null;
+if (!profile) return (
+    <div className="p-4 h-screen flex items-center justify-center">
+      <Loader2 size={32} className="animate-spin text-zinc-400" />
+    </div>
+  );
   return (
     <div className="p-4 h-screen bg-light-50 dark:bg-black transition-colors duration-500">
       <div className="relative h-full w-72 flex flex-col rounded-[2.5rem] border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900 shadow-2xl overflow-hidden">

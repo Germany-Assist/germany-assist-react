@@ -10,12 +10,12 @@ import TimelinePage from "./pages/TimelinePage.jsx";
 import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import JobsPage from "./pages/JobsPage.jsx";
-import ClientDisputes from "./features/Dashboard/tabs/client/ClientDisputes.jsx";
-import SPDisputes from "./features/Dashboard/tabs/serviceProvider/SPDisputes"; 
+import SPDisputes from "./features/Dashboard/tabs/serviceProvider/SPDisputes.jsx"; 
 import DisputeDetails from "./features/Dashboard/tabs/serviceProvider/DisputeDetails.jsx";
 import SPDisputeResponse from "./features/Dashboard/tabs/serviceProvider/SPDisputeResponse.jsx";
+
 function App() {
- return (
+  return (
     <ErrorBoundary>
       <Routes>
         <Route path="/" element={<Homepage />} />
@@ -25,17 +25,22 @@ function App() {
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/service/:serviceId" element={<ServiceProfile />} />
         <Route path="/timeline/:timelineId" element={<TimelinePage />} />
-
-        <Route path="/dashboard" element={<DashboardPage />} />          
-        <Route path="disputes" element={<SPDisputes />} />
-        <Route path="disputes/:id" element={<DisputeDetails />} />
-        <Route path="disputes/respond/:id" element={<SPDisputeResponse />} />
-  
+        
+        <Route path="/dashboard" element={<DashboardPage />}>
+          <Route index element={<DefaultDashboardContent />} />
+          <Route path="disputes" element={<SPDisputes />} />
+          <Route path="disputes/:id" element={<DisputeDetails />} />
+          <Route path="disputes/respond/:id" element={<SPDisputeResponse />} />
+        </Route>
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </ErrorBoundary>
   );
+}
+
+function DefaultDashboardContent() {
+  return null;
 }
 
 export default App;

@@ -135,7 +135,7 @@ export default function ClientOrders() {
             {
               label: "Go To Dispute Center",
               show: Boolean(row.dispute),
-              onClick: () => navigate(`/disputes`),
+              onClick: () => navigate(`/dashboard/disputes`),
               variant: "danger",
             },
             {
