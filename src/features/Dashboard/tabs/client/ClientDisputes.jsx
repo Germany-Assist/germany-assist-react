@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { getMyDisputes, cancelMyDispute } from "../../../../api/clientUserApis";
+import { getMyDisputes, cancelDispute } from "../../../../api/clientUserApis";
 import { useNavigate } from "react-router-dom";
 import { ShieldAlert, CheckCircle2, RefreshCw, Clock } from "lucide-react";
 import MetricCard from  "../../../../components/ui/dashboard/MetricCard";
@@ -45,7 +45,7 @@ export default function ClientDisputes() {
   const handleCancel = async (id) => {
     if (window.confirm("Are you sure you want to cancel this dispute?")) {
       try {
-        await cancelMyDispute(id);
+        await cancelDispute(id);
         fetchDisputes(); // Refresh data to update UI
       } catch (err) {
         alert("Action failed");

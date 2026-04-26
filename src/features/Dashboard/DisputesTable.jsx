@@ -4,27 +4,29 @@ import MultiUseTable from "../../components/ui/dashboard/MultiUseTable";
 import ActionGroup from "../Dashboard/ActionMenu";
 import TransactionCell from "../../components/ui/dashboard/TransactionCell";
 import adminApis from "../../api/adminApis";
-import DisputeModal from "../../components/ui/dashboard/DisputeModal"
-/**
- * DisputesTable Component
- * Renders a data table for managing order disputes with role-specific actions.
- * Supports Admin, Client, and Provider perspectives.
- */
+import { cancelDispute, respondToDispute } from "../../api/clientUserApis";
+import DisputeModal from "../../components/ui/dashboard/DisputeModal";
+
 const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomAction }) => {
 
   const [actionType, setActionType] = useState(null);
   const [selectedDispute, setSelectedDispute] = React.useState(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  /**
-   * Universal handler for API-based actions.
-   * Executes the call and triggers a data refresh on success.
-   */
+
   const handleAction = async (apiCall) => {
     try {
       await apiCall;
       onRefresh();
     } catch (error) {
       console.error("Action failed:", error);
+    }
+  };
+
+  const handleSubmit = async (payload) => {
+    if (actionType === "cancel") {
+      await cancelDispute(selectedDispute.id);
+    } else if (actionType === "respond") {
+      await respondToDispute(selectedDispute.id, payload.response);
     }
   };
 
@@ -150,11 +152,12 @@ const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomActio
 
       <DisputeModal
         isOpen={isModalOpen}
-  order={{ id: selectedDispute?.orderId }}
-  dispute={selectedDispute}
-  actionType={actionType}
-  onClose={() => setIsModalOpen(false)}
-  onSuccess={onRefresh}
+        itemName={`Order #${selectedDispute?.orderId}`}
+        dispute={selectedDispute}
+        actionType={actionType}
+        onSubmit={handleSubmit}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={onRefresh}
       />
     </div>
   );
