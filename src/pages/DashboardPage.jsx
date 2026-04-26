@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
 import { useProfile } from "../contexts/ProfileContext";
+
 import DashboardSideBar from "../features/Dashboard/DashboardSideBar";
 import DashboardMap from "../features/Dashboard/tabs/index";
 import { Loader2 } from "lucide-react";
@@ -10,7 +12,6 @@ export default function DashboardPage() {
 
   const roleData = profile?.role ? DashboardMap[profile.role] : {}; // ✅ هون الحل
 
-  
   useEffect(() => {
     if (!profile?.role) return;
 
@@ -43,7 +44,7 @@ export default function DashboardPage() {
       />
 
       <div className="flex-1">
-        {Component && <Component />}
+        {Component ? <Component /> : <Outlet />}
       </div>
     </div>
   );

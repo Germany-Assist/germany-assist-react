@@ -70,6 +70,7 @@ export default {
     Profile: { label: "Profile", icon: UserCircle, component: AdminProfile },
   },
   client: {
+    
     General: {
       label: "General",
       icon: LayoutDashboard,
