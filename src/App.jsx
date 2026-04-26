@@ -11,30 +11,28 @@ import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import JobsPage from "./pages/JobsPage.jsx";
 import ClientDisputes from "./features/Dashboard/tabs/client/ClientDisputes.jsx";
-import SPDisputes from "./features/Dashboard/tabs/serviceProvider/SPDisputes"; 
+import SPDisputes from "./features/Dashboard/tabs/serviceProvider/SPDisputes.jsx"; 
 import DisputeDetails from "./features/Dashboard/tabs/serviceProvider/DisputeDetails.jsx";
 import SPDisputeResponse from "./features/Dashboard/tabs/serviceProvider/SPDisputeResponse.jsx";
 function App() {
- return (
-    <ErrorBoundary>
-      <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/jobs" element={<JobsPage />} />
-        <Route path="/auth" element={<AuthPortal />} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/service/:serviceId" element={<ServiceProfile />} />
-        <Route path="/timeline/:timelineId" element={<TimelinePage />} />
-
-        <Route path="/dashboard" element={<DashboardPage />} />          
-        <Route path="disputes" element={<SPDisputes />} />
-        <Route path="disputes/:id" element={<DisputeDetails />} />
-        <Route path="disputes/respond/:id" element={<SPDisputeResponse />} />
-  
-
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </ErrorBoundary>
+return (
+     <ErrorBoundary>
+       <Routes>
+         <Route path="/" element={<Homepage />} />
+         <Route path="/about" element={<AboutPage />} />
+         <Route path="/jobs" element={<JobsPage />} />
+         <Route path="/auth" element={<AuthPortal />} />
+         <Route path="/services" element={<ServicesPage />} />
+         <Route path="/service/:serviceId" element={<ServiceProfile />} />
+         <Route path="/timeline/:timelineId" element={<TimelinePage />} />
+         <Route path="/dashboard" element={<DashboardPage />}>
+           <Route path="disputes" element={<SPDisputes />} />
+           <Route path="disputes/:id" element={<DisputeDetails />} />
+           <Route path="disputes/respond/:id" element={<SPDisputeResponse />} />
+         </Route>
+         <Route path="*" element={<NotFoundPage />} />
+       </Routes>
+     </ErrorBoundary>
   );
 }
 

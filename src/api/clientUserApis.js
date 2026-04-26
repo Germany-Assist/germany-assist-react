@@ -23,8 +23,14 @@ export async function getMyDisputes() {
   return res.data;
 }
 
-export async function cancelMyDispute(id) {
+export async function cancelDispute(id) {
   if (!id) throw new Error("id is required");
   const res = await api.patch(`/dispute/${id}/cancel`);
+  return res.data;
+}
+
+export async function respondToDispute(id, response) {
+  if (!id) throw new Error("id is required");
+  const res = await api.patch(`/dispute/${id}/respond`, { response });
   return res.data;
 }
