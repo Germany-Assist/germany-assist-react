@@ -6,9 +6,9 @@ import { useProfile } from "../../../contexts/ProfileContext";
 import { Filter ,MailCheck,Check} from "lucide-react";
 import StatusModal from "../StatusModal";
 import {useSocket} from "../../../contexts/SocketContext";
-
+import { useSearchParams } from "react-router-dom";
 const NotificationsPage = ({role}) => {
-const isAdminFilter = role === "super_admin";
+//const isAdminFilter = role === "super_admin";
 const socket = useSocket();
     const { profile, fetchProfile, setProfile } = useProfile();  
     const [notifications, setNotifications] = useState([]);
@@ -16,13 +16,28 @@ const socket = useSocket();
     const [totalPages, setTotalPages] = useState(1);  
     const [selectedNotification, setSelectedNotification] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const isAdminFromUrl = searchParams.get("isAdmin");
+    const readStatusFromUrl = searchParams.get("readStatus");
     const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
-    readStatus: "" ,
-         isAdmin: role === "super_admin" ? "" : false 
-
+    readStatus: readStatusFromUrl || "",
+    isAdmin:
+    isAdminFromUrl === null
+      ? ""
+      : isAdminFromUrl === "true"
     });
+    
+  useEffect(() => {
+    setFilters({
+      page: 1,
+      limit: 10,
+      readStatus: readStatusFromUrl || "",
+      isAdmin: isAdminFromUrl === "true" ? true : ""
+    });
+  }, [readStatusFromUrl, isAdminFromUrl]);
+
     const [selectedIds, setSelectedIds] = useState([]);
     const [open, setOpen] = useState(false);
     const [statusModal, setStatusModal] = useState(null);
@@ -133,14 +148,37 @@ const socket = useSocket();
         }
       };
     
+      // const handleFilterChange = (key, value) => {
+      //   setSelectedIds([]); // reset selection
+      //   setFilters((prev) => ({
+      //     ...prev,
+      //     [key]: value,
+      //     page: 1
+      //   }));
+      // };
       const handleFilterChange = (key, value) => {
-        setSelectedIds([]); // reset selection
-        setFilters((prev) => ({
-          ...prev,
+        setSelectedIds([]);
+        const newFilters = {
+          ...filters,
           [key]: value,
           page: 1
-        }));
-      };
+        };
+
+      setFilters(newFilters);
+
+
+      const params = {};
+
+      if (newFilters.isAdmin !== "") {
+        params.isAdmin = newFilters.isAdmin;
+      }
+
+      if (newFilters.readStatus) {
+        params.readStatus = newFilters.readStatus;
+      }
+
+      setSearchParams(params);
+    };
     
       const handleMarkAllAsRead = async () => {
       try {
@@ -251,15 +289,12 @@ const socket = useSocket();
           <select
             value={filters.isAdmin}
             onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                isAdmin:
-                e.target.value === ""
-                  ? ""
-                  : e.target.value === "true" ? true : false,
-                page: 1,
-              }))
-            }
+            handleFilterChange(
+              "isAdmin",
+              e.target.value === ""
+                ? ""
+                : e.target.value === "true"
+            )}
             className="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/5 pl-10 pr-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest appearance-none focus:ring-2 ring-blue-500/20 transition-all outline-none cursor-pointer"
           >
             <option value="">All</option>
