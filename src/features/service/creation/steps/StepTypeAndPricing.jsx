@@ -6,6 +6,8 @@ import {
   Calendar,
   Plus,
   Trash2,
+  Clock,
+  Users,
 } from "lucide-react";
 
 const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
@@ -15,21 +17,35 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
     (data.type === "oneTime" &&
       (!data.variants ||
         data.variants.length === 0 ||
-        data.variants.some((v) => !v.label || v.price <= 0))) ||
+        data.variants.some(
+          (v) => !v.label || v.price <= 0 || !v.deliveryTime,
+        ))) ||
     (data.type === "timeline" &&
       (!data.timelines ||
         data.timelines.length === 0 ||
-        data.timelines.some((t) => !t.label || !t.startDate || t.price <= 0)));
+        data.timelines.some(
+          (t) =>
+            !t.label || !t.startDate || t.price <= 0 || t.maxParticipants <= 0,
+        )));
 
   // Helper to add new items
   const addItem = () => {
     if (data.type === "oneTime") {
-      const newVariants = [...(data.variants || []), { label: "", price: "" }];
+      const newVariants = [
+        ...(data.variants || []),
+        { label: "", price: "", deliveryTime: "" },
+      ];
       onUpdate({ variants: newVariants });
     } else {
       const newTimelines = [
         ...(data.timelines || []),
-        { label: "", startDate: "", endDate: "", price: "" },
+        {
+          label: "",
+          startDate: "",
+          endDate: "",
+          price: "",
+          maxParticipants: 1,
+        },
       ];
       onUpdate({ timelines: newTimelines });
     }
@@ -51,7 +67,7 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
           Pricing & Structure
         </h1>
         <p className="text-slate-500 dark:text-slate-400 mt-3 text-lg">
-          Define the Type and how much you charge for this service.
+          Define how you offer this service and your capacity.
         </p>
       </div>
 
@@ -75,7 +91,7 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
             <p className="font-bold text-sm text-slate-900 dark:text-white">
               One-Time
             </p>
-            <p className="text-xs text-slate-500">Variants & Tiers</p>
+            <p className="text-xs text-slate-500">Fixed Tiers & Delivery</p>
           </div>
         </button>
 
@@ -97,7 +113,7 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
             <p className="font-bold text-sm text-slate-900 dark:text-white">
               Timeline
             </p>
-            <p className="text-xs text-slate-500">Schedules & Batches</p>
+            <p className="text-xs text-slate-500">Schedules & Capacity</p>
           </div>
         </button>
       </div>
@@ -110,43 +126,55 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
               Service Variants
             </label>
             {(data.variants || []).map((variant, idx) => (
-              <div key={idx} className="flex gap-3 items-center">
-                <input
-                  placeholder="Variant (e.g. Standard)"
-                  className="flex-1 p-3 border border-light-700 dark:border-white/10 rounded-xl bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
-                  value={variant.label}
-                  onChange={(e) => {
-                    const v = [...data.variants];
-                    v[idx].label = e.target.value;
-                    onUpdate({ variants: v });
-                  }}
-                />
-                <input
-                  placeholder="Limit"
-                  type="text"
-                  className="w-[15%] p-3  border border-light-700 dark:border-white/10 rounded-xl bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
-                  value={variant.limit}
-                  onChange={(e) => {
-                    const v = [...data.variants];
-                    v[idx].limit = e.target.value;
-                    onUpdate({ variants: v });
-                  }}
-                />
-                <input
-                  type="text"
-                  placeholder="Price"
-                  className="w-[15%] p-3 border border-light-700 dark:border-white/10 rounded-xl bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
-                  value={variant.price}
-                  onChange={(e) => {
-                    const v = [...data.variants];
-                    v[idx].price = parseFloat(e.target.value) || 0;
-                    onUpdate({ variants: v });
-                  }}
-                />
+              <div
+                key={idx}
+                className="flex gap-3 items-start bg-light-900/10 p-3 rounded-2xl border border-light-700 dark:border-white/5"
+              >
+                <div className="flex-1 space-y-3">
+                  <input
+                    placeholder="Variant Name (e.g. Basic Package)"
+                    className="w-full p-2 bg-transparent border-b border-light-700 dark:border-white/10 text-slate-900 dark:text-white focus:border-accent outline-none"
+                    value={variant.label}
+                    onChange={(e) => {
+                      const v = [...data.variants];
+                      v[idx].label = e.target.value;
+                      onUpdate({ variants: v });
+                    }}
+                  />
+                  <div className="flex gap-3">
+                    <div className="flex-1 relative">
+                      <Clock
+                        size={14}
+                        className="absolute left-2 top-3 text-slate-400"
+                      />
+                      <input
+                        placeholder="Delivery Time in Days (e.g. 3) leave zero for unknown delivery times"
+                        className="w-full pl-8 p-2 text-sm border border-light-700 dark:border-white/10 rounded-lg bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
+                        value={variant.deliveryTime}
+                        onChange={(e) => {
+                          const v = [...data.variants];
+                          v[idx].deliveryTime = parseFloat(e.target.value) || 0;
+                          onUpdate({ variants: v });
+                        }}
+                      />
+                    </div>
+                    <input
+                      type="number"
+                      placeholder="Price"
+                      className="w-24 p-2 text-sm border border-light-700 dark:border-white/10 rounded-lg bg-transparent text-slate-900 dark:text-white focus:border-accent outline-none"
+                      value={variant.price}
+                      onChange={(e) => {
+                        const v = [...data.variants];
+                        v[idx].price = parseFloat(e.target.value) || 0;
+                        onUpdate({ variants: v });
+                      }}
+                    />
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={() => removeItem(idx)}
-                  className="text-slate-400 hover:text-red-500 transition-colors"
+                  className="mt-2 text-slate-400 hover:text-red-500 transition-colors"
                 >
                   <Trash2 size={18} />
                 </button>
@@ -167,7 +195,7 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
               >
                 <div className="flex gap-4">
                   <input
-                    placeholder="Batch label (e.g. Monday Morning)"
+                    placeholder="Batch label (e.g. Winter Intake)"
                     className="flex-1 bg-transparent border-b border-light-700 dark:border-white/10 text-slate-900 dark:text-white font-bold py-2 focus:border-accent outline-none"
                     value={timeline.label}
                     onChange={(e) => {
@@ -176,10 +204,27 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
                       onUpdate({ timelines: t });
                     }}
                   />
+                  <div className="relative w-[25%]">
+                    <Users
+                      size={14}
+                      className="absolute left-0 top-3 text-slate-400"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Max Ppl"
+                      className="w-full bg-transparent border-b border-light-700 dark:border-white/10 text-slate-900 dark:text-white font-bold py-2 pl-5 focus:border-accent outline-none"
+                      value={timeline.maxParticipants}
+                      onChange={(e) => {
+                        const t = [...data.timelines];
+                        t[idx].maxParticipants = parseInt(e.target.value) || 0;
+                        onUpdate({ timelines: t });
+                      }}
+                    />
+                  </div>
                   <input
                     type="number"
                     placeholder="Price"
-                    className="w-[20%] bg-transparent border-b border-light-700 dark:border-white/10 text-slate-900 dark:text-white font-bold py-2 pl-4 focus:border-accent outline-none"
+                    className="w-[20%] bg-transparent border-b border-light-700 dark:border-white/10 text-slate-900 dark:text-white font-bold py-2 focus:border-accent outline-none"
                     value={timeline.price}
                     onChange={(e) => {
                       const t = [...data.timelines];
@@ -187,23 +232,12 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
                       onUpdate({ timelines: t });
                     }}
                   />
-                  <input
-                    type="number"
-                    placeholder="Limit"
-                    className="w-[20%] mr-6 bg-transparent border-b border-light-700 dark:border-white/10 text-slate-900 dark:text-white font-bold py-2 pl-4 focus:border-accent outline-none"
-                    value={timeline.limit}
-                    onChange={(e) => {
-                      const t = [...data.timelines];
-                      t[idx].limit = parseFloat(e.target.value) || 0;
-                      onUpdate({ timelines: t });
-                    }}
-                  />
                 </div>
 
-                <div className="flex gap-4 items-center">
-                  <div className="flex-1">
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
                     <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
-                      Start Date
+                      Start
                     </p>
                     <input
                       type="date"
@@ -216,9 +250,9 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
                       }}
                     />
                   </div>
-                  <div className="flex-1">
+                  <div>
                     <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
-                      End Date
+                      End
                     </p>
                     <input
                       type="date"
@@ -231,9 +265,9 @@ const StepTypeAndPricing = ({ data, onUpdate, onNext, onBack }) => {
                       }}
                     />
                   </div>
-                  <div className="flex-1">
+                  <div>
                     <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
-                      Deadline Date
+                      Deadline
                     </p>
                     <input
                       type="date"

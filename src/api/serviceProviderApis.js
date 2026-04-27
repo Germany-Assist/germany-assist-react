@@ -1,3 +1,4 @@
+import { update } from "lodash";
 import { api } from "./client";
 
 export const getAllServices = async (params) => {
@@ -11,16 +12,13 @@ export const createNewService = async (payload) => {
   const res = await api.post("/service/provider", payload);
   return res;
 };
-export const publishService = async (serviceId) => {
-  const res = await api.get(`/service/provider/services/publish/${serviceId}`);
+export const pauseResumeService = async (serviceId, action) => {
+  const res = await api.put(`/service/provider/services/${serviceId}/status`, {
+    action,
+  });
   return res;
 };
-export const unpublishService = async (serviceId) => {
-  const res = await api.get(
-    `/service/provider/services/unpublish/${serviceId}`,
-  );
-  return res;
-};
+
 export const serviceProfilePageSP = async (serviceId) => {
   const res = await api.get(`/service/provider/services/${serviceId}`);
   return res.data;
@@ -86,13 +84,27 @@ export const serviceProviderGetVerificationStatus = async () => {
   const res = await api.get(`/requests/provider/profile`);
   return res.data;
 };
-
+export const requestApproval = async (id) => {
+  const res = await api.put(`service/provider/services/${id}/requestApproval`);
+  return res.data;
+};
+export const providerPrivateView = async (id) => {
+  const res = await api.get(`/service/provider/services/${id}`);
+  return res.data;
+};
+export const updateService = async (id, payload) => {
+  const res = await api.put(`/service/provider/services/update/${id}`, payload);
+  return res;
+};
 const serviceProviderApis = {
-  publishService,
-  unpublishService,
+  requestApproval,
   serviceProviderGetVerificationStatus,
   serviceProviderReSubmitVerification,
   serviceProviderSubmitVerification,
   getAllServices,
+  pauseResumeService,
+  serviceProfilePageSP,
+  providerPrivateView,
+  updateService,
 };
 export default serviceProviderApis;

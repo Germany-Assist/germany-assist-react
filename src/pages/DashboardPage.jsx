@@ -3,42 +3,42 @@ import { useProfile } from "../contexts/ProfileContext";
 import DashboardSideBar from "../features/Dashboard/DashboardSideBar";
 import DashboardMap from "../features/Dashboard/tabs/index";
 import { Loader2 } from "lucide-react";
-import { useLocation,useNavigate } from "react-router-dom";
-import { Outlet, NavLink  } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Outlet, NavLink } from "react-router-dom";
 
 export default function DashboardPage() {
   const { profile } = useProfile();
   const location = useLocation();
   const role = profile?.role;
-  
+
   const getTitle = () => {
-  const currentPath = location.pathname.replace("/dashboard/", "");
-  const items = Object.values(DashboardMap[role]);
+    const currentPath = location.pathname.replace("/dashboard/", "");
+    const items = Object.values(DashboardMap[role]);
 
-  for (const item of items) {
-    // parent
-    if (item.path === currentPath) {
-      return item.label;
-    }
+    for (const item of items) {
+      // parent
+      if (item.path === currentPath) {
+        return item.label;
+      }
 
-    if (item.path === "" && currentPath === "") {
-      return item.label;
-    }
+      if (item.path === "" && currentPath === "") {
+        return item.label;
+      }
 
-    // parent and children
-    if (item.children) {
-      for (const child of item.children) {
-        const fullPath = `${item.path}/${child.path}`;
+      // parent and children
+      if (item.children) {
+        for (const child of item.children) {
+          const fullPath = `${item.path}/${child.path}`;
 
-        if (currentPath === fullPath) {
-          return child.label;
+          if (currentPath === fullPath) {
+            return child.label;
+          }
         }
       }
     }
-  }
-  return "General";
-};
- 
+    return "General";
+  };
+
   if (!profile?.role)
     return (
       <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center">
@@ -53,7 +53,7 @@ export default function DashboardPage() {
     <div className="flex h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 transition-colors duration-700 overflow-hidden">
       {/* Sidebar - Floating Pod */}
       <DashboardSideBar
-        navElements={Object.values(DashboardMap[profile.role])}   
+        navElements={Object.values(DashboardMap[profile.role])}
       />
 
       {/* Main Viewport */}
@@ -65,23 +65,17 @@ export default function DashboardPage() {
         {/* The Main Glass Pod */}
         <main className="relative z-10 flex-1 bg-white/40 dark:bg-zinc-900/40 backdrop-blur-2xl border border-zinc-200 dark:border-white/5 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col">
           <div className="flex-1 overflow-y-auto custom-scrollbar p-8 lg:p-12">
-            
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
-                {/* Section Header */}
-                <header className="mb-10">
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+              {/* Section Header */}
+              <header className="mb-10">
+                <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
+                  {getTitle()}
+                </h1>
+              </header>
 
-                  <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
-                    {getTitle()}
-                  </h1>
-                  <p className="text-zinc-500 dark:text-zinc-400 mt-2 font-medium">
-                    Workspace / {getTitle()}
-                  </p>
-                </header>
-
-                {/* The Active View (e.g., ServiceWizard) */}
-                <Outlet />
-              </div>
-
+              {/* The Active View (e.g., ServiceWizard) */}
+              <Outlet />
+            </div>
           </div>
         </main>
       </div>

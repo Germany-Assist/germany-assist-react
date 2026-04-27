@@ -17,7 +17,7 @@ const CreationSuccess = ({ serviceId }) => {
 
       <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
         <button
-          onClick={() => navigate(`/service/${serviceId}`)}
+          onClick={() => navigate(`/provider/service/${serviceId}`)}
           className="flex-1 bg-gray-900 text-white font-bold py-4 px-6 rounded-2xl hover:bg-black transition flex items-center justify-center gap-2"
         >
           View Service <ArrowRight size={18} />

@@ -22,7 +22,7 @@ const STYLES = {
     title: "System Error",
   },
   warning: {
-    icon: <AlertCircle size={48} />, // Changed to AlertCircle for warning distinction
+    icon: <AlertCircle size={48} />,
     bgIcon: "bg-amber-500/10 text-amber-500",
     title: "Wait a moment",
   },
@@ -43,11 +43,25 @@ const STYLES = {
   },
 };
 
+/**
+ * @param {boolean} isOpen Whether the modal is open.
+ * @param {function} onClose Function to close the modal.
+ * @param {function} onConfirm Function to call when confirming.
+ * @param {string} type The type of the status modal.
+ * @param {string} title Custom title for the modal (optional).
+ * @param {string} message The message to display.
+ * @param {string} buttonText The text of the main button.
+ * @param {string} secondaryButtonText The text of the secondary button.
+ * @param {number} autoCloseMs Time to auto-close.
+ * @param {boolean} showInput Whether to show textarea.
+ * @param {string} inputPlaceholder Placeholder for textarea.
+ */
 function StatusModal({
   isOpen,
   onClose,
   onConfirm,
   type = "success",
+  title, // Added title prop
   message = "",
   buttonText = "Continue",
   secondaryButtonText = "Cancel",
@@ -72,16 +86,16 @@ function StatusModal({
   const isConfirmation = !!onConfirm;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      <div className="relative z-10 w-full max-w-md rounded-[2.5rem] bg-white dark:bg-zinc-900 shadow-2xl p-8 animate-in zoom-in-95 duration-200">
+      <div className="relative z-10 w-full max-w-md rounded-[2.5rem] bg-white dark:bg-zinc-900 shadow-2xl p-8 animate-in zoom-in-95 duration-200 border border-zinc-100 dark:border-white/5">
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition"
+          className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition"
         >
           <X size={18} />
         </button>
@@ -94,10 +108,11 @@ function StatusModal({
           </div>
 
           <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter">
-            {currentStyle.title}
+            {title || currentStyle.title}{" "}
+            {/* Uses passed title or default from STYLES */}
           </h3>
 
-          <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm">
+          <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm leading-relaxed">
             {message}
           </p>
 
@@ -108,7 +123,7 @@ function StatusModal({
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={inputPlaceholder}
-                className="w-full min-h-[100px] p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-white/5 text-sm text-white outline-none focus:ring-2 ring-blue-500/20 transition-all resize-none"
+                className="w-full min-h-[120px] p-4 rounded-2xl bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-white/5 text-sm text-slate-900 dark:text-white outline-none focus:ring-2 ring-blue-500/20 transition-all resize-none"
               />
             </div>
           )}
@@ -117,7 +132,7 @@ function StatusModal({
             {isConfirmation && (
               <button
                 onClick={onClose}
-                className="flex-1 px-6 py-4 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-zinc-800 transition-all"
+                className="flex-1 px-6 py-4 rounded-2xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
               >
                 {secondaryButtonText}
               </button>
@@ -127,7 +142,11 @@ function StatusModal({
               disabled={showInput && !inputValue.trim()}
               onClick={() => (onConfirm ? onConfirm(inputValue) : onClose())}
               className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl transition-all active:scale-95 disabled:opacity-30
-                ${type === "operation" || type === "input" ? "bg-red-600 text-white" : "bg-white text-black dark:bg-white dark:text-black"}`}
+                ${
+                  type === "operation" || type === "input"
+                    ? "bg-red-600 text-white shadow-lg shadow-red-600/20"
+                    : "bg-zinc-900 text-white dark:bg-white dark:text-black shadow-lg shadow-black/10"
+                }`}
             >
               {buttonText} <ArrowRight size={16} />
             </button>
