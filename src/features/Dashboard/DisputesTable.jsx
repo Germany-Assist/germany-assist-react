@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Gavel, Eye, MessageSquare, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import MultiUseTable from "../../components/ui/dashboard/MultiUseTable";
@@ -11,16 +11,16 @@ import { cancelMyDispute } from "../../api/clientUserApis";
  * Renders a data table for managing order disputes with role-specific actions.
  * Supports Admin, Client, and Provider perspectives.
  */
-const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomAction }) => {
+const DisputesTable = ({ data, loading, onRefresh, role = "admin" }) => {
   const navigate = useNavigate();
   /**
    * Universal handler for API-based actions.
    * Executes the call and triggers a data refresh on success.
    */
-  const handleAction = async (apiCall) => {
+  const handleAction = async (apiCallFn) => {
     try {
-      await apiCall;
-      onRefresh();
+      await apiCallFn();
+      onRefresh?.();
     } catch (error) {
       console.error("Action failed:", error);
     }
@@ -72,38 +72,36 @@ const DisputesTable = ({ data, loading, onRefresh, role = "admin", onCustomActio
         const actions = role === "admin"
           ? [
             {
-  label: "Start Review",
-  show: row.status === 'open',
-  onClick: () => handleAction(adminApis.markDisputeInReview(row.id)),
-},
+              label: "Start Review",
+              show: row.status === 'open',
+              onClick: () => handleAction(() => adminApis.markDisputeInReview(row.id)),
+            },
             {
               label: "Refund Buyer",
               icon: Sparkles,
               show: row.status === 'in_review',
-              onClick: () => handleAction(adminApis.resolveDispute(row.id, "buyer_won")),
+              onClick: () => handleAction(() => adminApis.resolveDispute(row.id, "buyer_won")),
               variant: "danger",
             },
             {
               label: "Release to Provider",
               show: row.status === 'in_review',
-              onClick: () => handleAction(adminApis.resolveDispute(row.id, "provider_won")),
+              onClick: () => handleAction(() => adminApis.resolveDispute(row.id, "provider_won")),
               variant: "primary",
             },
           ]
-          : role === "client"
+: role === "client"
             ? [
               {
-              label: "View Details",
-              icon: Eye,
-              onClick: () => navigate(`/dashboard/disputes/${row.id}`),
-            },
-          {
-            label: "Cancel Dispute",
-            show: row.status === 'open',
-            onClick: () => handleAction(cancelMyDispute(row.id)),
-          }
-
-
+                label: "View Details",
+                icon: Eye,
+                onClick: () => navigate(`/dashboard/disputes/${row.id}`),
+              },
+              {
+                label: "Cancel Dispute",
+                show: row.status === 'open',
+                onClick: () => handleAction(() => cancelMyDispute(row.id)),
+              }
             ]
             : [
               {
